@@ -15,54 +15,204 @@ namespace OrchidMod.Content.Guardian
 {
 	public abstract class OrchidModGuardianHammer : OrchidModGuardianItem
 	{
+		/// <summary>
+		/// Time in ticks before the anchor starts to return to the player.
+		/// </summary>
 		public int Range;
+		
+		/// <summary>
+		/// The amount of slams gained from hitting with a fully charged throw.
+		/// </summary>
 		public int SlamStacks;
+		
+		/// <summary>
+		/// The amount of guards gained from hitting with a fully charged throw.
+		/// </summary>
 		public int GuardStacks;
+		
+		/// <summary>
+		/// The time span of blocking with the hammer before it returns in ticks.
+		/// </summary>
 		public int BlockDuration;
+		
+		/// <summary>
+		/// If true, the anchor will penetrate through enemies indefinitely instead of returning on hit.
+		/// <br/> Defaults to <see langword="false"/>.
+		/// </summary>
 		public bool Penetrate;
+		
+		/// <summary>
+		/// If true, the anchor will collide with tiles.
+		/// <br/> Defaults to <see langword="true"/>.
+		/// </summary>
 		public bool TileCollide;
+		
+		/// <summary>
+		/// If true, the anchor will bounce off tiles and preserve its velocity instead of immediately returning on collision.
+		/// <br/>Defaults to <see langword="false"/>.
+		/// </summary>
 		public bool TileBounce;
+		
+		/// <summary>
+		/// Multiplier for the velocity of the hammer when returning to the player.
+		/// </summary>
 		public float ReturnSpeed;
+		
+		/// <summary>
+		/// Multiplier for the speed of a melee swing.
+		/// </summary>
 		public float SwingSpeed;
-		/// <summary>Multiplier for the amount of bonus charge gained from hitting with a melee swing.</summary>
+		
+		/// <summary>
+		/// Multiplier for the amount of bonus charge gained from hitting with a melee swing.
+		/// </summary>
 		public float SwingChargeGain;
+		
+		/// <summary>
+		/// Multiplier for the amount of damage inflicted by a melee swing.
+		/// <br/> If the hammer charge is less than full, this multiplier is increased by 50%.
+		/// </summary>
 		public float SwingDamage;
+		
+		/// <summary>
+		/// Multiplier for the amount of damage inflicted by a throw hit.
+		/// <br>/ If <see cref="Penetrate">Penetrate</see> is false, this multiplier is decreased by 25% for each enemy hit other than the initial target.
+		/// </summary>
 		public float ThrowDamage;
+		
+		/// <summary>
+		/// Multiplier for the amount of damage inflicted by a block hit.
+		/// </summary>
 		public float BlockDamage;
+		
 		public int HitCooldown;
-		/// <summary>If true, the warhammer will never be swung.</summary>
+		
+		/// <summary>
+		/// If true, the warhammer will never be swung.
+		/// </summary>
 		public bool CannotSwing;
-		/// <summary>offsets the drawing of the warhammer while being held (in pixels). Negative values draw it closer, while positive further.</summary>
+		
+		/// <summary>
+		/// Offsets the drawing of the warhammer while being held (in pixels). Negative values draw it closer, while positive further.
+		/// </summary>
 		public float HoldOffset;
-		/// <summary>Multiplier for the initial velocity of the hammer when blocking.</summary>
+		
+		/// <summary>
+		/// Multiplier for the initial velocity of the hammer when blocking.
+		/// </summary>
 		public float BlockVelocityMult;
-		/// <summary>If true, the anchor will load and use ItemName_Hammer.png as its texture.</summary>
+		
+		/// <summary>
+		/// If true, the anchor will load and use ItemName_Hammer.png as its texture.
+		/// </summary>
 		public bool hasSpecialHammerTexture = false;
+		
+		/// <summary>
+		/// The file name of the anchor's texture file, if <see cref="hasSpecialHammerTexture">hasSpecialHammerTexture</see> is true.
+		/// </summary>
 		public virtual string HammerTexture => Texture + "_Hammer";
+		
+		/// <summary>
+		/// Called upon pushing an enemy with a throw (can happen repeatedly).
+		/// </summary>
+		public virtual void OnBlockContact(Player player, OrchidGuardian guardian, NPC target, Projectile projectile) { } 
+		
+		/// <summary>
+		/// Called upon blocking an enemy (1 time per throw per enemy).
+		/// </summary>
+		public virtual void OnBlockNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile) { } 
 
-		public virtual void OnBlockContact(Player player, OrchidGuardian guardian, NPC target, Projectile projectile) { } // Called upon pushing an enemy with a throw (can happen repeatedly)
-		public virtual void OnBlockNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile) { } // Called upon blocking an enemy (1 time per throw per enemy)
-		public virtual void OnBlockFirstNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile) { } // Called upon blocking the first enemy of a blocking throw
-		public virtual bool OnBlockProjectile(Player player, OrchidGuardian guardian, Projectile projectileHammer, Projectile projectileBlocked) { return true; } // Called upon blocking a proejctile, return false to prevent the projectile from being destroyed
-		public virtual void OnBlockFirstProjectile(Player player, OrchidGuardian guardian, Projectile projectileHammer, Projectile projectileBlocked) { } // Called upon blocking the first projectile of a blocking throw
-		public virtual void OnMeleeHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged) { } // Called upon landing any melee swing hit
-		public virtual void OnMeleeHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged) { } // Called upon landing the first hit of a melee swing
-		public virtual void OnThrowHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak) { } // Called upon landing any throw hit
-		public virtual void OnThrowHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak) { } // Called upon landing the first hit of a throw
-		public virtual void OnBlockHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { } // Called upon landing any block hit
-		public virtual void OnBlockHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { } // Called upon landing the first hit of a block
+		/// <summary>
+		/// Called upon blocking the first enemy of a blocking throw.
+		/// </summary>
+		public virtual void OnBlockFirstNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile) { } 
+
+		/// <summary>
+		/// Called upon blocking a proejctile. Return false to prevent the projectile from being destroyed. Returns true by default.
+		/// </summary
+		public virtual bool OnBlockProjectile(Player player, OrchidGuardian guardian, Projectile projectileHammer, Projectile projectileBlocked) { return true; } 
+
+		/// <summary>
+		/// Called upon blocking the first projectile of a blocking throw.
+		/// </summary>
+		public virtual void OnBlockFirstProjectile(Player player, OrchidGuardian guardian, Projectile projectileHammer, Projectile projectileBlocked) { } 
+
+		/// <summary>
+		/// Called upon landing any melee swing hit.
+		/// </summary>
+		public virtual void OnMeleeHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged) { } 
+
+		/// <summary>
+		/// Called upon landing the first hit of a melee swing.
+		/// </summary>
+		public virtual void OnMeleeHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged) { } 
+
+		/// <summary>
+		/// Called upon landing any throw hit.
+		/// </summary>
+		public virtual void OnThrowHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak) { } 
+
+		/// <summary>
+		/// Called upon landing the first hit of a throw.
+		/// </summary>
+		public virtual void OnThrowHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak) { } 
+
+		/// <summary>
+		/// Called upon landing any block hit.
+		/// </summary>
+		public virtual void OnBlockHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { } 
+
+		/// <summary>
+		/// Called upon landing the first hit of a block.
+		/// </summary>
+		public virtual void OnBlockHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { } 
+
+		/// <summary>
+		/// Called upon colliding with a tile.
+		/// </summary>
+		/// <param name="oldVelocity">The velocity of the anchor upon collision.</param>
 		public virtual void OnThrowTileCollide(Player player, OrchidGuardian guardian, Projectile projectile, Vector2 oldVelocity) { }
-		public virtual void OnSwing(Player player, OrchidGuardian guardian, Projectile projectile, bool FullyCharged) { } // Called on the first frame of a throw, FullyCharged is true if the guardian's hammer charge is full, FullyCharged is true if the guardian's hammer charge is full
-		public virtual void OnThrow(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak) { } // Called on the first frame of a swing
-		public virtual void OnBlockThrow(Player player, OrchidGuardian guardian, Projectile projectile) { } // Called on the first frame of a block
-		public virtual void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile) { } // Called at the end of the anchors Projectile AI()
-		/// <summary>Called before default throw AI. Return false to prevent the default AI from running.</summary>
-		/// <remarks>Remember to set <c>Projectile.friendly</c> and <c>OrchidModGuardianProjectile.ResetHitStatus()</c> if overriding default behavior.</remarks>
+
+		/// <summary>
+		/// Called on the first frame of a throw.
+		/// </summary>
+		/// <param name="FullyCharged">Whether or not the guardian's hammer charge is full.</param>
+		public virtual void OnSwing(Player player, OrchidGuardian guardian, Projectile projectile, bool FullyCharged) { } 
+
+		/// <summary>
+		/// Called on the first frame of a swing.
+		/// </summary>
+		public virtual void OnThrow(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak) { } 
+
+		/// <summary>
+		/// Called on the first frame of a block.
+		/// </summary>
+		public virtual void OnBlockThrow(Player player, OrchidGuardian guardian, Projectile projectile) { } 
+
+		/// <summary>
+		/// Allows you to determine how this projectile behaves. This will be called at the end of the anchor's <c>Projectile.AI()</c>. 
+		/// </summary>
+		public virtual void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile) { } 
+		
+		/// <summary>
+		/// Called before default throw AI. Return false to prevent the default AI from running.
+		/// </summary>
+		/// <remarks>
+		/// Remember to set <c>Projectile.friendly</c> and <c>OrchidModGuardianProjectile.ResetHitStatus()</c> if overriding default behavior.
+		/// </remarks>
 		public virtual bool ThrowAI(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak) => true;
-		/// <summary>Called before drawing the hammer. Return false to prevent the default draw code from running.</summary>
-		/// <remarks>The default draw code will use hammerTexture and drawRectangle (which defaults to null)</remarks>
+		
+		/// <summary>
+		/// Called before drawing the hammer. Return false to prevent the default draw code from running.
+		/// </summary>
+		/// <remarks>
+		/// The default draw code will use hammerTexture and drawRectangle (which defaults to null)
+		/// </remarks>
 		public virtual bool PreDrawHammer(Player player, OrchidGuardian guardian, Projectile projectile, SpriteBatch spriteBatch, ref Color lightColor, ref Texture2D hammerTexture, ref Rectangle drawRectangle) => true;
-		/// <summary>Called after drawing the hammer.</summary>
+		
+		/// <summary>
+		/// Called after drawing the hammer.
+		/// </summary>
 		public virtual void PostDrawHammer(Player player, OrchidGuardian guardian, Projectile projectile, SpriteBatch spriteBatch, Color lightColor, Texture2D hammerTexture, Rectangle drawRectangle) { }
 
 		public sealed override void SetDefaults()

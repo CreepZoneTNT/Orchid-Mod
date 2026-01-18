@@ -214,6 +214,7 @@ namespace OrchidMod.Content.Guardian
 		/// Called after drawing the hammer.
 		/// </summary>
 		public virtual void PostDrawHammer(Player player, OrchidGuardian guardian, Projectile projectile, SpriteBatch spriteBatch, Color lightColor, Texture2D hammerTexture, Rectangle drawRectangle) { }
+		public virtual Color GetHammerGlowmaskColor(Player player, OrchidGuardian guardian, Projectile projectile, Color lightColor) => Color.White;
 
 		public sealed override void SetDefaults()
 		{

@@ -52,6 +52,10 @@ namespace OrchidMod.Content.Guardian
 		public virtual void SafeHoldItem(Player player) { }
 		public virtual Color GetGauntletGlowmaskColor(Player player, OrchidGuardian guardian, Projectile projectile, Color lightColor) => Color.White;
 
+		public bool hasSpecialPunchTexture = false;
+		public virtual string PunchTexture(Player player, OrchidGuardian guardian, Projectile anchor, bool offHandGauntlet) => "OrchidMod/Content/Guardian/GuardianPunchProjectile";
+
+
 		public float StrikeVelocity = 10f; // Initial speed of the punches
 		/// <summary> Jab and slam animation speed multiplier. Also affected by melee speed, but not by usetime. </summary>
 		public float PunchSpeed = 1f;

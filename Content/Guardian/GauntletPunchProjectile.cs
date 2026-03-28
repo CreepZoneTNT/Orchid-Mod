@@ -1,7 +1,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OrchidMod.Utilities;
+using OrchidMod.Content.Guardian;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -10,16 +12,16 @@ namespace OrchidMod.Content.Guardian
 {
 	public class GauntletPunchProjectile : OrchidModGuardianAnchor
 	{
-		private static Texture2D TextureMain;
+		public Texture2D TextureMain;
 		public OrchidModGuardianGauntlet GauntletItem;
 		public bool ChargedHit => Projectile.ai[0] == 1f;
 		public bool OffHand => Projectile.ai[1] == 1f;
 		public bool FirstFrame = false;
 
-		public override void Load()
-		{
-			TextureMain ??= ModContent.Request<Texture2D>(Texture, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
-		}
+		// public override void Load()
+		// {
+		// 	TextureMain ??= ModContent.Request<Texture2D>(Texture, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+		// }
 
 		public override void SafeSetDefaults()
 		{
@@ -38,28 +40,26 @@ namespace OrchidMod.Content.Guardian
 			Projectile.localNPCHitCooldown = 90;
 		}
 
-		public override void AI()
+		public override void OnSpawn(IEntitySource source) 
 		{
-
-			Player owner = Main.player[Projectile.owner];
-			if (!Initialized)
-			{
-				Initialized = true;
+			if (source is EntitySource_Parent parent && parent.Entity is Projectile parentProj && parentProj.ModProjectile is GuardianGauntletAnchor anchor) {
+				Player owner = Main.player[Projectile.owner];
 				Projectile.rotation = (Projectile.velocity - owner.velocity * 0.375f).ToRotation();
 				if (ChargedHit) Strong = true;
 				if (!IsLocalOwner)
 				{
 					foreach (Projectile projectile in Main.projectile)
 					{ // This cannot be reliably synced with packets (?)
-						if (projectile.ModProjectile is GuardianGauntletAnchor anchor && projectile.owner == Projectile.owner && projectile.active)
-						{
-							GauntletItem = anchor.GauntletItem.ModItem as OrchidModGuardianGauntlet;
-						}
+						if (projectile.ModProjectile is GuardianGauntletAnchor otherAnchor && projectile.owner == Projectile.owner && projectile.active)
+							GauntletItem = otherAnchor.GauntletItem.ModItem as OrchidModGuardianGauntlet;
 					}
 
 					owner.GetModPlayer<OrchidGuardian>().GuardianItemCharge = 0; // probably not the best place to put this but it works. (fixes a minor visual issue)
 					SoundEngine.PlaySound(ChargedHit ? SoundID.DD2_MonkStaffGroundMiss : SoundID.DD2_MonkStaffSwing, owner.Center);
 				}
+				TextureMain = ModContent.Request<Texture2D>(Texture, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+				if (GauntletItem != null && GauntletItem.hasSpecialPunchTexture) TextureMain = ModContent.Request<Texture2D>(GauntletItem.PunchTexture(owner, Owner.GetModPlayer<OrchidGuardian>(), anchor.Projectile, OffHand), ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+
 
 				float scale = Owner.GetModPlayer<OrchidGuardian>().GuardianWeaponScale;
 				if (scale != 1f)
@@ -71,8 +71,20 @@ namespace OrchidMod.Content.Guardian
 					Projectile.Center = oldCenter;
 				}
 			}
-			else
-			{
+		
+		}
+
+
+		public override void AI()
+		{
+			Player owner = Main.player[Projectile.owner];
+			// if (!Initialized)
+			// {
+			// 	Initialized = true;
+				
+			// }
+			// else
+			// {
 				if (!FirstFrame)
 				{
 					FirstFrame = true;
@@ -87,7 +99,7 @@ namespace OrchidMod.Content.Guardian
 				{
 					Projectile.velocity *= 0.94574f;
 				}
-			}
+			// }
 		}
 
 		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)

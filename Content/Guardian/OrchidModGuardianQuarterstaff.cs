@@ -48,6 +48,7 @@ namespace OrchidMod.Content.Guardian
 		public int ParryDuration = 60; // Parry duration in ticks
 		public int SlamStacks; // Stam Stacks given by the item
 		public int GuardStacks; // Block Stacks given by the item
+		public float ChargeRate = 1f; // Charge generation multiplier
 		public float JabSpeed = 1f; // Jab speed multiplier
 		public float SwingSpeed = 1f; // swing speed multiplier
 		public float CounterSpeed = 1f; // spin speed multiplier

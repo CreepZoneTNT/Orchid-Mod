@@ -279,7 +279,7 @@ namespace OrchidMod.Content.Guardian
 					Projectile.friendly = false;
 					if (guardian.GuardianItemCharge < 180f)
 					{ // Increase guardian charge
-						guardian.GuardianItemCharge += 30f / guardianItem.Item.useTime * owner.GetTotalAttackSpeed(DamageClass.Melee);
+						guardian.GuardianItemCharge += 30f / guardianItem.Item.useTime * owner.GetTotalAttackSpeed(DamageClass.Melee) * guardianItem.ChargeRate;
 						if (guardian.GuardianItemCharge > 180f) guardian.GuardianItemCharge = 180f;
 					}
 

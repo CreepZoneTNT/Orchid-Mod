@@ -305,7 +305,7 @@ namespace OrchidMod.Content.Guardian
 
 							if (guardian.GuardianItemCharge < 210f)
 							{
-								guardian.GuardianItemCharge += 30f / HammerItem.Item.useTime * owner.GetTotalAttackSpeed(DamageClass.Melee);
+								guardian.GuardianItemCharge += 30f / HammerItem.Item.useTime * owner.GetTotalAttackSpeed(DamageClass.Melee) * HammerItem.ChargeRate;
 
 								if (guardian.GuardianItemCharge > 210f) guardian.GuardianItemCharge = 210f;
 							}

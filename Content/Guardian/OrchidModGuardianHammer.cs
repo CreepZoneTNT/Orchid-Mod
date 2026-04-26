@@ -23,6 +23,8 @@ namespace OrchidMod.Content.Guardian
 		public bool Penetrate;
 		public bool TileCollide;
 		public bool TileBounce;
+		/// <summary>Multiplier for the speed of charge generation.</summary>
+		public float ChargeRate;
 		public float ReturnSpeed;
 		public float SwingSpeed;
 		/// <summary>Multiplier for the amount of bonus charge gained from hitting with a melee swing.</summary>
@@ -90,6 +92,7 @@ namespace OrchidMod.Content.Guardian
 			TileCollide = true;
 			SlamStacks = 0;
 			ThrowDamage = 1f;
+			ChargeRate = 1f;
 			ReturnSpeed = 1f;
 			SwingSpeed = 1f;
 			SwingDamage = 0.5f;

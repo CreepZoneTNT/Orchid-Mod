@@ -65,6 +65,7 @@ namespace OrchidMod
 		public bool GuardianSharpRebuttalParry = false;
 		public bool GuardianWormTooth = false;
 		public bool GuardianMonsterFang = false;
+		public bool GuardianShieldSupport = false;
 		public bool GuardianStandardDesert = false; // Standards
 		public int GuardianStandardStarScouter = -1; //Points to current StarScouterStandard holder
 		public bool GuardianStandardStarScouterWarp = false;
@@ -406,6 +407,7 @@ namespace OrchidMod
 			GuardianHoneyPotion = false;
 			GuardianWormTooth = false;
 			GuardianMonsterFang = false;
+			GuardianShieldSupport = false;
 			GuardianInfiniteResources = (Player.creativeGodMode || CrossModGodMode);
 			GuardianShowDebugVisuals = false;
 			GuardianBronzeShieldBuff = false;

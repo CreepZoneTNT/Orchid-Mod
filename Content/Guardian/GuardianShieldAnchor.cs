@@ -9,6 +9,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+using CollisionLib;
 
 namespace OrchidMod.Content.Guardian
 {
@@ -30,6 +31,8 @@ namespace OrchidMod.Content.Guardian
 		public Vector2 hitboxOrigin = Vector2.Zero;
 
 		public float networkedRotation => Projectile.ai[2];
+
+		public CollisionSurface[] colliders;
 
 		// ...
 		public bool IsRotationLocked;
@@ -79,6 +82,14 @@ namespace OrchidMod.Content.Guardian
 			{
 				guardianItem.SlamHitFirst(owner, Projectile, target);
 			}
+		}
+
+		public override bool OrchidPreAI()
+		{
+			if (colliders == null || colliders.Length != 1)
+				colliders = [ new(Projectile.TopLeft, Projectile.BottomLeft, [2, 1, 0, 1]) ];
+
+			return true;
 		}
 
 		public override void AI()
@@ -242,6 +253,16 @@ namespace OrchidMod.Content.Guardian
 						}
 					}
 
+					if (colliders != null && colliders.Length == 1 && guardian.GuardianShieldSupport) 
+					{
+						colliders[0].Update();
+						if (Projectile.Center.Y > owner.MountedCenter.Y)
+							colliders[0].collisionStyles = [0, 1, 0, 1];
+						else colliders[0].collisionStyles = [2, 1, 0, 1];
+						colliders[0].endPoints[0] = p1.ToVector2();
+						colliders[0].endPoints[1] = p2.ToVector2();
+					}
+
 					Projectile.ai[0] --;
 					if (Projectile.ai[0] <= 0f)
 					{
@@ -315,6 +336,17 @@ namespace OrchidMod.Content.Guardian
 
 			oldOwnerPos = owner.Center;
 			guardianItem.ExtraAIShield(Projectile);
+		}
+
+		public override void SafePostAI()
+		{
+			if (colliders != null)
+			{
+				foreach (CollisionSurface surface in colliders)
+					surface.PostUpdate();
+
+			}
+
 		}
 
 		// https://stackoverflow.com/questions/5514366/how-to-know-if-a-line-intersects-a-rectangle

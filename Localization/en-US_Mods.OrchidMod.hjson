@@ -3174,6 +3174,11 @@ Items: {
 		DisplayName: Ice Gauntlet
 		Tooltip: ""
 	}
+
+	ShieldSupport: {
+		DisplayName: Reinforced Plank
+		Tooltip: Allows players to stand on top of your shields
+	}
 }
 
 NPCs: {

@@ -18,9 +18,12 @@ namespace OrchidMod.Content.Guardian
 	public abstract class OrchidModGuardianQuarterstaff : OrchidModGuardianParryItem
 	{
 		public virtual string QuarterstaffTexture => Texture + "_Staff";
-		public virtual void OnHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, HitInfo hit, bool jabAttack, bool counterAttack) { } // Called when hitting a target during an attack
-		public virtual void OnHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, HitInfo hit, bool jabAttack, bool counterAttack) { } // Called when hitting the first target for the first time during an attack
+		public virtual void OnHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, NPC.HitInfo hit, bool jabAttack, bool counterAttack) { } // Called when hitting a target during an attack
+		public virtual void OnHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, NPC.HitInfo hit, bool jabAttack, bool counterAttack) { } // Called when hitting the first target for the first time during an attack
+		public virtual void OnHitPlayer(Player player, OrchidGuardian guardian, Player target, Projectile projectile, Player.HurtInfo hit, bool jabAttack, bool counterAttack) { } // Called when hitting a player during an attack
+		public virtual void OnHitPlayerFirst(Player player, OrchidGuardian guardian, Player target, Projectile projectile, Player.HurtInfo hit, bool jabAttack, bool counterAttack) { } // Called when hitting the first player for the first time during an attack
 		public virtual void QuarterstaffModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref NPC.HitModifiers modifiers, bool jabAttack, bool counterAttack, bool firstHit) { } // anchor's modifyhitNPC
+		public virtual void QuarterstaffModifyHitPlayer(Player player, OrchidGuardian guardian, Player target, Projectile projectile, ref Player.HurtModifiers modifiers, bool jabAttack, bool counterAttack, bool firstHit) { } // anchor's modifyhitPlayer
 		public virtual void OnAttack(Player player, OrchidGuardian guardian, Projectile projectile, bool jabAttack, bool counterAttack) { } // Called on the first frame of an attack
 		/// <summary>Called before uncharged jab or mid-charging jab AI is executed, including repositioning the quarterstaff and the player's arms for its attack animation. Return false to prevent normal AI from running, effectively overriding <c>JabStyle</c>.</summary>
 		/// <remarks>During a jab, <c>Projectile.ai[0]</c> is set to -40 as an animation timer and incremented by <c>JabSpeed</c> every frame until it reaches 0. Use <c>Projectile.ResetLocalNPCHitImmunity()</c> for multi-swing animations to allow them to hit multiple times. See <c>GuardianQuarterstaffAnchor</c> for examples of default <c>JabStyle</c> behavior.</remarks>

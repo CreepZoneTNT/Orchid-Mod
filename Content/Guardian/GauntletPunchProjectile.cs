@@ -96,6 +96,12 @@ namespace OrchidMod.Content.Guardian
 			GauntletItem.GauntletModifyHitNPC(owner, owner.GetModPlayer<OrchidGuardian>(), target, Projectile, ref modifiers, ChargedHit);
 		}
 
+		public override void SafeModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
+		{
+			var owner = Main.player[Projectile.owner];
+			GauntletItem.GauntletModifyHitPlayer(owner, owner.GetModPlayer<OrchidGuardian>(), target, Projectile, ref modifiers, ChargedHit);
+		}
+
 		public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone, Player player, OrchidGuardian guardian)
 		{
 			var owner = Main.player[Projectile.owner];
@@ -120,6 +126,17 @@ namespace OrchidMod.Content.Guardian
 					GauntletItem.OnHitFirst(owner, guardian, target, Projectile, hit, ChargedHit);
 				}
 				GauntletItem.OnHit(owner, guardian, target, Projectile, hit, ChargedHit);
+			}
+		}
+
+		public override void SafeOnHitPlayer(Player target, Player.HurtInfo hit, Player player, OrchidGuardian guardian)
+		{
+			var owner = Main.player[Projectile.owner];
+			if (!owner.active || owner.dead || GauntletItem == null) return;
+			else
+			{
+				if (FirstHit) GauntletItem.OnHitPlayerFirst(owner, guardian, target, Projectile, hit, ChargedHit);
+				GauntletItem.OnHitPlayer(owner, guardian, target, Projectile, hit, ChargedHit);
 			}
 		}
 

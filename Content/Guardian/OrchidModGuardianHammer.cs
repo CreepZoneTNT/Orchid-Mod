@@ -57,6 +57,8 @@ namespace OrchidMod.Content.Guardian
 		public virtual void OnThrowHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak) { } // Called upon landing the first hit of a throw
 		public virtual void OnBlockHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { } // Called upon landing any block hit
 		public virtual void OnBlockHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { } // Called upon landing the first hit of a block
+		public virtual void OnPlayerHit(Player player, OrchidGuardian guardian, Player target, Projectile projectile, float knockback, bool Weak, bool Melee, bool Throw, bool Block) {}
+		public virtual void OnPlayerHitFirst(Player player, OrchidGuardian guardian, Player target, Projectile projectile, float knockback, bool Weak, bool Melee, bool Throw, bool Block) {}
 		public virtual void WarhammerModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref HitModifiers modifiers, bool FullyCharged, bool Melee, bool Block, bool firstHit) { }
 		public virtual void OnThrowTileCollide(Player player, OrchidGuardian guardian, Projectile projectile, Vector2 oldVelocity) { }
 		public virtual void OnSwing(Player player, OrchidGuardian guardian, Projectile projectile, bool FullyCharged) { } // Called on the first frame of a throw, FullyCharged is true if the guardian's hammer charge is full, FullyCharged is true if the guardian's hammer charge is full
@@ -140,7 +142,11 @@ namespace OrchidMod.Content.Guardian
 				if (SlamBlockCost > 0) guardian.UseSlam(SlamBlockCost);
 				if (GuardBlockCost > 0) guardian.UseGuard(GuardBlockCost);
 				projectile.velocity = Vector2.Normalize(Main.MouseWorld - player.Center) * (10f + (Item.shootSpeed - 10f) * 0.35f * BlockVelocityMult);
+				if (projectile.friendly != true)
+				{
 				projectile.friendly = true;
+					projectile.netUpdate = true;
+				}
 				projectile.knockBack = 0f;
 				projectile.tileCollide = true;
 

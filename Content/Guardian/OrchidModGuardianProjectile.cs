@@ -10,7 +10,9 @@ namespace OrchidMod.Content.Guardian
 	public abstract class OrchidModGuardianProjectile : OrchidModProjectile
 	{
 		public virtual void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone, Player player, OrchidGuardian guardian) { }
+		public virtual void SafeOnHitPlayer(Player target, Player.HurtInfo hit, Player attacker, OrchidGuardian guardian) { }
 		public virtual void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers) { }
+		public virtual void SafeModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers) { }
 		/// <summary>Set to false in ModifyHitNPC when this projectile or specific anchor attack hits an enemy a second time. Flagged before most hit functions.</summary>
 		/// <remarks>As the name suggests, this will be true on only the first time hit functions are called. Useful for effects that are only supposed to trigger once per projectile, such as resource generation.</remarks>
 		public bool FirstHit;
@@ -45,6 +47,14 @@ namespace OrchidMod.Content.Guardian
 			SafeOnHitNPC(target, hit, damageDone, player, guardian);
 		}
 
+		public override void OnHitPlayer(Player target, Player.HurtInfo info)
+		{
+			Player player = Main.player[Projectile.owner];
+			OrchidGuardian guardian = player.GetModPlayer<OrchidGuardian>();
+
+			SafeOnHitPlayer(target, info, player, guardian);
+		}
+
 		public sealed override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
 		{
 			FirstHit = NotHitYet;
@@ -65,6 +75,16 @@ namespace OrchidMod.Content.Guardian
 				}
 			}
 		}
+
+		public sealed override void ModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
+		{
+			FirstHit = NotHitYet;
+			NotHitYet = false;
+			SafeModifyHitPlayer(target, ref modifiers);
+
+			// the modTarget.GuardianHit check/packet only seems to be for spawning Guardian resources on death
+			// players in PVP do not drop resources on death, though, so the code is irrelevant
+		} 
 	}
 
 	public abstract class OrchidModGuardianAnchor : OrchidModGuardianProjectile {} // Only used to "fake" true melee hits when hitting with those projectiles

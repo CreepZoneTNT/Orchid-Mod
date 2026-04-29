@@ -12,7 +12,6 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using static Terraria.NPC;
 
 namespace OrchidMod.Content.Guardian
 {
@@ -27,21 +26,28 @@ namespace OrchidMod.Content.Guardian
 		public virtual string GauntletBackTexture => Texture + "_GauntletBack";
 		public virtual string ArmTexture => Texture + "_Arm";
 		public virtual string ShoulderTexture => Texture + "_Shoulder";
-		public virtual void OnHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, HitInfo hit, bool charged) { }
-		public virtual void OnHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, HitInfo hit, bool charged) { }
-		public virtual void GauntletModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref HitModifiers modifiers, bool charged) { }
+		public virtual void OnHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, NPC.HitInfo hit, bool charged) { }
+		public virtual void OnHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, NPC.HitInfo hit, bool charged) { }
+		public virtual void OnHitPlayer(Player player, OrchidGuardian guardian, Player target, Projectile projectile, Player.HurtInfo hit, bool charged) { }
+		public virtual void OnHitPlayerFirst(Player player, OrchidGuardian guardian, Player target, Projectile projectile, Player.HurtInfo hit, bool charged) { }
+		public virtual void GauntletModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref NPC.HitModifiers modifiers, bool charged) { }
+		public virtual void GauntletModifyHitPlayer(Player player, OrchidGuardian guardian, Player target, Projectile projectile, ref Player.HurtModifiers modifiers, bool charged) { }
 		/// <summary> Called right before a punch projectile is spawned. Return false to prevent normal punch projectiles from spawning. </summary>
 		public virtual bool OnPunch(Player player, OrchidGuardian guardian, Projectile projectile, bool offHandGauntlet, bool manuallyFullyCharged, ref bool charged, ref int damage) => true;
 		/// <summary> Called after the player parries damage. </summary>
 		public virtual void OnParryGauntlet(Player player, OrchidGuardian guardian, Entity aggressor, Projectile anchor) { }
 		/// <summary> Called when the player presses the guard button to begin guarding while at least one gauntlet can guard. Return false to prevent guarding. Defaults to <c>guardian.UseGuard(1)</c>. Returning true without calling <c>guardian.UseGuard</c> will allow the player to guard without resources. </summary>
+		/// <param name="player"> The player pressing the guard button. </param>
+		/// <param name="guardian"> The <c>OrchidGuardian</c> instance of the guarding player.</param>
 		/// <param name="anchor"> A gauntlet currently eligible for parrying. Will be the main hand gauntlet if both can parry. </param>
 		public virtual bool PreGuard(Player player, OrchidGuardian guardian, Projectile anchor) { return guardian.UseGuard(1); }
+		/// <summary> Called before the punch projectile's AI is executed, including the deceleration of the projectile. Return false to prevent normal AI from running. </summary>
 		public virtual bool ProjectileAI(Player player, Projectile projectile, bool charged) => true;
 		public virtual void ExtraAIGauntlet(Player player, OrchidGuardian guardian, Projectile anchor, bool offHandGauntlet) { }
 		public virtual void PostDrawGauntlet(SpriteBatch spriteBatch, Projectile projectile, Player player, bool offHandGauntlet, Color lightColor) { }
 		public virtual bool PreDrawGauntlet(SpriteBatch spriteBatch, Projectile projectile, Player player, bool offHandGauntlet, ref Color lightColor) { return true; }
 		public virtual void SafeModifyTooltips(List<TooltipLine> tooltips) { } // Called at the end of ModifyTooltips
+		public virtual bool? CanInstantSlam(Player player, OrchidGuardian guardian, Projectile projectile, bool offHandGauntlet) => null;
 
 		public virtual Color GetColor(bool offHand) => Color.White;
 		/// <summary> Responsible for playing the sound when the player begins guarding with the weapon. Default behavior is <c>SoundEngine.PlaySound(SoundID.Item37, player.Center);</c> </summary>

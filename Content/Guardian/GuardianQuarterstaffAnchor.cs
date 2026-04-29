@@ -72,8 +72,8 @@ namespace OrchidMod.Content.Guardian
 			Projectile.ai[0] = 0f;
 			guardian.GuardianItemCharge = 0;
 			SelectedItem = owner.selectedItem;
-			Projectile.netUpdate = true;
 			Projectile.friendly = false;
+			Projectile.netUpdate = true;
 
 			if (QuarterstaffItem.ModItem is OrchidModGuardianQuarterstaff guardianItem)
 			{
@@ -126,7 +126,11 @@ namespace OrchidMod.Content.Guardian
 
 				if (Projectile.ai[2] > 0f)
 				{ // Blocking
-					Projectile.friendly = false;
+					if (Projectile.friendly != false)
+					{
+						Projectile.friendly = false;
+						Projectile.netUpdate = true;
+					}
 					guardian.GuardianGauntletParry = true;
 					guardian.GuardianGauntletParry2 = true;
 
@@ -188,6 +192,7 @@ namespace OrchidMod.Content.Guardian
 							Projectile.CritChance = guardian.GetGuardianCrit(QuarterstaffItem.crit);
 							Projectile.knockBack = QuarterstaffItem.knockBack * guardianItem.CounterKnockback;
 							Projectile.friendly = true;
+							Projectile.netUpdate = true;
 							Projectile.ResetLocalNPCHitImmunity();
 							ResetHitStatus(true);
 							DamageReset = 1;
@@ -246,6 +251,7 @@ namespace OrchidMod.Content.Guardian
 						Projectile.ai[2] = 0f;
 						ResetSize();
 						Projectile.friendly = false;
+						Projectile.netUpdate = true;
 
 						if (IsLocalOwner)
 						{
@@ -276,7 +282,11 @@ namespace OrchidMod.Content.Guardian
 				}
 				else if (Projectile.ai[0] == 1f)
 				{ // Being charged by the player
-					Projectile.friendly = false;
+					if (Projectile.friendly != false)
+					{
+						Projectile.friendly = false;
+						Projectile.netUpdate = true;
+					}
 					if (guardian.GuardianItemCharge < 180f)
 					{ // Increase guardian charge
 						guardian.GuardianItemCharge += 30f / guardianItem.Item.useTime * owner.GetTotalAttackSpeed(DamageClass.Melee) * guardianItem.ChargeRate;
@@ -354,6 +364,7 @@ namespace OrchidMod.Content.Guardian
 						Projectile.CritChance = guardian.GetGuardianCrit(QuarterstaffItem.crit);
 						Projectile.knockBack = QuarterstaffItem.knockBack * guardianItem.JabKnockback;
 						Projectile.friendly = true;
+						Projectile.netUpdate = true;
 						DamageReset = 0;
 						Projectile.ResetLocalNPCHitImmunity();
 						SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing, Projectile.Center);
@@ -409,6 +420,7 @@ namespace OrchidMod.Content.Guardian
 
 						Projectile.ai[1] = 0f;
 						Projectile.friendly = false;
+						Projectile.netUpdate = true;
 
 						if (Main.mouseLeft && Main.mouseRight)
 						{ // Perfect jab loop while holding the attack
@@ -433,6 +445,7 @@ namespace OrchidMod.Content.Guardian
 						Projectile.CritChance = guardian.GetGuardianCrit(QuarterstaffItem.crit);
 						Projectile.knockBack = QuarterstaffItem.knockBack * guardianItem.SwingKnockback;
 						Projectile.friendly = true;
+						Projectile.netUpdate = true;
 						DamageReset = 0;
 						Projectile.ResetLocalNPCHitImmunity();
 						SoundEngine.PlaySound(QuarterstaffItem.UseSound, Projectile.Center);
@@ -510,6 +523,7 @@ namespace OrchidMod.Content.Guardian
 						Projectile.ai[0] = 0f;
 						Projectile.ai[1] = 0f;
 						Projectile.friendly = false;
+						Projectile.netUpdate = true;
 					}
 
 					guardianItem.ExtraAIQuarterstaffSwinging(owner, guardian, Projectile);
@@ -518,7 +532,11 @@ namespace OrchidMod.Content.Guardian
 				{ // Idle - guarterstaff is held further and lower
 					ResetSize();
 					Ding = false;
-					Projectile.friendly = false;
+					if (Projectile.friendly != false)
+					{
+						Projectile.friendly = false;
+						Projectile.netUpdate = true;
+					}
 
 					Projectile.Center = owner.MountedCenter.Floor() + new Vector2(12f * owner.direction, 0f);
 					Projectile.rotation = MathHelper.PiOver4 * owner.direction - MathHelper.PiOver4;
@@ -588,7 +606,11 @@ namespace OrchidMod.Content.Guardian
 				case 0:
 					if (ai <= 30)
 					{ // Returning
-						Projectile.friendly = false;
+						if (Projectile.friendly != false)
+						{
+							Projectile.friendly = false;
+							Projectile.netUpdate = true;
+						}
 						Projectile.rotation = Projectile.ai[1] - MathHelper.PiOver4 + (float)Math.Sin(0.1046f * (30 - ai)) * 0.4f * -player.direction + MathHelper.Pi;
 						Projectile.Center = player.MountedCenter.Floor() + Vector2.UnitY.RotatedBy(Projectile.ai[1]) * (38f - (float)Math.Sin(0.0523f * (30 - ai)) * 24f);
 						Projectile.position.Y -= (float)Math.Sin(0.0523f * (30 - ai)) * 2f;
@@ -624,7 +646,11 @@ namespace OrchidMod.Content.Guardian
 					}
 					else
 					{ // Returning
-						Projectile.friendly = false;
+						if (Projectile.friendly != false)
+						{
+							Projectile.friendly = false;
+							Projectile.netUpdate = true;
+						}
 						Projectile.rotation = Projectile.ai[1] - MathHelper.PiOver4 + (-0.5f * 1.1f - (float)Math.Sin(0.12f * -ai + 2.88f) + 0.8f) * -player.direction + MathHelper.Pi;
 						Projectile.Center = player.MountedCenter.Floor() + Vector2.UnitY.RotatedBy(Projectile.ai[1] + (-0.5f - (float)Math.Sin(0.12f * -ai + 2.88f) + 0.8f) * -player.direction) * (ai * 0.75f + 9.75f);
 						player.SetCompositeArmFront(true, CompositeArmStretchAmount.Quarter, MathHelper.PiOver4 * player.direction + Projectile.ai[1] + 0.1f + (float)Math.Cos(0.145f * (ai - 9)) * player.direction + (19 - ai) * 0.04f * player.direction);
@@ -719,6 +745,49 @@ namespace OrchidMod.Content.Guardian
 				modifiers.FinalDamage *= 0.5f;
 			}
 		}
+
+		public override void SafeOnHitPlayer(Player target, Player.HurtInfo hit, Player player, OrchidGuardian guardian)
+		{
+			if (QuarterstaffItem.ModItem is OrchidModGuardianQuarterstaff guardianItem)
+			{
+				if (Projectile.ai[0] > 1f)
+				{ // Swing
+					if (FirstHit)
+					{
+						guardian.AddGuard(guardianItem.GuardStacks);
+						guardian.AddSlam(guardianItem.SlamStacks);
+						guardianItem.OnHitPlayerFirst(player, guardian, target, Projectile, hit, false, false);
+					}
+					guardianItem.OnHitPlayer(player, guardian, target, Projectile, hit, false, false);
+				}
+				else if (Projectile.ai[0] < 0f)
+				{ // Jab
+					if (FirstHit) guardianItem.OnHitPlayerFirst(player, guardian, target, Projectile, hit, true, false);
+					guardianItem.OnHitPlayer(player, guardian, target, Projectile, hit, true, false);
+				}
+				else
+				{ // Counterattack
+					if (FirstHit) guardianItem.OnHitPlayerFirst(player, guardian, target, Projectile, hit, false, true);
+					guardianItem.OnHitPlayer(player, guardian, target, Projectile, hit, false, true);
+				}
+			}
+		}
+
+		public override void SafeModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
+		{
+			if (QuarterstaffItem.ModItem is OrchidModGuardianQuarterstaff guardianItem)
+			{
+				Player player = Owner;
+				OrchidGuardian guardian = player.GetModPlayer<OrchidGuardian>();
+				if ((Projectile.ai[0] > 1f && guardianItem.SwingStyle == 1 && DamageReset == 0) || (Projectile.ai[0] < 0f && guardianItem.JabStyle == 1 && DamageReset == 0))
+					modifiers.Knockback *= 0.1f; //90% reduced kb on initial hit of double swing
+				if (Projectile.ai[2] < 0f && DamageReset < guardianItem.CounterHits)
+					modifiers.Knockback /= guardianItem.CounterHits - DamageReset;
+				guardianItem.QuarterstaffModifyHitPlayer(player, guardian, target, Projectile, ref modifiers, Projectile.ai[0] < 0f, Projectile.ai[2] < 0f, FirstHit);
+			}
+		}
+
+		public override bool CanHitPvp(Player target) => Projectile.friendly && (target.Hitbox.Intersects(HitBox[0]) || target.Hitbox.Intersects(HitBox[1]) || target.Hitbox.Intersects(HitBox[2])) && (Projectile.ai[0] > 1f || Projectile.ai[0] < 0f || Projectile.ai[2] < 0f);
 
 		public void ResetSize()
 		{

@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -17,7 +18,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 		{
 			Projectile.width = 14;
 			Projectile.height = 10;
-			Projectile.friendly = true;
+			Projectile.friendly = false;
 			Projectile.aiStyle = -1;
 			Projectile.timeLeft = 630;
 			Projectile.scale = 0.66f;
@@ -26,7 +27,6 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = 10;
 			Projectile.tileCollide = false;
-			Projectile.friendly = false;
 		}
 
 		public override void AI()
@@ -38,16 +38,18 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 				Initialized = true;
 				Projectile.frame = Main.rand.Next(4);
 				Projectile.localAI[0] = Main.rand.Next(2);
-				Projectile.localAI[1] = Main.rand.NextFloat(- 48f, 48f);
-				Projectile.localAI[2] = Main.rand.NextFloat(-48f, 48f);
 				Projectile.ai[0] += Main.rand.NextFloat(1f, 2f);
 				Projectile.ai[2] = -1f;
+
+				Projectile.netUpdate = true;
 
 				SoundStyle soundStyle = Main.rand.NextBool(3) ? SoundID.Zombie83 : Main.rand.NextBool() ? SoundID.Zombie81 : SoundID.Zombie82;
 				soundStyle.Pitch = Main.rand.NextFloat(1.4f, 1.8f);
 				soundStyle.Volume *= 0.1f;
 				SoundEngine.PlaySound(soundStyle, Projectile.Center);
 			}
+
+        	if (Owner.dead) Projectile.Kill();
 
 			if (Projectile.localAI[0] < 0.85f)
 			{
@@ -129,16 +131,18 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 							Projectile.velocity *= 0f;
 							Projectile.netUpdate = true;
 						}
-						else
-						{
-							Projectile.Kill();
-						}
+						else Projectile.Kill();
 					}
 				}
 			}
 			else
 			{ // homing
-				Projectile.friendly = true;
+				if (Projectile.friendly != true)
+				{
+					Projectile.friendly = true;
+					Projectile.netUpdate = true;
+				}
+
 				if (Projectile.ai[1] != 0f)
 				{
 					timerNoReach = 0;
@@ -216,6 +220,8 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 				}
 			}
 		}
+
+		public override bool CanHitPvp(Player target) => Projectile.friendly && !(Projectile.ai[2] < 0f);
 
 		public override bool OrchidPreDraw(SpriteBatch spriteBatch, ref Color lightColor)
 		{

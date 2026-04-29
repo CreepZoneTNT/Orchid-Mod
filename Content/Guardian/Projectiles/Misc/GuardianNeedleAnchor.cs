@@ -68,8 +68,8 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 			Projectile.ai[0] = 0f;
 			guardian.GuardianItemCharge = 0;
 			SelectedItem = owner.selectedItem;
-			Projectile.netUpdate = true;
 			Projectile.friendly = false;
+			Projectile.netUpdate = true;
 
 			if (GuardianItem.ModItem is GuardianNeedle guardianItem)
 			{
@@ -117,7 +117,11 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 
 				if (Projectile.ai[2] > 0f)
 				{ // Blocking
-					Projectile.friendly = false;
+					if (Projectile.friendly != false)
+					{
+						Projectile.friendly = false;
+						Projectile.netUpdate = true;
+					}
 					guardian.GuardianGauntletParry = true;
 					guardian.GuardianGauntletParry2 = true;
 
@@ -179,6 +183,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 						Projectile.CritChance = guardian.GetGuardianCrit(GuardianItem.crit);
 						Projectile.knockBack = GuardianItem.knockBack;
 						Projectile.friendly = true;
+						Projectile.netUpdate = true;
 						Projectile.ResetLocalNPCHitImmunity();
 						SoundEngine.PlaySound(GuardianItem.UseSound, Projectile.Center);
 						ResetHitStatus(true);
@@ -222,6 +227,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 						Projectile.ai[2] = 0f;
 						Projectile.ai[1] = 0f;
 						Projectile.friendly = false;
+						Projectile.netUpdate = true;
 					}
 				}
 				else if (Projectile.ai[0] == 1f)
@@ -312,6 +318,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 						Projectile.CritChance = guardian.GetGuardianCrit(GuardianItem.crit);
 						Projectile.knockBack = GuardianItem.knockBack;
 						Projectile.friendly = true;
+						Projectile.netUpdate = true;
 						Projectile.ResetLocalNPCHitImmunity();
 						SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing, Projectile.Center);
 						ResetHitStatus(false);
@@ -344,7 +351,11 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 
 					if (Projectile.ai[0] >= -30)
 					{ // Returning
-						Projectile.friendly = false;
+						if (Projectile.friendly != false)
+						{
+							Projectile.friendly = false;
+							Projectile.netUpdate = true;
+						}
 						Projectile.rotation = Projectile.ai[1] - MathHelper.PiOver4 + (float)Math.Sin(0.1046f * (30 + Projectile.ai[0])) * 0.4f * -owner.direction + MathHelper.Pi;
 						Projectile.Center = owner.MountedCenter.Floor() + Vector2.UnitY.RotatedBy(Projectile.ai[1]) * (38f - (float)Math.Sin(0.0523f * (30 + Projectile.ai[0])) * 24f);
 						Projectile.position.Y -= (float)Math.Sin(0.0523f * (30 + Projectile.ai[0])) * 2f;
@@ -384,7 +395,11 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 						}
 
 						Projectile.ai[1] = 0f;
-						Projectile.friendly = false;
+						if (Projectile.friendly != false)
+						{
+							Projectile.friendly = false;
+							Projectile.netUpdate = true;
+						}
 
 						if (Main.mouseLeft && Main.mouseRight)
 						{ // Perfect jab loop while holding the attack
@@ -407,6 +422,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 						Projectile.CritChance = guardian.GetGuardianCrit(GuardianItem.crit);
 						Projectile.knockBack = GuardianItem.knockBack;
 						Projectile.friendly = true;
+						Projectile.netUpdate = true;
 						Projectile.ResetLocalNPCHitImmunity();
 						SoundEngine.PlaySound(SoundID.DD2_GoblinBomberThrow, Projectile.Center);
 						ResetHitStatus(true);
@@ -488,6 +504,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 						Projectile.ai[0] = 0f;
 						Projectile.ai[1] = 0f;
 						Projectile.friendly = false;
+						Projectile.netUpdate = true;
 					}
 				}
 				else
@@ -602,6 +619,8 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 			if (target.Hitbox.Intersects(HitBox[0]) || target.Hitbox.Intersects(HitBox[1]) || target.Hitbox.Intersects(HitBox[2]) || Projectile.ai[2] < 0f) return base.CanHitNPC(target);
 			return false;
 		}
+
+		public override bool CanHitPvp(Player target) => Projectile.friendly = true && (target.Hitbox.Intersects(HitBox[0]) || target.Hitbox.Intersects(HitBox[1]) || target.Hitbox.Intersects(HitBox[2]) || Projectile.ai[2] < 0f);
 
 		public override bool? CanCutTiles() => Projectile.friendly = true;
 

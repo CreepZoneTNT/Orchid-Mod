@@ -73,7 +73,7 @@ namespace OrchidMod.Content.Guardian
 			OrchidGuardian guardian = player.GetModPlayer<OrchidGuardian>();
 			Item item = player.inventory[player.selectedItem];
 
-			if (item == null || !(item.ModItem is OrchidModGuardianHammer hammerItem))
+			if (item == null || item.ModItem is not OrchidModGuardianHammer hammerItem)
 			{
 				if (Projectile.owner == Main.myPlayer) Projectile.Kill();
 				return;
@@ -529,7 +529,9 @@ namespace OrchidMod.Content.Guardian
 			}
 		}
 
-		public override void ModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
+		public override bool CanHitPvp(Player target) => Projectile.friendly && (Projectile.ai[1] < 0 || (Projectile.timeLeft < 598 && range > 0) || BlockDuration != 0);
+
+		public override void SafeModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
 		{
 			if (Projectile.ai[1] < 0) // Less damage for melee hits
 			{
@@ -632,6 +634,56 @@ namespace OrchidMod.Content.Guardian
 				HammerItem.OnMeleeHit(player, guardian, target, Projectile, hit.Knockback, hit.Crit, fullyCharged);
 			}
 		}
+
+		public override void SafeOnHitPlayer(Player target, Player.HurtInfo hit, Player player, OrchidGuardian guardian)
+		{
+			if (BlockDuration != 0) // Block hit
+			{
+				if (FirstHit)
+				{
+					HammerItem.OnPlayerHitFirst(player, guardian, target, Projectile, hit.Knockback, false, false, false, true);
+				}
+				HammerItem.OnPlayerHit(player, guardian, target, Projectile, hit.Knockback, false, false, false, true);
+			}
+			else if (Projectile.ai[1] > 0)
+			{ // Throw
+				bool weak = WeakThrow;
+				if (FirstHit)
+				{
+					// if (!weak)
+					// {
+					// 	guardian.AddSlam(HammerItem.SlamStacks);
+					// 	guardian.AddGuard(HammerItem.GuardStacks);
+					// }
+					HammerItem.OnPlayerHitFirst(player, guardian, target, Projectile, hit.Knockback, weak, false, true, false);
+				}
+				HammerItem.OnPlayerHit(player, guardian, target, Projectile, hit.Knockback, weak, false, true, false);
+
+				if (!penetrate && target.statLife > HammerItem.Item.damage)
+				{
+					range = -40;
+					Projectile.netUpdate = true;
+				}
+			}
+			else if (BlockDuration == 0)
+			{ // Melee Swing
+				bool fullyCharged = guardian.GuardianItemCharge >= 180f;
+				if (FirstHit)
+				{
+					HammerItem.OnPlayerHitFirst(player, guardian, target, Projectile, hit.Knockback, !fullyCharged, true, false, false);
+					// if (guardian.GuardianItemCharge > 0f)
+					// {
+					// 	guardian.GuardianItemCharge += 60f * HammerItem.SwingChargeGain * player.GetTotalAttackSpeed(DamageClass.Melee);
+					// 	if (guardian.GuardianItemCharge > 210f)
+					// 	{
+					// 		guardian.GuardianItemCharge = 210f;
+					// 	}
+					// }
+				}
+				HammerItem.OnPlayerHit(player, guardian, target, Projectile, hit.Knockback, !fullyCharged, true, false, false);
+			}
+		}
+
 
 		public override void SendExtraAI(BinaryWriter writer)
 		{

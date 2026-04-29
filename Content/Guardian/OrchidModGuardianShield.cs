@@ -13,6 +13,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using static Terraria.NPC;
+using static Terraria.Player;
 
 namespace OrchidMod.Content.Guardian
 {
@@ -26,10 +27,18 @@ namespace OrchidMod.Content.Guardian
 		public virtual bool PreDrawShield(SpriteBatch spriteBatch, Projectile projectile, Player player, ref Color lightColor) { return true; }
 
 		public virtual void SafeHoldItem(Player player) { }
-		/// <summary>Called once per slam, when the slam first hits an enemy.</summary>
-		public virtual void SlamHitFirst(Player player, Projectile shield, NPC npc) { }
-		/// <summary>Called when this shield's slam hits an enemy.</summary>
-		public virtual void SlamHit(Player player, Projectile shield, NPC npc) { }
+		public virtual void PaviseModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref HitModifiers modifiers, bool firstHit) { }
+		public virtual void PaviseModifyHitPlayer(Player player, OrchidGuardian guardian, Player target, Projectile projectile, ref HurtModifiers modifiers, bool firstHit) { }
+		/// <summary>
+		/// Called when this shield's slam hits an enemy or player.
+		/// <br/>Make sure to check if <c>target</c> is a <c>NPC</c> or <c>Player</c> for the right effect.
+		/// </summary>
+		public virtual void SlamHit(Player player, Projectile shield, NPC target) { }
+		/// <summary>
+		/// Called once per slam, when the slam first hits an enemy or player.
+		/// <br/>Make sure to check if <c>target</c> is a <c>NPC</c> or <c>Player</c> for the right effect.
+		/// </summary>
+		public virtual void SlamHitFirst(Player player, Projectile shield, NPC target) { }
 		/// <summary>Called on the first frame of a slam.</summary>
 		public virtual void Slam(Player player, Projectile shield) { }
 		/// <summary>Called on the last frame of a slam.</summary>
@@ -41,13 +50,12 @@ namespace OrchidMod.Content.Guardian
 		/// <summary>Called when a projectile collides with the shield during a block. Return <c>true</c> to destroy the projectile. Defaults to <c>true</c>.</summary>
 		/// <returns>Whether to destroy the projectile.</returns>
 		public virtual bool Block(Player player, Projectile shield, Projectile projectile) { return true; }
-		/// <summary>Called when a projectile collides with the shield during a block, this should be use to spawn projectiles created by reflecting projectiles.
+		/// <summary>Called when a projectile collides with the shield during a block, this should be use to spawn projectiles created by reflecting projectiles. </summary>
 		public virtual void Reflect(Player player, Projectile shield, Projectile projectile, ref int GuardianShieldSpikeReflect) {}
 		/// <summary>Called on the first frame of a block.</summary>
 		public virtual void BlockStart(Player player, Projectile shield) { }
 		/// <summary>Called on the last frame of a block. Will spawn dust at the end of a block if it returns true</summary>
 		public virtual bool BlockEnd(Player player, Projectile shield) => true;
-		public virtual void PaviseModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref HitModifiers modifiers, bool firstHit) { }
 		public virtual Color GetPaviseGlowmaskColor(Player player, OrchidGuardian guardian, Projectile projectile, Color lightColor) => Color.White;
 
 		public float distance = 100f;
@@ -73,6 +81,7 @@ namespace OrchidMod.Content.Guardian
 		/// If true, slams performed with the shield will be locked to the rotation they started with, rather than being free to rotate mid-slam.
 		/// </summary>
 		public bool lockSlamRotation;
+		public bool drawOverPlayers = false;
 
 		public sealed override void SetDefaults()
 		{

@@ -51,7 +51,11 @@ namespace OrchidMod.Content.Guardian.Projectiles.Warhammers
 
 		public override void AI()
 		{
-			Projectile.friendly = Projectile.penetrate == 1 && Projectile.timeLeft < 180;
+			if (Projectile.friendly != (Projectile.penetrate == 1 && Projectile.timeLeft < 180))
+			{
+				Projectile.friendly = Projectile.penetrate == 1 && Projectile.timeLeft < 180;
+				Projectile.netUpdate = true;
+			}
 			Projectile.rotation += Projectile.ai[0];
 
 			if (Projectile.penetrate >= 1)

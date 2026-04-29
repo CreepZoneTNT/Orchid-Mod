@@ -5,6 +5,7 @@ using OrchidMod.Content.General.Prefixes;
 using ReLogic.Content;
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -30,6 +31,12 @@ namespace OrchidMod.Content.Guardian
 		public Vector2 hitboxOrigin = Vector2.Zero;
 
 		public float networkedRotation => Projectile.ai[2];
+
+
+		public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+		{
+			if ((ShieldItem.ModItem as OrchidModGuardianShield).drawOverPlayers && Projectile.ai[0] > 0) overPlayers.Add(index);
+		}
 
 		// ...
 		public bool IsRotationLocked;
@@ -68,7 +75,7 @@ namespace OrchidMod.Content.Guardian
 		{
 			var owner = Main.player[Projectile.owner];
 			var item = ShieldItem;
-			if (item == null || !(item.ModItem is OrchidModGuardianShield guardianItem))
+			if (item == null || item.ModItem is not OrchidModGuardianShield guardianItem)
 			{
 				Projectile.Kill();
 				return;
@@ -79,6 +86,13 @@ namespace OrchidMod.Content.Guardian
 			{
 				guardianItem.SlamHitFirst(owner, Projectile, target);
 			}
+		}
+
+
+		public override void SafeModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
+		{
+			var owner = Main.player[Projectile.owner];
+			if (ShieldItem.ModItem is OrchidModGuardianShield) (ShieldItem.ModItem as OrchidModGuardianShield).PaviseModifyHitPlayer(owner, owner.GetModPlayer<OrchidGuardian>(), target, Projectile, ref modifiers, FirstHit);
 		}
 
 		public override void AI()
@@ -93,13 +107,13 @@ namespace OrchidMod.Content.Guardian
 			}
 
 			var item = ShieldItem;
-			if (item == null || !(item.ModItem is OrchidModGuardianShield guardianItem))
+			if (item == null || item.ModItem is not OrchidModGuardianShield guardianItem)
 			{
 				Projectile.Kill();
 				return;
 			}
 
-			if (SelectedItem < 0 || !(owner.HeldItem.ModItem is OrchidModGuardianShield))
+			if (SelectedItem < 0 || owner.HeldItem.ModItem is not OrchidModGuardianShield)
 			{
 				Projectile.netUpdate = true;
 				death = true;
@@ -128,6 +142,7 @@ namespace OrchidMod.Content.Guardian
 						Projectile.knockBack = guardianItem.Item.knockBack;
 						Projectile.ResetLocalNPCHitImmunity();
 						Projectile.friendly = true;
+						Projectile.netUpdate = true;
 						ResetHitStatus(true);
 
 						if (IsLocalOwner)
@@ -259,7 +274,7 @@ namespace OrchidMod.Content.Guardian
 						aimedLocation = Main.MouseWorld - owner.Center.Floor();
 						aimedLocation.Normalize();
 						
-						aimedLocation = Vector2.UnitX.RotatedBy(IsRotationLocked ? LockedRotation : OrchidModGuardianShield.GetSnappedAngle(guardianItem, owner,aimedLocation.ToRotation()));
+						aimedLocation = Vector2.UnitX.RotatedBy(IsRotationLocked ? LockedRotation : OrchidModGuardianShield.GetSnappedAngle(guardianItem, owner, aimedLocation.ToRotation()));
 						Projectile.velocity = aimedLocation * float.Epsilon;
 						aimedLocation *= (guardianItem.distance + addedDistance) * -1f;
 
@@ -393,10 +408,12 @@ namespace OrchidMod.Content.Guardian
 
 		public override bool? CanCutTiles() => Projectile.ai[1] > 0f;
 
+		public override bool CanHitPvp(Player target) => Projectile.friendly && Projectile.ai[1] > 0f;
+
 		public override bool OrchidPreDraw(SpriteBatch spriteBatch, ref Color lightColor)
 		{
 			if (SelectedItem < 0 || SelectedItem > 58) return false;
-			if (!(ShieldItem.ModItem is OrchidModGuardianShield guardianItem)) return false;
+			if (ShieldItem.ModItem is not OrchidModGuardianShield guardianItem) return false;
 			if (!ModContent.HasAsset(guardianItem.ShieldTexture)) return false;
 
 			Player player = Main.player[Projectile.owner];
@@ -408,8 +425,8 @@ namespace OrchidMod.Content.Guardian
 				Texture2D texture = ModContent.Request<Texture2D>(guardianItem.ShieldTexture).Value;
 				Vector2 drawPosition = Projectile.Center - Main.screenPosition + Vector2.UnitY * player.gfxOffY;
 				SpriteEffects effect = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-				float colorMult = (Projectile.ai[1] + Projectile.ai[0] > 0 ? 1f : (0.4f + Math.Abs((1f * Main.player[Main.myPlayer].GetModPlayer<OrchidPlayer>().Timer120 - 60) / 120f)));
-				float flippedRotation = Projectile.rotation + (Projectile.spriteDirection == 1 ? 0 : MathHelper.Pi);
+				float colorMult = (Projectile.ai[1] + Projectile.ai[0] > 0 ? 1f : (0.4f + Math.Abs((1f * Main.LocalPlayer.GetModPlayer<OrchidPlayer>().Timer120 - 60) / 120f)));
+				float flippedRotation = networkedRotation + (Projectile.spriteDirection == 1 ? 0 : MathHelper.Pi);
 				
 				Rectangle frame = texture.Frame(1, guardianItem.ShieldFrames, 0, ShieldAnimFrame % guardianItem.ShieldFrames);
 				

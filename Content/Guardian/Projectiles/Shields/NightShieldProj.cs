@@ -34,7 +34,11 @@ namespace OrchidMod.Content.Guardian.Projectiles.Shields
 
 		public override void AI()
 		{
-			Projectile.friendly = Projectile.timeLeft < 55 && Projectile.penetrate == 1;
+			if (Projectile.friendly != (Projectile.timeLeft < 55 && Projectile.penetrate == 1))
+			{
+				Projectile.friendly = Projectile.timeLeft < 55 && Projectile.penetrate == 1;
+				Projectile.netUpdate = true;
+			}
 			if (Projectile.penetrate == 1)
 			{
 				OldPosition.Add(Projectile.Center);

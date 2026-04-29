@@ -242,6 +242,8 @@ namespace OrchidMod.Content.Guardian
 		}
 
 		public override bool? CanCutTiles() => false;
+		
+		public override bool CanHitPvp(Player target) => false;
 
 		public override bool OrchidPreDraw(SpriteBatch spriteBatch, ref Color lightColor)
 		{

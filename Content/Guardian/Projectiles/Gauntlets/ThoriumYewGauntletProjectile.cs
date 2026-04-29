@@ -43,6 +43,8 @@ namespace OrchidMod.Content.Guardian.Projectiles.Gauntlets
 			return base.CanHitNPC(target);
 		}
 
+		public override bool CanHitPvp(Player player) => false;
+
 		public override void AI()
 		{
 			TimeSpent++;

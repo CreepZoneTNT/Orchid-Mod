@@ -328,23 +328,31 @@ namespace OrchidMod.Content.Guardian
 			guardianItem.ExtraAIGauntlet(owner, guardian, Projectile, OffHandGauntlet);
 		}
 
+
+		public override bool CanHitPvp(Player target) => false;
+
 		public bool CanInstantSlam(OrchidModGuardianGauntlet gauntlet)
 		{
 			Player player = Main.player[Projectile.owner];
 			OrchidGuardian guardian = player.GetModPlayer<OrchidGuardian>();
 
-			if (guardian.GuardianItemCharge < 180f)
+			bool? gauntletCanInstantSlam = gauntlet.CanInstantSlam(player, guardian, Projectile, OffHandGauntlet);
+			if (gauntletCanInstantSlam == null) 
 			{
-				if (guardian.ChargeHoldTimer > ModContent.GetInstance<OrchidClientConfig>().GuardianMaxHoldTimer)
+				if (guardian.GuardianItemCharge < 180f)
 				{
-					return true;
+					if (guardian.ChargeHoldTimer > ModContent.GetInstance<OrchidClientConfig>().GuardianMaxHoldTimer)
+					{
+						return true;
+					}
+					else
+					{
+						return guardian.ChargeHoldTimer > ModContent.GetInstance<OrchidClientConfig>().GuardianMinHoldTimer && (guardian.GuardianItemCharge * gauntlet.ChargeSpeedMultiplier) > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f;
+					}
 				}
-				else
-				{
-					return guardian.ChargeHoldTimer > ModContent.GetInstance<OrchidClientConfig>().GuardianMinHoldTimer && (guardian.GuardianItemCharge * gauntlet.ChargeSpeedMultiplier) > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f;
-				}
+				else return false;
 			}
-			else return false;
+			else return gauntletCanInstantSlam.Value;
 		}
 
 		public override void OnKill(int timeLeft)

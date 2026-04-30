@@ -136,6 +136,11 @@ namespace OrchidMod
 				}
 			}
 
+			if (item.ModItem is OrchidModGuardianKatar)
+			{
+				drawInfo.compBackArmFrame = new Rectangle(1, 1, 1, 1); // Makes the back arm disappear when holding a katar
+			}
+
 			if (item.ModItem is OrchidModGuardianItem && Player.compositeFrontArm.enabled)
 			{
 				drawInfo.compShoulderOverFrontArm = true; // Why is this not on by default
@@ -746,12 +751,9 @@ namespace OrchidMod
 					GuardianCounterTime = (int)(40 / (qs.CounterSpeed * Player.GetTotalAttackSpeed<MeleeDamageClass>()));
 			}
 		}
-
-		public void OnBlockNPCFirst(Projectile anchor, NPC target, int toAdd = 1, bool parry = false)
-		{ // Called anytime the player blocks/parries their first NPC
-			OnBlockAnyFirst(anchor, ref toAdd, parry);
-
-			if (anchor.ModProjectile is GuardianShieldAnchor shieldAnchor && Player.whoAmI == Main.myPlayer)
+		public void OnBlockNPCNew(Projectile anchor, NPC target, int toAdd = 1, bool parry = false)
+		{ // Called anytime the player blocks/parries a NPC for the first time (NPC not contained in GuardianBlockedEnemies)
+			if (Player.whoAmI == Main.myPlayer)
 			{
 				if (GuardianSpikeDamage > 0)
 				{
@@ -764,6 +766,11 @@ namespace OrchidMod
 					Player.ApplyDamageToNPC(target, (int)damage, 0f, Player.direction, crit, ModContent.GetInstance<GuardianDamageClass>());
 				}
 			}
+		}
+
+		public void OnBlockNPCFirst(Projectile anchor, NPC target, int toAdd = 1, bool parry = false)
+		{ // Called anytime the player blocks/parries their first NPC
+			OnBlockAnyFirst(anchor, ref toAdd, parry);
 
 			if (anchor.ModProjectile is not GuardianHammerAnchor)
 			{

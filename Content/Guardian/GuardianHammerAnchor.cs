@@ -186,7 +186,7 @@ namespace OrchidMod.Content.Guardian
 									FirstBlock = true;
 									guardian.OnBlockProjectileFirst(Projectile, proj);
 									HammerItem.OnBlockFirstProjectile(owner, guardian, Projectile, proj);
-									SoundEngine.PlaySound(SoundID.Item37, Projectile.Center);
+									SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(Main.rand.NextFloat(0.4f, 0.6f)), owner.Center);
 								}
 								if (killProj) proj.Kill();
 								SoundEngine.PlaySound(SoundID.Dig, Projectile.Center);
@@ -221,6 +221,7 @@ namespace OrchidMod.Content.Guardian
 							if (!contained)
 							{ // First time blocking an enemy
 								guardian.GuardianBlockedEnemies.Add(new BlockedEnemy(target, 120));
+								guardian.OnBlockNPCNew(Projectile, target);
 								SoundEngine.PlaySound(SoundID.Dig, owner.Center);
 
 								if (!BlockedNPCs.Contains(target.whoAmI))
@@ -243,7 +244,7 @@ namespace OrchidMod.Content.Guardian
 								FirstBlock = true;
 								guardian.OnBlockNPCFirst(Projectile, target);
 								HammerItem.OnBlockFirstNPC(owner, guardian, target, Projectile);
-								SoundEngine.PlaySound(SoundID.Item37, owner.Center);
+								SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(Main.rand.NextFloat(0.4f, 0.6f)), owner.Center);
 							}
 						}
 					}

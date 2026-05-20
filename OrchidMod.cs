@@ -16,6 +16,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Shaders;
 using OrchidMod.Content.Shapeshifter;
 using Terraria.ModLoader.IO;
+using OrchidMod.Content.Guardian;
+using Terraria.Audio;
 
 namespace OrchidMod
 {
@@ -114,6 +116,8 @@ namespace OrchidMod
 			//BossChecklistCalls();
 			CensusModCalls();
 			ColoredDamageTypeModCalls();
+			RecipeBrowserModCalls();
+			// WikiThisModCalls();
 		}
 
 		public override void HandlePacket(BinaryReader reader, int whoAmI)
@@ -185,6 +189,24 @@ namespace OrchidMod
 						packet.Write((byte)OrchidModMessageType.SHAPESHIFTERHOOKDASH);
 						packet.Write(whoamI);
 						packet.Send(ignoreClient: whoAmI);
+					}
+
+					break;
+
+				case OrchidModMessageType.GUARDIANKATARAPPLYBLEEDTONPC:
+					npc = Main.npc[reader.ReadInt32()];
+					GuardianGlobalNPC globalNPCGuardian = npc.GetGlobalNPC<GuardianGlobalNPC>();
+					int bleedAmount = reader.ReadInt32();
+					globalNPCGuardian.KatarBleed += bleedAmount;
+					SoundEngine.PlaySound(SoundID.NPCHit18.WithPitchOffset(Main.rand.NextFloat(0.2f, 0.5f)), npc.Center);
+
+					if (Main.netMode == NetmodeID.Server)
+					{
+						var packet = GetPacket();
+						packet.Write((byte)OrchidModMessageType.GUARDIANKATARAPPLYBLEEDTONPC);
+						packet.Write(npc.whoAmI);
+						packet.Write(bleedAmount);
+						packet.Send();
 					}
 
 					break;

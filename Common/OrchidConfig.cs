@@ -6,7 +6,6 @@ namespace OrchidMod.Common
 {
 	public class OrchidClientConfig : ModConfig
 	{
-		public bool NeedTextureReload = false;
 		public override ConfigScope Mode => ConfigScope.ClientSide;
 		public override bool Autoload(ref string name) => true;
 
@@ -62,6 +61,10 @@ namespace OrchidMod.Common
 		[BackgroundColor(151, 120, 79)]
 		public bool GuardianGauntletAlwaysSlam { get; set; }
 
+		[DefaultValue(false)]
+		[BackgroundColor(151, 120, 79)]
+		public bool GuardianThoriumThorsHammerConversion { get; set; }
+
 		[Header("Shapeshifter")]
 		[DefaultValue(false)]
 		[BackgroundColor(100, 175, 150)]
@@ -85,16 +88,16 @@ namespace OrchidMod.Common
 
 		public override void OnChanged()
 		{
-			if (NeedTextureReload != GuardianUseFancyUI)
+			if (GuardianUIState.NeedTextureReload != GuardianUseFancyUI)
 			{
-				NeedTextureReload = GuardianUseFancyUI;
+				GuardianUIState.NeedTextureReload = GuardianUseFancyUI;
 				GuardianUIState.ReloadTextures();
 			}
 		}
 
 		public override void OnLoaded()
 		{
-			NeedTextureReload = GuardianUseFancyUI;
+			GuardianUIState.NeedTextureReload = GuardianUseFancyUI;
 		}
 	}
 

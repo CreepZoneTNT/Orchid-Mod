@@ -21,6 +21,7 @@ namespace OrchidMod
 	public class OrchidGuardian : ModPlayer
 	{
 
+
 		public bool CrossModGodMode;
 
 		// Misc & Static fields
@@ -65,6 +66,7 @@ namespace OrchidMod
 		public bool GuardianSharpRebuttalParry = false;
 		public bool GuardianWormTooth = false;
 		public bool GuardianMonsterFang = false;
+		public bool GuardianBadgeHoplite = false;
 		public bool GuardianStandardDesert = false; // Standards
 		public int GuardianStandardStarScouter = -1; //Points to current StarScouterStandard holder
 		public bool GuardianStandardStarScouterWarp = false;
@@ -79,6 +81,14 @@ namespace OrchidMod
 		public float GuardianChain = 0f; // Increases the swing range on Warhammers (additive, 16f = 1 tile)
 		public string GuardianChainTexture = null; // Used to draw the warhammer chain
 		public int GuardianStaffRocket = 0; // If > 0, the player can dash by spending slams with a quarterstaff (1,2,3,4 = red,green,blue,yellow)
+		public bool GuardianHammerMagnet = false; // Standards
+		public bool GuardianHammerDetonator = false; // Standards
+
+		// Debug bonus resources that do not get updated (for use with DragonLens)
+		
+		public int GuardianDebugBonusGuards = 0;
+		public int GuardianDebugBonusSlams = 0;
+		public int GuardianDebugBonusRunes = 0;
 
 		// Dynamic gameplay and UI fields
 
@@ -93,12 +103,15 @@ namespace OrchidMod
 		public bool OverThresholdSlams => GuardianSlam + GuardianSlamRecharging > GuardianSlamMax * GuardianRegenThreshold;
 		public int GuardianDisplayUI = 0; // Guardian UI is displayed if > 0
 		public float GuardianItemCharge = 0f; // Player Warhammer Throw Charge, max is 180f
-		public bool GuardianGauntletParry = false; // Player is currently parrying with a gauntlet
-		public bool GuardianGauntletParry2 = false; // Player is currently parrying with a gauntlet (1 frame buffer)
+		public bool GuardianParry = false; // Player is currently parrying
+		public bool GuardianParryBuffer = false; // Player is currently parrying (1 frame buffer)
 		/// <summary> Cooldown in frames between starting a new punch charge since starting the last one. Can begin a punch when 0 or lower, goes down to -10. Half of the gauntlet's punch animation time is added when a charge is started. </summary>
 		public int GauntletPunchCooldown = 0;
 		public bool GuardianStandardBuffer = false; // used to delay the deactivation of various standards effects by 1 frame
-		public int SlamCostUI = 0; // Displays an outline around slams in the UI if > 0
+		/// <summary> Displays an outline around guards in the UI if > 0.</summary>
+		public int SlamCostUI = 0; // 
+		/// <summary> Displays an outline around slams in the UI if > 0.</summary>
+		public int GuardCostUI = 0; // Displays an outline around slams in the UI if > 0
 		public int ChargeHoldTimer; // Timer (in frames) since GuardianItemCharge has been >0 
 		/// <summary> Allows the player to trigger counterattack effects. Set when able to use an item that has counterattack effects. Use GuardianCounterTime to check for counterattack eligibility. </summary>
 		public bool GuardianCounter;
@@ -112,6 +125,7 @@ namespace OrchidMod
 		public Projectile GuardianCurrentStandardAnchor;
 		public float GauntletSlamPool = 0f; // How much slam charge will be granted by hitting the next punch
 		public int GuardianStaffRocketCooldown = 0; // Cooldown between rocket dashes
+		public int GuardianBadgeHopliteLevel = 0; // goes up to 2 for bonus katar charge speed
 
 		public const int GuardianRechargeTime = 600;
 
@@ -159,7 +173,14 @@ namespace OrchidMod
 				}
 			}
 		}
-
+		
+		public Mod CheatSheet;
+		public Mod HerosMod;
+		public Mod DragonLens;
+		public FieldInfo CSGodMode;
+		public FieldInfo HMGodMode;
+		public FieldInfo DLGodMode;
+		
 		public override void SetStaticDefaults()
 		{
 			ProjectilesBlockBlacklist = new List<int>
@@ -182,6 +203,55 @@ namespace OrchidMod
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("GraniteEradicatorArm").Type);
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("KrakenArm").Type);
 			}
+			
+			if (ModLoader.TryGetMod("CheatSheet", out Mod cheatSheet))
+			{
+				CheatSheet = cheatSheet;
+				// var godModeService = CheatSheet.Code.GetType("CheatSheet.Menus.GodMode");
+				// if (godModeService != null) CSGodMode ??= godModeService.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				CSGodMode = CheatSheet.Code.GetType("CheatSheet.Menus.GodMode")?.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				if (CSGodMode != null)
+				{
+					Console.Out.WriteLine("OrchidGuardian: CheatSheet detected");
+					Mod.Logger.Debug("OrchidGuardian: CheatSheet detected");
+				}
+			}
+			if (ModLoader.TryGetMod("HEROsMod", out Mod herosMod))
+			{
+				HerosMod = herosMod;
+				// var godModeService = HerosMod.Code.GetType("HEROsMod.HEROsModServices.GodModeService");
+				// if (godModeService != null) HMGodMode ??= godModeService.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				HMGodMode = HerosMod.Code.GetType("HEROsMod.HEROsModServices.GodModeService")?.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				if (HMGodMode != null)
+				{
+					Console.Out.WriteLine("OrchidGuardian: HERO's Mod detected");
+					Mod.Logger.Debug("OrchidGuardian: HERO's Mod detected");
+				}
+
+			}
+			if (ModLoader.TryGetMod("DragonLens", out Mod dragonLens))
+			{
+				DragonLens = dragonLens;
+				// var godModeService = DragonLens.Code.GetType("DragonLens.Content.Tools.Gameplay.Godmode");
+				// if (godModeService != null) DLGodMode ??= godModeService.GetField("godMode", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				DLGodMode = DragonLens.Code.GetType("DragonLens.Content.Tools.Gameplay.Godmode")?.GetField("godMode", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				if (DLGodMode != null)
+				{
+					Console.Out.WriteLine("OrchidGuardian: DragonLens detected");
+					Mod.Logger.Debug("OrchidGuardian: DragonLens detected");
+				}
+			}
+		}
+
+
+		public override void Unload()
+		{
+			CheatSheet = null;
+			HerosMod = null;
+			DragonLens = null;
+			CSGodMode = null;
+			HMGodMode = null;
+			DLGodMode = null;
 		}
 
 		public override void Initialize()
@@ -220,7 +290,7 @@ namespace OrchidMod
 				GuardianJewelerGauntlet = 0;
 			}
 			
-			if (GuardianGauntletParry) {
+			if (GuardianParry) {
 				if (GuardianCrystalNinja && Player.dashDelay < 0) DoParryItemParry(null);
 
 				// Condition for when the player is in God Mode (intangible otherwise)
@@ -230,7 +300,7 @@ namespace OrchidMod
 					?? (Entity)Main.npc?.FirstOrDefault(npc => npc.active && (!npc.friendly && npc.damage > 0) && Collision.CheckAABBvAABBCollision(Player.Center, Player.Hitbox.Size(), npc.Center, npc.Hitbox.Size()));
 
 					if (entity != null) DoParryItemParry(entity);
-					}
+				}
 
 				// Condition for parrying an Aggro Dummy or Boss Dummy from Thorium 
 				// (only if the player is either in godmode, or if there aren't any enemies/bosses within 45 tiles)
@@ -257,15 +327,11 @@ namespace OrchidMod
 
 		public override void ResetEffects()
 		{
-			if (
-				(ModLoader.TryGetMod("CheatSheet", out Mod CheatSheet) && (bool)(CheatSheet.Code.GetType("CheatSheet.Menus.GodMode")?.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(null)))
-				|| 
-				(ModLoader.TryGetMod("HEROsMod", out Mod HerosMod) && (bool)(HerosMod.Code.GetType("HEROsMod.HEROsModServices.GodModeService")?.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(null)))
-				|| 
-				(ModLoader.TryGetMod("DragonLens", out Mod DragonLens) && (bool)(DragonLens.Code.GetType("DragonLens.Content.Tools.Gameplay.Godmode")?.GetField("godMode", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(null)))
-			)
-			CrossModGodMode = true;
-			else CrossModGodMode = false;
+		
+			bool csGodMode = CheatSheet != null && CSGodMode != null && CSGodMode?.GetValue(null) is true;
+			bool hmGodMode = HerosMod != null && HMGodMode != null && HMGodMode?.GetValue(null) is true;
+			bool dlGodMode = DragonLens != null && DLGodMode != null && DLGodMode?.GetValue(null) is true;
+			CrossModGodMode = csGodMode || hmGodMode || dlGodMode;
 
 			// Resetting Core guardian fields
 			if (Player.itemTime > 0 && Player.HeldItem.damage > 0 && Player.HeldItem.ModItem is not OrchidModGuardianItem && Player.HeldItem.pick + Player.HeldItem.hammer + Player.HeldItem.axe == 0)
@@ -334,6 +400,11 @@ namespace OrchidMod
 				GauntletSlamPool = 0f;
 			}
 
+			if (Player.HeldItem.ModItem is not OrchidModGuardianKatar)
+			{
+				GuardianBadgeHopliteLevel = 0;
+			}
+
 			if (GuardianCounter)
 			{
 				if (GuardianCounterTime > 0) GuardianCounterTime--;
@@ -361,10 +432,11 @@ namespace OrchidMod
 
 			if (Player.HeldItem.ModItem is not OrchidModGuardianItem) GuardianItemCharge = 0f;
 
-			if (GuardianGauntletParry2) GuardianGauntletParry2 = false;
-			else GuardianGauntletParry = false;
+			if (GuardianParryBuffer) GuardianParryBuffer = false;
+			else GuardianParry = false;
 
 			SlamCostUI = 0;
+			GuardCostUI = 0;
 
 			if (GuardianGuard > GuardianGuardMax) GuardianGuard = GuardianGuardMax;
 			if (GuardianSlam > GuardianSlamMax) GuardianSlam = GuardianSlamMax;
@@ -411,10 +483,18 @@ namespace OrchidMod
 			GuardianHoneyPotion = false;
 			GuardianWormTooth = false;
 			GuardianMonsterFang = false;
+			// GuardianInfiniteResources = false;
 			GuardianInfiniteResources = (Player.creativeGodMode || CrossModGodMode);
 			GuardianShowDebugVisuals = false;
 			GuardianBronzeShieldBuff = false;
 			GuardianBronzeShieldProtection = false;
+			GuardianBadgeHoplite = false;
+			GuardianHammerMagnet = false;
+			GuardianHammerDetonator = false;
+
+			GuardianGuardMax += GuardianDebugBonusGuards;
+			GuardianSlamMax += GuardianDebugBonusSlams;
+			GuardianBonusRune += GuardianDebugBonusRunes;
 		}
 
 		public override void PreUpdateMovement()
@@ -499,6 +579,24 @@ namespace OrchidMod
 					dust.velocity *= 3f;
 				}
 			}
+
+			if (Player.HeldItem != null)
+			{ // Ucaps players Y velocity while dashing downwards with a katar
+				if (Player.HeldItem.ModItem != null)
+				{
+					if (Player.HeldItem.ModItem is OrchidModGuardianKatar katar && katar.GetAnchors(Player) != null)
+					{
+						if (Main.projectile[katar.GetAnchors(Player)[1]].ModProjectile is GuardianKatarAnchor anchor && anchor.KatarDashTimer > 1)
+						{
+							Vector2 intendedVelocity = Vector2.UnitY.RotatedBy(anchor.KatarDashAngle) * -katar.ParryDashSpeed;
+							Player.velocity = intendedVelocity;
+							Player.direction = intendedVelocity.X > 0 ? 1 : -1;
+							Player.fallStart = (int)(Player.position.Y / 16);
+							Player.maxFallSpeed = katar.ParryDashSpeed;
+						}
+					}
+				}
+			}
 		}
 
 		public override void OnHitByNPC(NPC npc, Player.HurtInfo hurtInfo)
@@ -531,7 +629,7 @@ namespace OrchidMod
 		{
 			foreach (BlockedEnemy blockedEnemy in GuardianBlockedEnemies)
 			{
-				if (blockedEnemy.npc.whoAmI == npc.whoAmI && !GuardianGauntletParry)
+				if (blockedEnemy.npc.whoAmI == npc.whoAmI && !GuardianParry)
 				{
 					return false;
 				}
@@ -579,7 +677,7 @@ namespace OrchidMod
 
 		public override void ModifyHurt(ref Player.HurtModifiers modifiers)
 		{
-			if (GuardianGauntletParry)
+			if (GuardianParry)
 			{
 				modifiers.DamageSource.TryGetCausingEntity(out Entity entity);
 				DoParryItemParry(entity);
@@ -615,7 +713,7 @@ namespace OrchidMod
 			}
 		}
 
-		public bool UseSlam(int nb = 1, bool checkOnly = false)
+		public bool UseSlam(int nb = 1, bool checkOnly = false, bool showUICost = false)
 		{
 			if (GuardianHorizon && Player.statLife > Player.statLifeMax2 * 0.5f && Player.statLife > 20)
 			{ // Horizon armor set consumes health instead of guardian charges
@@ -624,6 +722,10 @@ namespace OrchidMod
 					Player.statLife -= 20;
 					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
+				}
+				if (showUICost)
+				{
+					SlamCostUI = nb;
 				}
 				return true;
 			}
@@ -656,7 +758,7 @@ namespace OrchidMod
 			return false;
 		}
 
-		public bool UseGuard(int nb = 1, bool checkOnly = false)
+		public bool UseGuard(int nb = 1, bool checkOnly = false, bool showUICost = false)
 		{
 			if (GuardianHorizon && Player.statLife > Player.statLifeMax2 * 0.5f && Player.statLife > 20)
 			{ // Horizon armor set consumes health instead of guardian charges
@@ -665,6 +767,10 @@ namespace OrchidMod
 					Player.statLife -= 20;
 					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
+				}
+				if (showUICost)
+				{
+					GuardCostUI = nb;
 				}
 				return true;
 			}
@@ -870,12 +976,13 @@ namespace OrchidMod
 
 		public void DoParryItemParry(Entity aggressor)
 		{
-			GuardianGauntletParry2 = false;
+			GuardianParryBuffer = false;
 
 			if (Player.HeldItem.ModItem is OrchidModGuardianParryItem parryItem)
 			{
 				int intendedImmunityLength = parryItem.InvincibilityDuration + ParryInvincibilityBonus;
 				if (Player.longInvince) intendedImmunityLength += 20;
+				if (parryItem is OrchidModGuardianKatar katar && Main.projectile[katar.GetAnchors(Player)[1]].ModProjectile is GuardianKatarAnchor katarAnchor && katarAnchor.KatarDashTimer > 0) intendedImmunityLength += katarAnchor.KatarDashTimer;
 				modPlayer.PlayerImmunity = intendedImmunityLength;
 				Player.immuneTime = intendedImmunityLength;
 				Player.immune = true;

@@ -68,8 +68,8 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 			Projectile.ai[0] = 0f;
 			guardian.GuardianItemCharge = 0;
 			SelectedItem = owner.selectedItem;
-			Projectile.friendly = false;
 			Projectile.netUpdate = true;
+			Projectile.friendly = false;
 
 			if (GuardianItem.ModItem is GuardianNeedle guardianItem)
 			{
@@ -122,8 +122,8 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 						Projectile.friendly = false;
 						Projectile.netUpdate = true;
 					}
-					guardian.GuardianGauntletParry = true;
-					guardian.GuardianGauntletParry2 = true;
+					guardian.GuardianParry = true;
+					guardian.GuardianParryBuffer = true;
 
 					Projectile.Center = owner.MountedCenter.Floor() + new Vector2(10f * owner.direction, -2f);
 					Projectile.rotation = MathHelper.PiOver4 * 0.55f * owner.direction - MathHelper.PiOver4;

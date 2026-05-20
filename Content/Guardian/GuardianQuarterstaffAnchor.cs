@@ -72,8 +72,8 @@ namespace OrchidMod.Content.Guardian
 			Projectile.ai[0] = 0f;
 			guardian.GuardianItemCharge = 0;
 			SelectedItem = owner.selectedItem;
-			Projectile.friendly = false;
 			Projectile.netUpdate = true;
+			Projectile.friendly = false;
 
 			if (QuarterstaffItem.ModItem is OrchidModGuardianQuarterstaff guardianItem)
 			{
@@ -135,8 +135,8 @@ namespace OrchidMod.Content.Guardian
 						Projectile.friendly = false;
 						Projectile.netUpdate = true;
 					}
-					guardian.GuardianGauntletParry = true;
-					guardian.GuardianGauntletParry2 = true;
+					guardian.GuardianParry = true;
+					guardian.GuardianParryBuffer = true;
 
 					Projectile.Center = owner.MountedCenter.Floor() + new Vector2(10f * owner.direction, -2f);
 					Projectile.rotation = MathHelper.PiOver4 * 0.55f * owner.direction - MathHelper.PiOver4;
@@ -276,8 +276,8 @@ namespace OrchidMod.Content.Guardian
 								Projectile.ai[2] = guardianItem.ParryDuration * guardianItem.Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianParryDuration;
 								Projectile.netUpdate = true;
 								SoundEngine.PlaySound(SoundID.Item37, owner.Center);
-								guardian.GuardianGauntletParry = true;
-								guardian.GuardianGauntletParry2 = true;
+								guardian.GuardianParry = true;
+								guardian.GuardianParryBuffer = true;
 							}
 						}
 					}

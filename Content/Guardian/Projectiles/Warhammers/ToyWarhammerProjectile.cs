@@ -498,7 +498,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Warhammers
 			}
 		}
 
-		public override void ModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
+		public override void SafeModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
 		{
 			if (Projectile.ai[1] < 0) // Less damage for melee hits
 			{

@@ -78,7 +78,12 @@
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.PreGuard(Terraria.Player,OrchidMod.OrchidGuardian,Terraria.Projectile)">
             <summary> Called when the player presses the guard button to begin guarding while at least one gauntlet can guard. Return false to prevent guarding. Defaults to <c>guardian.UseGuard(1)</c>. Returning true without calling <c>guardian.UseGuard</c> will allow the player to guard without resources. </summary>
+            <param name="player"> The player pressing the guard button. </param>
+            <param name="guardian"> The <c>OrchidGuardian</c> instance of the guarding player.</param>
             <param name="anchor"> A gauntlet currently eligible for parrying. Will be the main hand gauntlet if both can parry. </param>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.ProjectileAI(Terraria.Player,Terraria.Projectile,System.Boolean)">
+            <summary> Called before the punch projectile's AI is executed, including the deceleration of the projectile. Return false to prevent normal AI from running. </summary>
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.PlayGuardSound(Terraria.Player,OrchidMod.OrchidGuardian,Terraria.Projectile)">
             <summary> Responsible for playing the sound when the player begins guarding with the weapon. Default behavior is <c>SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(Main.rand.NextFloat(0.4f, 0.6f)), player.Center);</c> </summary>
@@ -88,6 +93,9 @@
         </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.PunchSpeed">
             <summary> Jab and slam animation speed multiplier. Also affected by melee speed, but not by usetime. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianHammer.ChargeRate">
+            <summary>Multiplier for the speed of charge generation.</summary>
         </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianHammer.SwingChargeGain">
             <summary>Multiplier for the amount of bonus charge gained from hitting with a melee swing.</summary>
@@ -287,16 +295,16 @@
             <br/> The animation frame must be set manually using <c>GuardianQuarterstaffAnchor.QuarterstaffAnimFrame</c>.
             </summary>
         </member>
-        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.SlamHitFirst(Terraria.Player,Terraria.Projectile,Terraria.NPC)">
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.SlamHitFirst(Terraria.Player,Terraria.Projectile,Terraria.NPC,System.Boolean)">
             <summary>Called once per slam, when the slam first hits an enemy.</summary>
         </member>
-        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.SlamHit(Terraria.Player,Terraria.Projectile,Terraria.NPC)">
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.SlamHit(Terraria.Player,Terraria.Projectile,Terraria.NPC,System.Boolean)">
             <summary>Called when this shield's slam hits an enemy.</summary>
         </member>
-        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.Slam(Terraria.Player,Terraria.Projectile)">
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.Slam(Terraria.Player,Terraria.Projectile,System.Boolean)">
             <summary>Called on the first frame of a slam.</summary>
         </member>
-        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.SlamEnd(Terraria.Player,Terraria.Projectile)">
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.SlamEnd(Terraria.Player,Terraria.Projectile,System.Boolean)">
             <summary>Called on the last frame of a slam.</summary>
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.Push(Terraria.Player,Terraria.Projectile,Terraria.NPC)">
@@ -309,12 +317,17 @@
             <summary>Called when a projectile collides with the shield during a block. Return <c>true</c> to destroy the projectile. Defaults to <c>true</c>.</summary>
             <returns>Whether to destroy the projectile.</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:OrchidMod.Content.Guardian.OrchidModGuardianShield.Reflect(Terraria.Player,Terraria.Projectile,Terraria.Projectile,System.Int32@)" -->
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.Reflect(Terraria.Player,Terraria.Projectile,Terraria.Projectile,System.Int32@)">
+            <summary>Called when a projectile collides with the shield during a block, this should be use to spawn projectiles created by reflecting projectiles. </summary>
+        </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.BlockStart(Terraria.Player,Terraria.Projectile)">
             <summary>Called on the first frame of a block.</summary>
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.BlockEnd(Terraria.Player,Terraria.Projectile)">
             <summary>Called on the last frame of a block. Will spawn dust at the end of a block if it returns true</summary>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.PlayGuardSound(Terraria.Player,OrchidMod.OrchidGuardian,Terraria.Projectile)">
+            <summary> Responsible for playing the sound when the player begins guarding with the weapon. Default behavior is <c>SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(Main.rand.NextFloat(0.4f, 0.6f)), player.Center);</c> </summary>
         </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianShield.shouldFlip">
             <summary>Causes the shield's held sprite to flip when facing right.</summary>
@@ -342,6 +355,9 @@
         </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianShield.parryRotation">
             <summary>How fast the pavise rotates towards the player cursor while blocking. Arbitrary value, defaults to 10f.</summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianShield.ChargeSpeedMultiplier">
+            <summary>Charge speed multiplier for this item. Defaults to 1f.</summary>
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianStandard.DrawCustomFlag(Microsoft.Xna.Framework.Graphics.SpriteBatch,Terraria.Projectile,Terraria.Player,Microsoft.Xna.Framework.Color,Microsoft.Xna.Framework.Vector2,System.Single)">
             <summary>Overrides the default flag drawing, but still renders the shaft. Return true to prevent the default flag from being drawn.</summary>
@@ -518,6 +534,12 @@
         </member>
         <member name="F:OrchidMod.OrchidGuardian.GauntletPunchCooldown">
             <summary> Cooldown in frames between starting a new punch charge since starting the last one. Can begin a punch when 0 or lower, goes down to -10. Half of the gauntlet's punch animation time is added when a charge is started. </summary>
+        </member>
+        <member name="F:OrchidMod.OrchidGuardian.SlamCostUI">
+            <summary> Displays an outline around guards in the UI if > 0.</summary>
+        </member>
+        <member name="F:OrchidMod.OrchidGuardian.GuardCostUI">
+            <summary> Displays an outline around slams in the UI if > 0.</summary>
         </member>
         <member name="F:OrchidMod.OrchidGuardian.GuardianCounter">
             <summary> Allows the player to trigger counterattack effects. Set when able to use an item that has counterattack effects. Use GuardianCounterTime to check for counterattack eligibility. </summary>

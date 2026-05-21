@@ -197,7 +197,6 @@ namespace OrchidMod.Content.Guardian
 						Projectile.width = (int)(texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames);
 						Projectile.height = (int)(texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames);
 						aimedLocation += (oldDimensions * 0.5f - new Vector2(texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames, texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames) * 0.5f).Floor();
-						Projectile.localAI[1] = 0f;
 					}
 
 					aimedLocation += owner.MountedCenter.Floor() - oldOwnerPos.Floor();
@@ -265,7 +264,7 @@ namespace OrchidMod.Content.Guardian
 						if (target.active && !target.dontTakeDamage && !target.friendly && LineIntersectsRect(p2, p1, target.Hitbox))
 						{
 							bool contained = false;
-							foreach(BlockedEnemy blockedEnemy in guardian.GuardianBlockedEnemies)
+							foreach (BlockedEnemy blockedEnemy in guardian.GuardianBlockedEnemies)
 							{
 								if (blockedEnemy.npc == target)
 								{ // Enemy already blocked, reset the timer
@@ -302,7 +301,7 @@ namespace OrchidMod.Content.Guardian
 						}
 					}
 
-					Projectile.ai[0] --;
+					Projectile.ai[0]--;
 					if (Projectile.ai[0] <= 0f)
 					{
 						if (guardianItem.BlockEnd(owner, Projectile))
@@ -394,7 +393,7 @@ namespace OrchidMod.Content.Guardian
 					{
 						aimedLocation = Main.MouseWorld - owner.MountedCenter.Floor();
 						aimedLocation.Normalize();
-						
+
 						aimedLocation = Vector2.UnitX.RotatedBy(IsRotationLocked ? LockedRotation : OrchidModGuardianShield.GetSnappedAngle(guardianItem, owner, aimedLocation.ToRotation()));
 						Projectile.velocity = aimedLocation * float.Epsilon;
 						aimedLocation *= (guardianItem.distance + addedDistance) * -1f;
@@ -455,7 +454,7 @@ namespace OrchidMod.Content.Guardian
 					}
 					guardianItem.Slam(owner, Projectile, WeakSlam);
 					guardian.GuardianCounterTime = 0;
-				} 
+				}
 
 				UpdateHitbox();
 				if (guardian.GuardianShowDebugVisuals) SeeHitbox();
@@ -558,11 +557,11 @@ namespace OrchidMod.Content.Guardian
 				Texture2D texture = ModContent.Request<Texture2D>(guardianItem.ShieldTexture).Value;
 				Vector2 drawPosition = Projectile.Center - Main.screenPosition + Vector2.UnitY * player.gfxOffY;
 				SpriteEffects effect = Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-				float colorMult = (Projectile.ai[1] + Projectile.ai[0] > 0 ? 1f : (0.4f + Math.Abs((1f * Main.LocalPlayer.GetModPlayer<OrchidPlayer>().Timer120 - 60) / 120f)));
-				float flippedRotation = networkedRotation + (Projectile.spriteDirection == 1 ? 0 : MathHelper.Pi);
-				
+				float colorMult = (Projectile.ai[1] + Projectile.ai[0] > 0 ? 1f : (0.4f + Math.Abs((1f * Main.player[Main.myPlayer].GetModPlayer<OrchidPlayer>().Timer120 - 60) / 120f)));
+				float flippedRotation = Projectile.rotation + (Projectile.spriteDirection == 1 ? 0 : MathHelper.Pi);
+
 				Rectangle frame = texture.Frame(1, guardianItem.ShieldFrames, 0, ShieldAnimFrame % guardianItem.ShieldFrames);
-				
+
 				spriteBatch.Draw(texture, drawPosition, frame, color * colorMult, flippedRotation, frame.Size() * 0.5f, Projectile.scale, effect, 0f);
 
 				if (ModContent.RequestIfExists<Texture2D>(guardianItem.ShieldTexture + "_Glow", out Asset<Texture2D> assetglow))

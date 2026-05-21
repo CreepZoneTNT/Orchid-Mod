@@ -487,6 +487,8 @@ namespace OrchidMod.Content.Guardian
 							float dist = Projectile.Center.Distance(owner.Center);
 							Vector2 vel = Vector2.Normalize(owner.Center - Projectile.Center) * HammerItem.ReturnSpeed;
 
+							returning = true;
+
 							if (range < -30)
 							{
 								vel *= 1 - (30 - range) * 0.15f;
@@ -498,7 +500,11 @@ namespace OrchidMod.Content.Guardian
 								Projectile.velocity += vel;
 							}
 
-							if (dist < 30f && owner.whoAmI == Main.myPlayer) Projectile.Kill();
+							if (dist < 30f && owner.whoAmI == Main.myPlayer)
+							{
+								returning = false;
+								Projectile.Kill();
+							}
 
 							if (range < -60)
 							{

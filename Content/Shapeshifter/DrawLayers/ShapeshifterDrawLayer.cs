@@ -43,7 +43,7 @@ namespace OrchidMod.Content.Shapeshifter.DrawLayers
 			{
 				bool drawHairColor = (shapeshifter.ShapeshifterHairpin && !anchor.SwapHairColorTrigger) || (anchor.SwapHairColorTrigger && !shapeshifter.ShapeshifterHairpin);
 				Texture2D hairTexture = (anchor.TextureShapeshiftHairGray != null && drawHairColor) ? anchor.TextureShapeshiftHairGray : anchor.TextureShapeshiftHair;
-				Color color = shapeshifterItem.GetColor(shapeshifter.ShapeshifterHairpin ? lightColor.MultiplyRGBA(player.hairColor) : lightColor, anchorProjectile, anchor, player, shapeshifter, true);
+				Color color = shapeshifterItem.GetColor(shapeshifter.ShapeshifterHairpin ? lightColor.MultiplyRGBA(player.GetHairColor()) : lightColor, anchorProjectile, anchor, player, shapeshifter, true);
 				Color colorGlow = shapeshifterItem.GetColorGlow(lightColor, anchorProjectile, anchor, player, player.GetModPlayer<OrchidShapeshifter>());
 				Color colorLight = shapeshifterItem.GetColor(lightColor, anchorProjectile, anchor, player, shapeshifter);
 				Vector2 drawPosition = Vector2.Transform(anchorProjectile.Center - Main.screenPosition + Vector2.UnitY * player.gfxOffY, Main.GameViewMatrix.EffectMatrix).Floor();

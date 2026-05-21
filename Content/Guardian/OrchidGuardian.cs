@@ -22,11 +22,12 @@ namespace OrchidMod
 	{
 
 
+		public bool VanillaGodMode;
 		public bool CrossModGodMode;
 
 		// Misc & Static fields
 
-		/// <summary> Current timer for slam stack regen or degen. Increments slams at 1 or higher, decrements at -1 or lower.</summary>
+		/// <summary> List of projectile IDs that cannot be blocked by shields or warhammers. </summary>
 		public static List<int> ProjectilesBlockBlacklist;
 		public OrchidPlayer modPlayer;
 
@@ -56,6 +57,7 @@ namespace OrchidMod
 		public bool GuardianMeteorite = false; // Armor Sets
 		public bool GuardianBamboo = false;
 		public bool GuardianGit = false;
+		public bool GuardianVoid = false;
 		public bool GuardianHorizon = false;
 		public bool GuardianCrystalNinja = false;
 		public float GuardianSpikeDamage = 0; // Accessories
@@ -117,9 +119,11 @@ namespace OrchidMod
 		public bool GuardianCounter;
 		/// <summary> Timer for performing a counterattack if GuardianCounter is true. Set to 60 after guarding with a gauntlet, or to the block or counter duration after guarding with a pavise or quarterstaff. Will always be 0 if GuardianCounter is false. </summary>
 		public int GuardianCounterTime = 0;
+		/// <summary> Goes up to 10 as the player deals melee damage with Guardian weapons, but decreases if damage is taken. Affects bonus damage and life/resource regeneration while wearing Void Sentinel armor. </summary>
+		public float GuardianVoidMagnificence = 0;
 		/// <summary> Makes the GuardianCounter indicator flash Horizon colors instead of red. </summary>
 		public bool GuardianCounterHorizon;
-		public int GuardianShieldSpikeReflect = 5; // Shgield spikes only fire a projectile if this is >0
+		public int GuardianShieldSpikeReflect = 5; // Shield spikes only fire a projectile if this is >0
 		public List<BlockedEnemy> GuardianBlockedEnemies = new List<BlockedEnemy>();
 		public List<Projectile> RuneProjectiles = new List<Projectile>();
 		public Projectile GuardianCurrentStandardAnchor;
@@ -202,6 +206,9 @@ namespace OrchidMod
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("OctopusArm").Type);
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("GraniteEradicatorArm").Type);
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("KrakenArm").Type);
+				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("BeholderLavaCascade").Type);
+				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("BeholderLavaCascade1").Type);
+				
 			}
 			
 			if (ModLoader.TryGetMod("CheatSheet", out Mod cheatSheet))
@@ -221,7 +228,7 @@ namespace OrchidMod
 				HerosMod = herosMod;
 				// var godModeService = HerosMod.Code.GetType("HEROsMod.HEROsModServices.GodModeService");
 				// if (godModeService != null) HMGodMode ??= godModeService.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-				HMGodMode = HerosMod.Code.GetType("HEROsMod.HEROsModServices.GodModeService")?.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				HMGodMode = HerosMod.Code.GetType("HEROsMod.HEROsModServices.GodModeService")?.GetField("_enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 				if (HMGodMode != null)
 				{
 					Console.Out.WriteLine("OrchidGuardian: HERO's Mod detected");
@@ -318,6 +325,18 @@ namespace OrchidMod
 			}
 
 			if (GauntletPunchCooldown > -10) GauntletPunchCooldown--;
+			
+			
+			VanillaGodMode = false;
+			if (Player.difficulty == PlayerDifficultyID.Creative && Player.creativeGodMode) VanillaGodMode = true;
+			
+			bool csGodMode = false;
+			if (CheatSheet != null && CSGodMode != null) csGodMode = CSGodMode?.GetValue(null) is true;
+			bool hmGodMode = false;
+			if (HerosMod != null && HMGodMode != null) hmGodMode = HMGodMode?.GetValue(null) is true;
+			bool dlGodMode = false;
+			if (DragonLens != null && DLGodMode != null) dlGodMode = DLGodMode?.GetValue(null) is true;
+			CrossModGodMode = csGodMode || hmGodMode || dlGodMode;
 		}
 
 		public override void UpdateLifeRegen()
@@ -327,11 +346,6 @@ namespace OrchidMod
 
 		public override void ResetEffects()
 		{
-		
-			bool csGodMode = CheatSheet != null && CSGodMode != null && CSGodMode?.GetValue(null) is true;
-			bool hmGodMode = HerosMod != null && HMGodMode != null && HMGodMode?.GetValue(null) is true;
-			bool dlGodMode = DragonLens != null && DLGodMode != null && DLGodMode?.GetValue(null) is true;
-			CrossModGodMode = csGodMode || hmGodMode || dlGodMode;
 
 			// Resetting Core guardian fields
 			if (Player.itemTime > 0 && Player.HeldItem.damage > 0 && Player.HeldItem.ModItem is not OrchidModGuardianItem && Player.HeldItem.pick + Player.HeldItem.hammer + Player.HeldItem.axe == 0)
@@ -715,12 +729,12 @@ namespace OrchidMod
 
 		public bool UseSlam(int nb = 1, bool checkOnly = false, bool showUICost = false)
 		{
-			if (GuardianHorizon && Player.statLife > Player.statLifeMax2 * 0.5f && Player.statLife > 20)
+			if (GuardianHorizon && Player.statLife > Player.statLifeMax2 * 0.5f && Player.statLife > 20 * nb)
 			{ // Horizon armor set consumes health instead of guardian charges
 				if (!checkOnly)
 				{
-					Player.statLife -= 20;
-					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20, false, true);
+					Player.statLife -= 20 * nb;
+					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20 * nb, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
 				}
 				if (showUICost)
@@ -760,12 +774,12 @@ namespace OrchidMod
 
 		public bool UseGuard(int nb = 1, bool checkOnly = false, bool showUICost = false)
 		{
-			if (GuardianHorizon && Player.statLife > Player.statLifeMax2 * 0.5f && Player.statLife > 20)
+			if (GuardianHorizon && Player.statLife > Player.statLifeMax2 * 0.5f && Player.statLife > 20 * nb)
 			{ // Horizon armor set consumes health instead of guardian charges
 				if (!checkOnly)
 				{
-					Player.statLife -= 20;
-					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20, false, true);
+					Player.statLife -= 20 * nb;
+					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20 * nb, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
 				}
 				if (showUICost)

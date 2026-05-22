@@ -300,9 +300,7 @@ namespace OrchidMod.Common.Global.NPCs
 					}
 					break;
 				case NPCID.MartianSaucerCore:
-					{
-						npcLoot.Add(ItemDropRule.Common(ItemType<MartianWarhammer>(), 4));
-					}
+					npcLoot.Add(new DropBasedOnExpertMode(ItemDropRule.Common(ItemType<MartianWarhammer>(), 4), ItemDropRule.ByCondition(ThoriumDisabled, ItemType<MartianWarhammer>(), 4)));
 					break;
 				case NPCID.Paladin:
 					{

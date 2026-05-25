@@ -3399,6 +3399,16 @@ Items: {
 		DisplayName: Viking Piolet
 		Tooltip: Pierces foes when hurled
 	}
+
+	HorizonBrick: {
+		DisplayName: Horizon Brick
+		Tooltip: ""
+	}
+
+	HorizonChandelier: {
+		Tooltip: ""
+		DisplayName: Horizon Chandelier
+	}
 }
 
 NPCs: {

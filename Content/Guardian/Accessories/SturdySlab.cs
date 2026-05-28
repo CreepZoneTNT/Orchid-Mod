@@ -1,4 +1,5 @@
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ID;
 
 namespace OrchidMod.Content.Guardian.Accessories
@@ -26,10 +27,11 @@ namespace OrchidMod.Content.Guardian.Accessories
 			var thoriumMod = OrchidMod.ThoriumMod;
 			if (thoriumMod != null)
 			{
-				var recipe = CreateRecipe();
-				recipe.AddTile(TileID.Anvils);
-				recipe.AddIngredient(thoriumMod, "GraniteEnergyCore", 10);
-				recipe.Register();
+				CreateRecipe()
+				.AddTile(TileID.Anvils)
+				.AddIngredient(thoriumMod, "GraniteEnergyCore", 10)
+				.AddDecraftCondition(Condition.DownedSkeletron)
+				.Register();
 			}
 		}
 	}

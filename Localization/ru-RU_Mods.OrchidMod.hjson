@@ -3302,9 +3302,8 @@ Items: {
 		// DisplayName: Frost Walker
 		/* Tooltip:
 			'''
-			[c/FF0000:Test Item]
-			Attacks grant Cold Energy charge
-			At full Cold Energy charge, your next slam will release a giant snowflake
+			Attacks grant cold energy charge
+			At full cold energy charge, your next slam will release a giant freezing snowflake
 			''' */
 	}
 
@@ -3399,6 +3398,16 @@ Items: {
 	IceAxeHammer: {
 		// DisplayName: Viking Piolet
 		// Tooltip: Pierces foes when hurled
+	}
+
+	HorizonBrick: {
+		// DisplayName: Horizon Brick
+		// Tooltip: ""
+	}
+
+	HorizonChandelier: {
+		// Tooltip: ""
+		// DisplayName: Horizon Chandelier
 	}
 }
 
@@ -3857,9 +3866,10 @@ Projectiles: {
 	// ThoriumVoidQuarterstaffProjectile.DisplayName: Thorium Void Quarterstaff Projectile
 	// ThoriumDemonBloodGauntletProjectile.DisplayName: Thorium Demon Blood Gauntlet Projectile
 	// ThoriumNagaQuarterstaffProjectile.DisplayName: Thorium Naga Quarterstaff Projectile
-	// ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Thorium Concentrated Thorium Quarterstaff Projectile
-	// ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
-	// GuardianDoubleHammerAnchor.DisplayName: Guardian Double Hammer Anchor
+	// ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Leyline
+	// ThoriumTerrariumWarhammerProjectile.DisplayName: Terrarium Warhammer
+	// GuardianDoubleHammerAnchor.DisplayName: Warhammer
+	// ThoriumBoreanStriderQuarterstaffProjectile.DisplayName: Frost Walker Snowflake
 }
 
 Configs: {

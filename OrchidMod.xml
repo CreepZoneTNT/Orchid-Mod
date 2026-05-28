@@ -86,6 +86,9 @@
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.PlayPunchSound(Terraria.Player,OrchidMod.OrchidGuardian,Terraria.Projectile,System.Boolean)">
             <summary> Responsible for playing the sound when the player punches with the weapon. Default behavior is <c>SoundEngine.PlaySound(charged ? SoundID.DD2_MonkStaffGroundMiss : SoundID.DD2_MonkStaffSwing, player.Center);</c> </summary>
         </member>
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.GauntletPostDrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch,Terraria.Player,Microsoft.Xna.Framework.Color@,Terraria.Projectile,Terraria.Projectile)">
+            <summary>Draws extra UI elements on the GuardianUIState while held.</summary>
+        </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.PunchSpeed">
             <summary> Jab and slam animation speed multiplier. Also affected by melee speed, but not by usetime. </summary>
         </member>
@@ -158,6 +161,9 @@
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianHammer.CannotExplode">
             <summary>If true, the warhammer will be unaffected by the Remote Detonator accessory.</summary>
         </member>
+        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianHammer.IgnoreHammerThrowVelocity">
+            <summary>If true, the OrchidGuardian.GuardianHammerThrowVelocity multiplier will not affect throw velocity.</summary>
+        </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianHammer.OnBlockContact(Terraria.Player,OrchidMod.OrchidGuardian,Terraria.NPC,Terraria.Projectile)">
             <summary>Called upon pushing an enemy with a throw (can happen repeatedly).</summary>
         </member>
@@ -225,6 +231,9 @@
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianHammer.WarhammerPostDrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch,Terraria.Player,Microsoft.Xna.Framework.Color@,Terraria.Projectile)">
             <summary>Draws extra UI elements on the GuardianUIState while held.</summary>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.OrchidModGuardianItem.AnchorType">
+            <summary>The relevant anchor type this item spawns, if not null.</summary>
         </member>
         <member name="P:OrchidMod.Content.Guardian.OrchidModGuardianKatar.KatarTexture">
             <summary> Path to the texture of the held katar. </summary>
@@ -339,6 +348,9 @@
         </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianKatar.NoUpwardsParryDash">
             <summary> Prevents the user from dashing upwards. Generally used to balance very early game katars. Defaults to false. </summary>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianKatar.KatarPostDrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch,Terraria.Player,Microsoft.Xna.Framework.Color@,Terraria.Projectile,Terraria.Projectile)">
+            <summary>Draws extra UI elements on the GuardianUIState while held.</summary>
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianParryItem.OnParryOther(Terraria.Player,OrchidMod.OrchidGuardian,Terraria.Projectile)">
             <summary>Specifically called if the aggressor when initiating the parry is neither an NPC nor a Projectile.</summary>
@@ -629,6 +641,12 @@
         </member>
         <member name="F:OrchidMod.OrchidGuardian.GuardianRegenThreshold">
             <summary> The ratio of guards and slams out of the player's maximum that can naturally be regenerated before the regeneration penalty takes effect. Default is 0.5.</summary>
+        </member>
+        <member name="F:OrchidMod.OrchidGuardian.GuardianHammerMagnet">
+            <summary> Throw warhammers will bend in the direction of the cursor when thrown if this is >0f. For reference, the basic Hammer magnet sets this value to 50f. Defaults to 0f.</summary>
+        </member>
+        <member name="F:OrchidMod.OrchidGuardian.GuardianHammerThrowVelocity">
+            <summary> Multiplier applied to the velocity of all warhammer throws. Defaults to 1f.</summary>
         </member>
         <member name="F:OrchidMod.OrchidGuardian.GuardianGuardRecharging">
             <summary> Current timer for guard stack regen or degen. Increments guards at 1 or higher, decrements at -1 or lower.</summary>

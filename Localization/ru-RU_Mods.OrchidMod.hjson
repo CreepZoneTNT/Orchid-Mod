@@ -3302,8 +3302,9 @@ Items: {
 		// DisplayName: Frost Walker
 		/* Tooltip:
 			'''
-			Attacks grant cold energy charge
-			At full cold energy charge, your next slam will release a giant freezing snowflake
+			[c/FF0000:Test Item]
+			Attacks grant Cold Energy charge
+			At full Cold Energy charge, your next slam will release a giant snowflake
 			''' */
 	}
 
@@ -3400,14 +3401,9 @@ Items: {
 		// Tooltip: Pierces foes when hurled
 	}
 
-	HorizonBrick: {
-		// DisplayName: Horizon Brick
-		// Tooltip: ""
-	}
-
-	HorizonChandelier: {
-		// Tooltip: ""
-		// DisplayName: Horizon Chandelier
+	ThoriumPharaohQuarterstaff: {
+		// DisplayName: Shuwt
+		// Tooltip: Fully charge to release a burst of sand
 	}
 }
 
@@ -3863,13 +3859,13 @@ Projectiles: {
 	// HellstoneKatarProjectile.DisplayName: Trailblaze
 	// ThoriumGraniteKatarProjectile.DisplayName: Ion Deluge
 	// ToyWarhammerProjectile.DisplayName: The Big Honker
-	// ThoriumVoidQuarterstaffProjectile.DisplayName: Thorium Void Quarterstaff Projectile
+	// ThoriumVoidQuarterstaffProjectile.DisplayName: Void
 	// ThoriumDemonBloodGauntletProjectile.DisplayName: Thorium Demon Blood Gauntlet Projectile
 	// ThoriumNagaQuarterstaffProjectile.DisplayName: Thorium Naga Quarterstaff Projectile
-	// ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Leyline
-	// ThoriumTerrariumWarhammerProjectile.DisplayName: Terrarium Warhammer
-	// GuardianDoubleHammerAnchor.DisplayName: Warhammer
-	// ThoriumBoreanStriderQuarterstaffProjectile.DisplayName: Frost Walker Snowflake
+	// ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Thorium Concentrated Thorium Quarterstaff Projectile
+	// ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
+	// GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
+	// ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
 }
 
 Configs: {

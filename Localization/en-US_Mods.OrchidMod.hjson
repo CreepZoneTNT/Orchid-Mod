@@ -2766,7 +2766,7 @@ Items: {
 
 	ThoriumViscountQuarterstaff: {
 		DisplayName: Pipistrelle
-		Tooltip: Counterattacks turn you into a swarm of bats, ignoring 25 defense
+		Tooltip: Counterattacks turn you into a swarm of bats, ignoring 20 defense
 	}
 
 	ThoriumThoriumQuarterstaff: {
@@ -2866,7 +2866,7 @@ Items: {
 	}
 
 	ShawlOfTheWind: {
-		DisplayName: Shawl of the Wind
+		DisplayName: Shawl Of The Wind
 		Tooltip:
 			'''
 			12% increased movement speed
@@ -3301,9 +3301,8 @@ Items: {
 		DisplayName: Frost Walker
 		Tooltip:
 			'''
-			[c/FF0000:Test Item]
-			Attacks grant Cold Energy charge
-			At full Cold Energy charge, your next slam will release a giant snowflake
+			Attacks grant cold energy charge
+			At full cold energy charge, your next slam will release a giant freezing snowflake
 			'''
 	}
 
@@ -3388,7 +3387,11 @@ Items: {
 
 	ThoriumTerrariumWarhammer: {
 		DisplayName: Terrarium Warhammer
-		Tooltip: Melee swings deal increased damage
+		Tooltip:
+			'''
+			[c/FF0000:Test Item]
+			Calls down piercing afterimages on hit
+			'''
 	}
 
 	IceAxeHammer: {
@@ -3396,38 +3399,15 @@ Items: {
 		Tooltip: Pierces foes when hurled
 	}
 
-	ThoriumPharaohQuarterstaff: {
-		DisplayName: Shuwt
-		Tooltip: Fully charge to release a burst of sand
-	}
-
-	VampireWarhammer: {
-		DisplayName: Vampire Slayer
-		Tooltip:
-			'''
-			Blocking or fully charging throws a short-lived piercing cross that blocks
-			'Die, monster!'
-			'''
-		InstantChargeText: Die, monster!
-	}
-
-	ThoriumLifeQuartzCenser: {
-		DisplayName: Life Censer
-		Tooltip: Spending a slam shields the lowest health nearby ally life by 5, up to 10
-	}
-
-	ConsolariaLepusEggNest: {
-		DisplayName: Consolaria Lepus Egg Nest
+	HorizonBrick: {
+		DisplayName: Horizon Brick
 		Tooltip: ""
 	}
 
-	DepthDiverHelmet.Tooltip: Regenerates guards over time
-	DepthDiverChestplate.Tooltip:
-		'''
-		Increases maximum guards by 2
-		Enemies are more likely to target you
-		'''
-	DepthDiverGreaves.Tooltip: Increases maximum guards by 2
+	HorizonChandelier: {
+		Tooltip: ""
+		DisplayName: Horizon Chandelier
+	}
 }
 
 NPCs: {
@@ -3882,14 +3862,13 @@ Projectiles: {
 	HellstoneKatarProjectile.DisplayName: Trailblaze
 	ThoriumGraniteKatarProjectile.DisplayName: Ion Deluge
 	ToyWarhammerProjectile.DisplayName: The Big Honker
-	ThoriumVoidQuarterstaffProjectile.DisplayName: Void
+	ThoriumVoidQuarterstaffProjectile.DisplayName: Thorium Void Quarterstaff Projectile
 	ThoriumDemonBloodGauntletProjectile.DisplayName: Thorium Demon Blood Gauntlet Projectile
 	ThoriumNagaQuarterstaffProjectile.DisplayName: Thorium Naga Quarterstaff Projectile
-	ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Thorium Concentrated Thorium Quarterstaff Projectile
-	ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
-	GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
-	ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
-	ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
+	ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Leyline
+	ThoriumTerrariumWarhammerProjectile.DisplayName: Terrarium Warhammer
+	GuardianDoubleHammerAnchor.DisplayName: Warhammer
+	ThoriumBoreanStriderQuarterstaffProjectile.DisplayName: Frost Walker Snowflake
 }
 
 Configs: {
@@ -3909,11 +3888,7 @@ Configs: {
 
 		ShowModTags: {
 			Label: Show Mod Tags
-			Tooltip:
-				'''
-				Enables/Disables the display of cross-content items tooltips
-				(Load Crossmod-Content without required mods must be enabled in Orchid Server Config)
-				'''
+			Tooltip: Enables/Disables the display of cross-content items tooltips (Load Crossmod-Content without required mods must be enabled in Orchid Server Config)
 		}
 
 		GuardianUseOldHammerUi: {
@@ -3943,25 +3918,17 @@ Configs: {
 
 		ShapeshifterUseHairColor: {
 			Label: Use Hair Color for Wildshapes
-			Tooltip:
-				'''
-				Applies the 'Peculiar Hairpin' accessory effect at all times, and has it apply the default wildshape color instead.
-				The hairpin can still be used to apply dye to wildshape hair
-				'''
+			Tooltip: Applies the 'Peculiar Hairpin' accessory effect at all times, and has it apply the default wildshape color instead. The hairpin can still be used to apply dye to wildshape hair.
 		}
 
 		ShapeshifterHookDelay: {
 			Label: Shawl Dash Hook Delay
-			Tooltip: While a 'Shawl' accessory is equipped, how long should the hook key be held (in frames) before the hook is fired
+			Tooltip: While a 'Shawl' accessory is equipped, how long should the hook key be held (in frames) before the hook is fired.
 		}
 
 		ShapeshifterHookDashRelease: {
 			Label: Shawl Dash on release
-			Tooltip:
-				'''
-				Triggers 'Shawl' accessory dashes when releasing the hook key instead of pressing it
-				(allowing to launch a hook without dashing)
-				'''
+			Tooltip: Triggers 'Shawl' accessory dashes when releasing the hook key instead of pressing it (allowing to launch a hook without dashing)
 		}
 
 		ShapeshifterScrollDelay: {
@@ -4002,15 +3969,6 @@ Configs: {
 		GuardianThoriumBoreanStriderColorUI: {
 			Label: Frost Walker UI uses colored icon
 			Tooltip: The Frost Walker's special 'snowflake charge' UI will use a colored icon (the Ice Gauntlet's crystal projectile) instead of a monochrome variant
-		}
-
-		SmartSmartCursor: {
-			Label: Smart Smart Cursor
-			Tooltip:
-				'''
-				Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.
-				No effect if Smart Cursor isn't set to 'Toggle'
-				'''
 		}
 	}
 
@@ -4186,5 +4144,3 @@ Conditions: {
 	EnableContentGambler: Gambler content is enabled
 	EnableContentShapeshifter: Shapeshifter content is enabled
 }
-
-RecipeGroups.Any: Mods.OrchidMod.RecipeGroups.Any

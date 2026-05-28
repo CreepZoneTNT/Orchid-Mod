@@ -7,18 +7,20 @@ using OrchidMod.Content.Guardian.Projectiles.Warhammers;
 using OrchidMod.Utilities;
 using System.Collections.Generic;
 using System.Linq;
+using System.Transactions;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.Audio;
+using Terraria.Initializers;
 
 namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 {
     public class ToyWarhammers : OrchidModGuardianHammer
     {
-
-        private SoundStyle SqueakSound = new SoundStyle("OrchidMod/Assets/Sounds/Squeak") { PitchRange = (-0.2f, 0.2f), MaxInstances = 5 };
+	    
+        public static SoundStyle SqueakSound = new SoundStyle("OrchidMod/Assets/Sounds/Squeak") { PitchRange = (-0.2f, 0.2f), MaxInstances = 5 };
 
         public override void SafeSetDefaults()
         {
@@ -38,94 +40,190 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
             BlockDuration = 60;
             hasSpecialHammerTexture = true;
             HoldOffset = -2f;
+            CannotBlock = true;
         }
-        
+
         public override bool? UseItem(Player player)
+        {
+	        var guardian = player.GetModPlayer<OrchidGuardian>();
+
+	        if (Main.mouseLeft)
+	        { // If the player does a valid RMB input (the weapon can block) or a mouseleft input - so we don't create a proejctile for nothing in edge cases
+		        int damage = guardian.GetGuardianDamage(Item.damage);
+		        
+		        int projTypeMain = ModContent.ProjectileType<GuardianHammerAnchor>();
+		        Projectile projMain = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center, Vector2.Zero, projTypeMain, damage, Item.knockBack, player.whoAmI);
+		        projMain.CritChance = (int)(player.GetCritChance<GuardianDamageClass>() + player.GetCritChance<GenericDamageClass>() + Item.crit);
+
+		        bool altExists = false;
+		        Projectile projAlt = GetAltProjectile(player, out ToyWarhammerProjectile _);
+		        if (projAlt == null)
+		        {
+			        int projTypeAlt = ModContent.ProjectileType<GuardianHammerAnchor>();
+			        projAlt = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center, Vector2.Zero, projTypeAlt, damage, Item.knockBack, player.whoAmI);
+			        projAlt.CritChance = (int)(player.GetCritChance<GuardianDamageClass>() + player.GetCritChance<GenericDamageClass>() + Item.crit);
+		        }
+		        else altExists = true;
+
+		        guardian.GuardianItemCharge = 0f;
+		        return true;
+	        }
+
+	        return false;
+        }
+
+		public override void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile)
 		{
-			var guardian = player.GetModPlayer<OrchidGuardian>();
-			int damage = guardian.GetGuardianDamage(Item.damage);
-
-			int projTypeMain = ModContent.ProjectileType<GuardianHammerAnchor>();
-			Projectile mainProjectile = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center, Vector2.Zero, projTypeMain, damage, Item.knockBack, player.whoAmI);
-			mainProjectile.CritChance = (int)(player.GetCritChance<GuardianDamageClass>() + player.GetCritChance<GenericDamageClass>() + Item.crit);
-
-			int projTypeAlt = ModContent.ProjectileType<ToyWarhammerProjectile>();
-			Projectile altProjectile = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center, Vector2.Zero, projTypeAlt, damage, Item.knockBack, player.whoAmI);
-			altProjectile.CritChance = (int)(player.GetCritChance<GuardianDamageClass>() + player.GetCritChance<GenericDamageClass>() + Item.crit);
-
-			if (Main.mouseRight && Main.mouseRightRelease && mainProjectile.ModProjectile is GuardianHammerAnchor anchorMain && altProjectile.ModProjectile is ToyWarhammerProjectile anchorAlt && ((SlamBlockCost > 0 && guardian.UseSlam(SlamBlockCost, true)) || (GuardBlockCost > 0 && guardian.UseGuard(GuardBlockCost, true))))
+			Projectile altProj = GetAltProjectile(player, out ToyWarhammerProjectile altAnchor);
+			if (altProj != null && altAnchor != null && altProj.ai[1] <= 0)
 			{
-				if (SlamBlockCost > 0) guardian.UseSlam(SlamBlockCost);
-				if (GuardBlockCost > 0) guardian.UseGuard(GuardBlockCost);
+				if (altProj.ai[1] == 0)
+				{
+					if (projectile.ai[1] == 1 && guardian.GuardianItemCharge < 210f)
+					{
+						guardian.GuardianItemCharge += 30f / Item.useTime * player.GetTotalAttackSpeed(DamageClass.Melee);
 
-                if (anchorMain.BlockDuration != 0) {
-                    altProjectile.velocity = Vector2.Normalize(Main.MouseWorld - player.Center) * (10f + (Item.shootSpeed - 10f) * 0.35f * BlockVelocityMult);
-                    altProjectile.friendly = true;
-                    altProjectile.knockBack = 0f;
-                    altProjectile.tileCollide = true;
+						if (guardian.GuardianItemCharge > 210f) guardian.GuardianItemCharge = 210f;
+					}
 
-                    anchorAlt.BlockDuration = (int)(BlockDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianBlockDuration + 10);
-                    anchorAlt.NeedNetUpdate = true;
-                }
-                else {
-                    mainProjectile.velocity = Vector2.Normalize(Main.MouseWorld - player.Center) * (10f + (Item.shootSpeed - 10f) * 0.35f * BlockVelocityMult);
-                    mainProjectile.friendly = true;
-                    mainProjectile.knockBack = 0f;
-                    mainProjectile.tileCollide = true;
+					if (player.whoAmI == Main.myPlayer)
+					{
+						if (!player.controlUseItem)
+						{
+							if (player.boneGloveItem != null && !player.boneGloveItem.IsAir && player.boneGloveTimer == 0)
+							{ // Bone glove compatibility, from vanilla code
+								player.boneGloveTimer = 60;
+								Vector2 center = player.Center;
+								Vector2 vector = player.DirectionTo(player.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
+								Projectile.NewProjectile(player.GetSource_ItemUse(player.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, player.whoAmI);
+							}
 
-                    anchorMain.BlockDuration = (int)(BlockDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianBlockDuration + 10);
-                    anchorMain.NeedNetUpdate = true;
-                }
+							if (guardian.GuardianItemCharge > 10f)
+							{ // Hammer is charged enough to be thrown (or can't be thrown)
+								altProj.ai[1] = 1;
 
-				
-			}
+								Vector2 dir = Vector2.Normalize(Main.MouseWorld - player.Center) * Item.shootSpeed * (IgnoreHammerThrowVelocity ? 1f : guardian.GuardianHammerThrowVelocity);
 
-			guardian.GuardianItemCharge = 0f;
-			return true;
-		}
+								if (guardian.ThrowLevel() < 4)
+								{
+									dir *= (0.3f * (guardian.ThrowLevel() + 2) / 3);
+									altProj.damage = (int)(altProj.damage * 0.75f);
+									altProj.knockBack = (int)(altProj.knockBack / 3f);
+									altProj.ai[0] = 1f;
+								}
 
-        public override bool CanUseItem(Player player)
-		{
-			int projTypeMain = ModContent.ProjectileType<GuardianHammerAnchor>();
-			int projTypeAlt = ModContent.ProjectileType<GuardianHammerAnchor>();
+								altProj.velocity = dir;
+								altProj.rotation = dir.ToRotation();
+								altProj.direction = altProj.spriteDirection;
+								altProj.netUpdate = true;
 
-			if (Main.mouseRight && Main.mouseRightRelease)
-			{
-				var projMain = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == projTypeMain && i.ModProjectile is GuardianHammerAnchor warhammerMain && warhammerMain.BlockDuration > 0);
-				var projAlt = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == projTypeAlt && i.ModProjectile is ToyWarhammerProjectile warhammerAlt && warhammerAlt.BlockDuration > 0);
-                if (projMain != null && projMain.ModProjectile is GuardianHammerAnchor warhammerMain)
-				{ // recalls existing blocking warhammers when right clicking
-                    if (projAlt != null && projAlt.ModProjectile is ToyWarhammerProjectile alt && alt.BlockDuration != 0) {
-                        warhammerMain.BlockDuration = -30; // -30 instead of -1 so they return faster
-                        projMain.netUpdate = true;
-                    }
+								guardian.GuardianItemCharge = 0;
+							}
+							else
+							{ // charged too little, hammer is swung
+								altProj.ai[1] = -61f;
+								altProj.netUpdate = true;
+							}
+						}
+						else if (Main.mouseRight)
+						{
+							if (player.boneGloveItem != null && !player.boneGloveItem.IsAir && player.boneGloveTimer == 0)
+							{ // Bone glove compatibility, from vanilla code
+								player.boneGloveTimer = 60;
+								Vector2 center = player.Center;
+								Vector2 vector = player.DirectionTo(player.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
+								Projectile.NewProjectile(player.GetSource_ItemUse(player.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, player.whoAmI);
+							}
+
+							altProj.ai[1] = -60f;
+							altProj.netUpdate = true;
+						}
+					}
 				}
-                if (projAlt != null && projAlt.ModProjectile is ToyWarhammerProjectile warhammerAlt)
-                { 
-                    if (projMain == null || projMain is { ModProjectile: GuardianHammerAnchor { BlockDuration: 0 } }) {
-                        warhammerAlt.BlockDuration = -30; // -30 instead of -1 so they return faster
-                        projAlt.netUpdate = true;
-                    }
-                }
 			}
-
-			if ((player.ownedProjectileCounts[projTypeMain] > 0 && player.ownedProjectileCounts[projTypeAlt] > 0) || (!(Main.mouseRight && Main.mouseRightRelease && player.GetModPlayer<OrchidGuardian>().UseGuard(1, true)) && !Main.mouseLeft)) return false;
-			return base.CanUseItem(player);
 		}
 
-        public override void OnMeleeHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged)
-        {
-            SoundEngine.PlaySound(SqueakSound);
-        }
+		public override void OnSwing(Player player, OrchidGuardian guardian, Projectile projectile, bool FullyCharged)
+		{
+			Projectile altProj = GetAltProjectile(player, out ToyWarhammerProjectile altAnchor);
+			if (altProj != null && altAnchor != null && altProj.ai[1] == 0)
+			{
+				if (player.boneGloveItem != null && !player.boneGloveItem.IsAir && player.boneGloveTimer == 0)
+				{
+					// Bone glove compatibility, from vanilla code
+					player.boneGloveTimer = 60;
+					Vector2 center = player.Center;
+					Vector2 vector = player.DirectionTo(player.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
+					Projectile.NewProjectile(player.GetSource_ItemUse(player.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, player.whoAmI);
+				}
 
-        public override void OnThrowHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak)
-        {
-            SoundEngine.PlaySound(SqueakSound);
-        }
+				altProj.ai[1] = -60f;
+				altProj.netUpdate = true;
+			}
+		}
 
-        public override void OnThrowTileCollide(Player player, OrchidGuardian guardian, Projectile projectile, Vector2 oldVelocity)
+		public override void OnThrow(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak)
+		{
+			if (projectile.ModProjectile is GuardianHammerAnchor)
+			{
+				Projectile altProj = GetAltProjectile(player, out ToyWarhammerProjectile altAnchor);
+				if (altProj != null && altAnchor != null && altProj.ai[1] == 0)
+				{
+					if (player.boneGloveItem != null && !player.boneGloveItem.IsAir && player.boneGloveTimer == 0)
+					{ // Bone glove compatibility, from vanilla code
+						player.boneGloveTimer = 60;
+						Vector2 center = player.Center;
+						Vector2 vector = player.DirectionTo(player.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
+						Projectile.NewProjectile(player.GetSource_ItemUse(player.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, player.whoAmI);
+					}
+
+					if (guardian.GuardianItemCharge > 10f)
+					{ // Hammer is charged enough to be thrown (or can't be thrown)
+						altProj.ai[1] = 1;
+
+						Vector2 dir = Vector2.Normalize(Main.MouseWorld - player.Center) * Item.shootSpeed * (IgnoreHammerThrowVelocity ? 1f : guardian.GuardianHammerThrowVelocity);
+
+						if (guardian.ThrowLevel() < 4)
+						{
+							dir *= (0.3f * (guardian.ThrowLevel() + 2) / 3);
+							altProj.damage = (int)(altProj.damage * 0.75f);
+							altProj.knockBack = (int)(altProj.knockBack / 3f);
+							altProj.ai[0] = 1f;
+						}
+
+						altProj.velocity = dir;
+						altProj.rotation = dir.ToRotation();
+						altProj.direction = altProj.spriteDirection;
+						altProj.netUpdate = true;
+
+						guardian.GuardianItemCharge = 0;
+					}
+					else
+					{ // charged too little, hammer is swung
+						altProj.ai[1] = -61f;
+						altProj.netUpdate = true;
+					}
+					projectile.Kill();
+				}
+			}
+		}
+
+		public override void OnMeleeHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged) => SoundEngine.PlaySound(SqueakSound);
+
+        public override void OnThrowHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak) => SoundEngine.PlaySound(SqueakSound);
+
+        public override void OnThrowTileCollide(Player player, OrchidGuardian guardian, Projectile projectile, Vector2 oldVelocity) => SoundEngine.PlaySound(SqueakSound);
+
+        public Projectile GetAltProjectile(Player player, out ToyWarhammerProjectile altAnchor)
         {
-            SoundEngine.PlaySound(SqueakSound);
+	        Projectile altProj = Main.projectile.FirstOrDefault(proj => proj.whoAmI < Main.maxProjectiles && proj.active && proj.owner == Main.myPlayer && proj.type == ModContent.ProjectileType<ToyWarhammerProjectile>());
+	        altAnchor = null;
+	        if (altProj != null && altProj.ModProjectile is ToyWarhammerProjectile anchor)
+	        {
+		        altAnchor = anchor;
+		        return altProj;
+	        }
+	        return null;
         }
     }
 }

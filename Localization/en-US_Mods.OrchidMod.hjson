@@ -3301,8 +3301,9 @@ Items: {
 		DisplayName: Frost Walker
 		Tooltip:
 			'''
-			Attacks grant cold energy charge
-			At full cold energy charge, your next slam will release a giant freezing snowflake
+			[c/FF0000:Test Item]
+			Attacks grant Cold Energy charge
+			At full Cold Energy charge, your next slam will release a giant snowflake
 			'''
 	}
 
@@ -3402,16 +3403,6 @@ Items: {
 	ThoriumPharaohQuarterstaff: {
 		DisplayName: Shuwt
 		Tooltip: Fully charge to release a burst of sand
-	}
-
-	HorizonBrick: {
-		DisplayName: Horizon Brick
-		Tooltip: ""
-	}
-
-	HorizonChandelier: {
-		Tooltip: ""
-		DisplayName: Horizon Chandelier
 	}
 }
 

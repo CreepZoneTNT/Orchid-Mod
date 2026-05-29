@@ -4,9 +4,11 @@ using Microsoft.Xna.Framework.Graphics;
 using OrchidMod.Content.Guardian.Misc;
 using OrchidMod.Content.Guardian.Projectiles.Misc;
 using OrchidMod.Utilities;
+using ReLogic.Content;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -14,7 +16,7 @@ namespace OrchidMod.Content.Guardian.Tiles;
 
 public class HorizonBrickTile : ModTile
 {
-	public Texture2D GlowMask;
+	public Asset<Texture2D> GlowMask;
 
 	
 	public override void SetStaticDefaults()
@@ -28,17 +30,14 @@ public class HorizonBrickTile : ModTile
 		HitSound = SoundID.Tink;
 		AddMapEntry(new Color(159, 122, 163));
 		
-		
-
-		GlowMask ??= ModContent.Request<Texture2D>(Texture + "_Glow").Value;
+		GlowMask = ModContent.Request<Texture2D>(Texture + "_Glow");
 	}
 	
 	public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
 	{
-		Vector3 horizonColor = HorizonBrick.HorizonBrickColor.ToVector3() * 0.5f;
-		r = horizonColor.X;
-		g = horizonColor.Y;
-		b = horizonColor.Z;
+		r = 0.5f;
+		g = 0.33f;
+		b = 0.5f;
 	}
 
 	public override void NumDust(int i, int j, bool fail, ref int num) => num = fail ? 1 : 3;
@@ -60,9 +59,34 @@ public class HorizonBrickTile : ModTile
 	// 	return false;
 	// }
 	
-	public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+	public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
 	{
-		drawData.drawTexture = GlowMask;
-		drawData.glowColor = HorizonBrick.HorizonBrickColor;
+		Tile tile = Main.tile[i, j];
+		Vector2 zero = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
+
+		Texture2D texture = TextureAssets.Tile[Type].Value;
+		spriteBatch.Draw(
+			texture,
+			new Vector2(i * 16f, j * 16f) - Main.screenPosition + zero,
+			new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16),
+			Lighting.GetColor(i, j),
+			0f, Vector2.Zero, 1f, SpriteEffects.None, 0f
+		);
+		
+		spriteBatch.Draw(
+			GlowMask.Value,
+			new Vector2(i * 16f, j * 16f) - Main.screenPosition + zero,
+			new Rectangle(tile.TileFrameX, tile.TileFrameY, 16, 16),
+			Lighting.GetColor(i, j, HorizonBrick.HorizonBrickColor),
+			0f, Vector2.Zero, 1f, SpriteEffects.None, 0f
+		);
+
+		return false;
 	}
+	
+	// public override void DrawEffects(int i, int j, SpriteBatch spriteBatch, ref TileDrawInfo drawData)
+	// {
+	// 	drawData.drawTexture = GlowMask;
+	// 	drawData.glowColor = HorizonBrick.HorizonBrickColor;
+	// }
 }

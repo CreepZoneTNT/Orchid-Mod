@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using OrchidMod.Content.Guardian.Projectiles.Misc;
 using OrchidMod.Content.Guardian.Tiles;
 using OrchidMod.Utilities;
+using ReLogic.Content;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,9 +14,9 @@ namespace OrchidMod.Content.Guardian.Misc
 {
 	public class HorizonBrick : ModItem
 	{
-		public Texture2D GlowMask;
+		public Asset<Texture2D> GlowMask;
 		
-		public static Color HorizonBrickColor => GuardianHorizonLanceAnchor.GetHorizonGlowColor(Math.Sin(Main.timeForVisualEffects * 0.005f), 0.4f + (float)Math.Cos(Main.timeForVisualEffects * 0.01f) * 0.1f);
+		public static Color HorizonBrickColor => GuardianHorizonLanceAnchor.GetHorizonGlowColor(Math.Sin(Main.timeForVisualEffects * 0.02f), 0.6f + (float)Math.Cos(Main.timeForVisualEffects * 0.04f) * 0.1f, 0.8f);
 
 
 		public override void SetStaticDefaults()
@@ -28,12 +29,12 @@ namespace OrchidMod.Content.Guardian.Misc
 			Item.width = 20;
 			Item.height = 20;
 			
-			GlowMask ??= ModContent.Request<Texture2D>(Texture + "_Glow").Value;
+			GlowMask = ModContent.Request<Texture2D>(Texture + "_Glow");
 		}
 
 		public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)
 		{
-			spriteBatch.Draw(GlowMask, position, null, HorizonBrickColor, 0f, GlowMask.Size() * 0.5f, scale, SpriteEffects.None, 0f);
+			spriteBatch.Draw(GlowMask.Value, position, null, HorizonBrickColor, 0f, GlowMask.Size() * 0.5f, scale, SpriteEffects.None, 0f);
 
 			return true;
 		}
@@ -44,7 +45,7 @@ namespace OrchidMod.Content.Guardian.Misc
 			Vector2 drawOrigin = itemFrame.Size() * 0.5f;
 			Vector2 drawPosition = Item.Bottom - Main.screenPosition - new Vector2(0, drawOrigin.Y);
 			
-			spriteBatch.Draw(GlowMask, drawPosition, itemFrame, Lighting.GetColor((int)(Item.position.X / 16f), (int)(Item.position.Y / 16f), HorizonBrickColor), rotation, GlowMask.Size() * 0.5f, scale, SpriteEffects.None, 0f);
+			spriteBatch.Draw(GlowMask.Value, drawPosition, itemFrame, Lighting.GetColor((int)(Item.position.X / 16f), (int)(Item.position.Y / 16f), HorizonBrickColor), rotation, GlowMask.Size() * 0.5f, scale, SpriteEffects.None, 0f);
 			
 			return true;
 		}

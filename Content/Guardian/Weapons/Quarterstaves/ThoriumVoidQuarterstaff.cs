@@ -51,18 +51,6 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 
 		public override void SafeHoldItem(Player player)
 		{
-			if (player.HasBuff(ModContent.BuffType<GuardianVoidQuarterstaffBuff>())) 
-			{
-				JabSpeed = 0.3333f;
-				SwingSpeed = 0.4f;
-				CounterSpeed = 0.3333f;
-
-			}
-			else {
-				JabSpeed = 1.0f;
-				SwingSpeed = 1.2f;
-				CounterSpeed = 1.0f;
-			}
 		}
 
 		public override void ExtraAIQuarterstaff(Player player, OrchidGuardian guardian, Projectile projectile)
@@ -90,7 +78,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 
 		public override void OnAttack(Player player, OrchidGuardian guardian, Projectile projectile, bool jabAttack, bool counterAttack) 
 		{ 
-			if (OrchidMod.ThoriumMod != null && !jabAttack && !counterAttack) 
+			if (!jabAttack && !counterAttack) 
 			{
 				projectile.scale *= 1.25f;
 				projectile.width = (int)(projectile.width * 1.25f);
@@ -100,29 +88,22 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 				if (player.direction == 1) tipPosition.X -= 12;
 
 				Vector2 velocity = Vector2.UnitY.RotatedBy((player.Center - Main.MouseWorld).ToRotation() + MathHelper.PiOver2);
-				
 
-				int dustType = OrchidMod.ThoriumMod.Find<ModDust>("VoidHeartDust").Type;
+				var thoriumMod = OrchidMod.ThoriumMod;
+				int dustType = thoriumMod != null ? thoriumMod.Find<ModDust>("VoidHeartDust").Type : DustID.Shadowflame;
 
 				for (int i = 0; i < 10; i++) {
 					Dust.NewDustDirect(player.Center, 24, 24, dustType, Scale: 3f);
 				}
 
-				int distance = 0;
-				for (int i = 0; i < 600; i++) 
+				NPC hitNPC = CalcFirstThingInLine(player, velocity, 600, out List<Vector2> samplePoints, out Vector2 finalPoint);
+				foreach (Vector2 point in samplePoints)
 				{
-					Vector2 point = player.Center + velocity * i;
-					if (i > 40 && i % 20 == 0 && Main.rand.NextBool(10))
+					if (Main.rand.NextBool(10))
 					{
 						Dust dust = Dust.NewDustPerfect(point, dustType);
 						dust.noGravity = true;
 					}
-					distance++;
-
-					NPC hitEnemy = Main.npc.FirstOrDefault(npc => npc.active && npc.whoAmI < Main.maxNPCs && !npc.friendly && Collision.CheckAABBvAABBCollision(point, player.Hitbox.Size(), npc.position, npc.Hitbox.Size()));
-					Tile hitTile = Framing.GetTileSafely((int)(point.X / 16f), (int)(point.Y / 16));
-					if (hitEnemy != null || (hitTile.HasTile && Main.tileSolid[hitTile.TileType] && !Main.tileSolidTop[hitTile.TileType])) 
-						break;
 				}
 				
 				if (IsLocalPlayer(player))
@@ -131,11 +112,11 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 				}
 
 				player.RemoveAllGrapplingHooks();
-				player.Center += velocity * (distance - 20);
+				player.Center = finalPoint;
 
 				projectile.localAI[0] = 10;
 			
-				SoundEngine.PlaySound(SoundID.Item8 with {Volume = 4f});
+				SoundEngine.PlaySound(SoundID.Item8);
 			}
 		}
 
@@ -211,7 +192,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 
 				if (++offSet >= 80) offSet = 0;
 
-				NPC hitNPC = CalcFirstThingInLine(player, 600, out List<Vector2> samplePoints, out Vector2 finalPoint);
+				NPC hitNPC = CalcFirstThingInLine(player, player.Center.DirectionTo(Main.MouseWorld), 600, out List<Vector2> samplePoints, out Vector2 finalPoint);
 				
 				for (int i = 0; i < samplePoints.Count; i++) 
 				{
@@ -223,15 +204,20 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 
 					Vector2 drawPositionLine = Vector2.Transform(reticlePoint - Main.screenPosition, Main.GameViewMatrix.EffectMatrix);
 
-					spriteBatch.Draw(TextureLineBlur, drawPositionLine, null, drawColor * 0.8f, (reticlePoint - player.Center).ToRotation(), TextureLineBlur.Size() * 0.5f, 0.2f, SpriteEffects.None, 0f);
-					spriteBatch.Draw(TextureLine, drawPositionLine, null, drawColor, (reticlePoint - player.Center).ToRotation(), TextureLine.Size() * 0.5f, 0.05f, SpriteEffects.None, 0f);
+					float dimension = 0;
+					if (hitNPC != null)
+						dimension = hitNPC.GetLargestDimension() * 0.5f;
+
+					// if (i < samplePoints.Count - (int)dimension) {
+						spriteBatch.Draw(TextureLineBlur, drawPositionLine, null, drawColor * 0.8f, (reticlePoint - player.Center).ToRotation(), TextureLineBlur.Size() * 0.5f, 0.2f, SpriteEffects.None, 0f);
+						spriteBatch.Draw(TextureLine, drawPositionLine, null, drawColor, (reticlePoint - player.Center).ToRotation(), TextureLine.Size() * 0.5f, 0.05f, SpriteEffects.None, 0f);
+					// }
 
 					if (i == samplePoints.Count - 1) {
 						if (hitNPC != null) 
 						{
-							float maxDimension = Math.Max(hitNPC.width / 2f, hitNPC.height / 2f);
 							Vector2 drawPositionOutlineAura = Vector2.Transform(hitNPC.Center - Main.screenPosition, Main.GameViewMatrix.EffectMatrix);
-							spriteBatch.Draw(TextureRing, drawPositionOutlineAura, null, drawColor, 0f, TextureRing.Size() * 0.5f, 0.007f * maxDimension, SpriteEffects.None, 0f);
+							spriteBatch.Draw(TextureRing, drawPositionOutlineAura, null, drawColor, 0f, TextureRing.Size() * 0.5f, 0.007f * dimension, SpriteEffects.None, 0f);
 						}
 						else {
 							Vector2 drawPositionReticle = Vector2.Transform(finalPoint - Main.screenPosition, Main.GameViewMatrix.EffectMatrix);
@@ -271,20 +257,18 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			}
 		}
 
-		public static NPC CalcFirstThingInLine(Player player, int maxSteps, out List<Vector2> samplePoints, out Vector2 finalPoint)
+		public static NPC CalcFirstThingInLine(Player player, Vector2 velocity, int maxSteps, out List<Vector2> samplePoints, out Vector2 finalPoint)
 		{
 			NPC hitNPC = null;
 			samplePoints = [];
 			finalPoint = Vector2.Zero;
-
-			Vector2 velocity = player.Center.DirectionTo(Main.MouseWorld);
 
 			for (int i = 0; i < maxSteps; i++) 
 			{
 				Vector2 point = player.Center + velocity * i;
 				if (i > 40 && i % 4 == 0) samplePoints.Add(point);
 
-				hitNPC = Main.npc.FirstOrDefault(npc => npc.active && npc.whoAmI < Main.maxNPCs && !npc.friendly && Collision.CheckAABBvAABBCollision(point, player.Hitbox.Size(), npc.position, npc.Hitbox.Size()));
+				hitNPC = Main.npc.FirstOrDefault(npc => npc.active && npc.whoAmI < Main.maxNPCs && !npc.friendly && OrchidUtils.CheckCircularvCircularCollision(point, player.GetDimension() * 0.5f, npc.Center, npc.GetDimension(false) * 0.5f));
 				if (hitNPC != null && !hitNPC.dontTakeDamage) 
 				{
 					finalPoint = point;

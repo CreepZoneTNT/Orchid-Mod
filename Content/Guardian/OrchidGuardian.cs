@@ -1,26 +1,27 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Microsoft.Xna.Framework;
 using OrchidMod.Common.ModObjects;
-using OrchidMod.Content.Guardian;
 using OrchidMod.Content.Guardian.Buffs;
 using OrchidMod.Content.Guardian.Projectiles.Misc;
 using OrchidMod.Content.Guardian.Projectiles.Standards;
 using OrchidMod.Content.Guardian.Weapons.Gauntlets;
-using System;
-using System.Reflection;
-using System.Collections.Generic;
 using Terraria;
-using Terraria.Localization;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameInput;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
-using System.Linq;
 
-namespace OrchidMod
+namespace OrchidMod.Content.Guardian
 {
 	public class OrchidGuardian : ModPlayer
 	{
-
+		public static ModKeybind ThoriumArmorKey;
+		public static ModKeybind ThoriumAccessoryKey;
 
 		public bool CrossModGodMode;
 
@@ -56,6 +57,7 @@ namespace OrchidMod
 		public bool GuardianMeteorite = false; // Armor Sets
 		public bool GuardianBamboo = false;
 		public bool GuardianGit = false;
+		public bool GuardianVoid = false;
 		public bool GuardianHorizon = false;
 		public bool GuardianCrystalNinja = false;
 		public float GuardianSpikeDamage = 0; // Accessories
@@ -183,6 +185,7 @@ namespace OrchidMod
 		public FieldInfo CSGodMode;
 		public FieldInfo HMGodMode;
 		public FieldInfo DLGodMode;
+
 		
 		public override void SetStaticDefaults()
 		{
@@ -205,6 +208,30 @@ namespace OrchidMod
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("OctopusArm").Type);
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("GraniteEradicatorArm").Type);
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("KrakenArm").Type);
+				
+				FieldInfo armorKey = thoriumMod.Code.GetType("ThoriumMod.ThoriumHotkeySystem")?.GetField("ArmorKey", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				if (armorKey != null)
+				{
+					Mod.Logger.Debug("OrchidGuardian: ArmorKey detected");
+					ModKeybind keybind = (ModKeybind)armorKey.GetValue(null);
+					if (keybind != null)
+					{
+						ThoriumArmorKey = keybind;
+						Mod.Logger.Debug(ThoriumArmorKey.DisplayName);
+					}
+				}
+				
+				FieldInfo accessKey = thoriumMod.Code.GetType("ThoriumMod.ThoriumHotkeySystem")?.GetField("AccessoryKey", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				if (accessKey != null)
+				{
+					Mod.Logger.Debug("OrchidGuardian: AccessoryKey detected");
+					ModKeybind keybind = (ModKeybind)accessKey.GetValue(null);
+					if (keybind != null)
+					{
+						ThoriumAccessoryKey = keybind;
+						Mod.Logger.Debug(ThoriumAccessoryKey.DisplayName);
+					}
+				}
 			}
 			
 			if (ModLoader.TryGetMod("CheatSheet", out Mod cheatSheet))
@@ -244,6 +271,9 @@ namespace OrchidMod
 					Mod.Logger.Debug("OrchidGuardian: DragonLens detected");
 				}
 			}
+			
+			if (ThoriumArmorKey != null && ThoriumAccessoryKey != null) 
+				Mod.Logger.Debug("Both Thorium hotkeys loaded!");
 		}
 
 
@@ -255,6 +285,9 @@ namespace OrchidMod
 			CSGodMode = null;
 			HMGodMode = null;
 			DLGodMode = null;
+			
+			ThoriumArmorKey = null;
+			ThoriumAccessoryKey = null;
 		}
 
 		public override void Initialize()
@@ -293,6 +326,20 @@ namespace OrchidMod
 				GuardianJewelerGauntlet = 0;
 			}
 			
+			int type = ModContent.ProjectileType<VoidArmorTail>();
+			Projectile voidTail = Main.projectile.FirstOrDefault(proj => proj.whoAmI < Main.maxProjectiles && proj.active && proj.owner == Player.whoAmI && proj.type == type);
+			if (GuardianVoid)
+			{
+				Vector2 target = Player.Center + new Vector2(20f * Player.direction, -40f) + Player.velocity * 0.8f;
+				if (voidTail == null) Projectile.NewProjectileDirect(Player.GetSource_FromAI(), target, Vector2.Zero, type, GetGuardianDamage(80), 4f, Player.whoAmI, target.X, target.Y);
+				else
+				{
+					(voidTail.ai[0], voidTail.ai[1]) = (target.X, target.Y);
+				}
+			}
+			else
+				voidTail?.Kill();
+
 			if (GuardianParry) {
 				if (GuardianCrystalNinja && Player.dashDelay < 0) DoParryItemParry(null);
 
@@ -321,6 +368,52 @@ namespace OrchidMod
 			}
 
 			if (GauntletPunchCooldown > -10) GauntletPunchCooldown--;
+		}
+
+		public override void ProcessTriggers(TriggersSet triggersSet)
+		{
+			var thoriumMod = OrchidMod.ThoriumMod;
+			if (thoriumMod != null && ThoriumAccessoryKey != null)
+			{
+				if (ThoriumArmorKey != null && ThoriumArmorKey.JustPressed && Player.active && !Player.dead)
+				{
+					if (GuardianVoid)
+					{
+						int type = ModContent.ProjectileType<VoidArmorTail>();
+						foreach (Projectile proj in Main.projectile)
+						{
+							if (proj.active && proj.owner == Player.whoAmI && proj.type == type && proj.ModProjectile is VoidArmorTail voidTail && proj.ai[2] == 0)
+							{
+								if (!Main.dedServ)
+								{
+									int voidDust = thoriumMod.Find<ModDust>("VoidHeartDust").Type;
+									for (int i = 0; i < 10; i++)
+									{
+										Dust dust = Dust.NewDustPerfect(Player.Center, voidDust, Main.rand.NextVector2CircularEdge(2.5f, 2.5f));
+										dust.noGravity = true;
+									}
+
+									SoundEngine.PlaySound(SoundID.Item104, Player.Center);
+								}
+
+								int hpToSteal = Player.statLifeMax2 / 10;
+								if (Player.statLife - hpToSteal < 0)
+									Player.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromFormattable("{0} gave too much of their life energy to the Void", Player.name)), Player.statLifeMax2, Player.direction);
+								else
+								{
+									Player.statLife -= hpToSteal;
+									CombatText.NewText(Player.getRect(), CombatText.DamagedFriendly, hpToSteal, dot: true);
+								}
+								voidTail.stabDirection = Player.Center.DirectionTo(Main.MouseWorld);
+								proj.ai[2] = 20;
+								break;
+							}
+						}
+
+						
+					}
+				}
+			}
 		}
 
 		public override void UpdateLifeRegen()
@@ -483,6 +576,7 @@ namespace OrchidMod
 			GuardianSharpRebuttalParry = false;
 			GuardianBamboo = false;
 			GuardianGit = false;
+			GuardianVoid = false;
 			GuardianHorizon = false;
 			GuardianCrystalNinja = false;
 			GuardianHoneyPotion = false;

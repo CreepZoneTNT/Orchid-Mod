@@ -11,10 +11,5 @@ namespace OrchidMod.Content.Guardian.Buffs
 			Main.buffNoTimeDisplay[Type] = false;
 			Main.buffNoSave[Type] = true;
 		}
-
-		public override void Update(Player player, ref int buffIndex)
-		{
-			if (player.HeldItem != null && player.HeldItem.ModItem is ThoriumVoidQuarterstaff) player.GetAttackSpeed(DamageClass.Melee) += 2f;
-		}
 	}
 }

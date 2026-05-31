@@ -46,7 +46,8 @@ namespace OrchidMod.Content.Guardian.Armors.Void
 		{
 			OrchidGuardian modPlayer = player.GetModPlayer<OrchidGuardian>();
 			player.setBonus = SetBonusText.Value;
-			player.statLifeMax2 -= 250;
+			modPlayer.GuardianVoid = true;
+			player.statLifeMax2 -= 100;
 		}
 
 		public override void AddRecipes()

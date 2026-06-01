@@ -44,7 +44,7 @@ namespace OrchidMod.Content.Guardian
 
 		public bool Ding = false;
 		
-		public int HammerAnimFrame = 0;
+		public int Frame = 0;
 
 		public bool WeakThrow => Projectile.ai[0] == 1;
 
@@ -69,7 +69,7 @@ namespace OrchidMod.Content.Guardian
 			Projectile.localNPCHitCooldown = -1;
 			FirstBlock = false;
 
-			HammerAnimFrame = 0;
+			Frame = 0;
 
 			InitialVelocity = Vector2.Zero;
 			OldPosition = new List<Vector2>();
@@ -329,6 +329,11 @@ namespace OrchidMod.Content.Guardian
 								guardian.GuardianItemCharge += 30f / HammerItem.Item.useTime * owner.GetTotalAttackSpeed(DamageClass.Melee) * hammerItem.WaitChargeGain * (HammerItem.DualWarhammers ? 0.5f : 1f);
 
 								if (guardian.GuardianItemCharge > 210f) guardian.GuardianItemCharge = 210f;
+							}
+
+							if (HammerItem.DualWarhammers && hammerItem.GetAnchors(owner)[1] == -1f)
+							{ // the paired hammer was somehow killed without this one, kill it for parity.
+								Projectile.Kill();
 							}
 
 							if (owner.whoAmI == Main.myPlayer)
@@ -806,7 +811,7 @@ namespace OrchidMod.Content.Guardian
 			if (HammerTexture == null) return false;
 			Player player = Main.player[Projectile.owner];
 			OrchidGuardian guardian = player.GetModPlayer<OrchidGuardian>();
-			Rectangle drawRectangle = HammerTexture.Frame(1, HammerItem.HammerFrames, 0, HammerAnimFrame % HammerItem.HammerFrames);
+			Rectangle drawRectangle = HammerTexture.Frame(1, HammerItem.HammerFrames, 0, Frame % HammerItem.HammerFrames);
 
 			if (HammerItem.PreDrawHammer(player, guardian, Projectile, spriteBatch, ref lightColor, ref HammerTexture, ref drawRectangle, OffHand))
 			{
@@ -896,7 +901,7 @@ namespace OrchidMod.Content.Guardian
 				if (HammerTextureGlow != null)
 				{
 					Color glowColor = HammerItem.GetHammerGlowmaskColor(player, guardian, Projectile, lightColor, OffHand); 
-					spriteBatch.Draw(HammerTextureGlow, position, drawRectangle, glowColor, Projectile.rotation + rotationBonus, HammerTextureGlow.Size() * 0.5f, Projectile.scale, effect, 0f);
+					spriteBatch.Draw(HammerTextureGlow, position, drawRectangle, glowColor, Projectile.rotation + rotationBonus, drawRectangle.Size() * 0.5f, Projectile.scale, effect, 0f);
 				}
 
 				HammerItem.PostDrawHammer(player, guardian, Projectile, spriteBatch, lightColor, HammerTexture, drawRectangle, OffHand);

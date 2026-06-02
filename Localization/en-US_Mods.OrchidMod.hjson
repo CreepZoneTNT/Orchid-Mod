@@ -3400,6 +3400,16 @@ Items: {
 		DisplayName: Shuwt
 		Tooltip: Fully charge to release a burst of sand
 	}
+
+	VampireWarhammer: {
+		DisplayName: Vampire Slayer
+		Tooltip:
+			'''
+			Blocking or fully charging throws a short-lived piercing cross that blocks
+			'Die, monster!'
+			'''
+		InstantChargeText: "Die, monster!"
+	}
 }
 
 NPCs: {

@@ -374,7 +374,7 @@ namespace OrchidMod.Content.Guardian
 											offHandProjectile.knockBack = (int)(Projectile.knockBack / 3f);
 											offHandProjectile.ai[0] = 1f;
 											offHandProjectile.ai[1] = 1;
-											offHandProjectile.velocity = dir.RotatedByRandom(0.1f); // ~6°
+											offHandProjectile.velocity = dir.RotatedByRandom(0.1f); // ~6 degrees
 											offHandProjectile.rotation = dir.ToRotation();
 											offHandProjectile.direction = Projectile.spriteDirection;
 											offHandProjectile.netUpdate = true;
@@ -604,15 +604,18 @@ namespace OrchidMod.Content.Guardian
 
 		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
 		{
-			if (HammerItem != null)
+			OrchidGuardian guardian = Main.LocalPlayer.GetModPlayer<OrchidGuardian>();
+			bool block = BlockDuration != 0;
+			bool swing = Projectile.ai[1] < 0;
+			if (HammerItem != null && HammerItem.ModifyHit(Owner, guardian, Projectile, target, ref modifiers, Projectile.ai[1] < 0 ? guardian.GuardianItemCharge >= 180f : WeakThrow, swing, block, FirstHit))
 			{
-				if (BlockDuration != 0) // Block hit
+				if (block) // Block hit
 				{
 					modifiers.FinalDamage *= HammerItem.BlockDamage;
 				}
-				else if (Projectile.ai[1] < 0) // Swing hit
+				else if (swing) // Swing hit
 				{
-					if (Main.LocalPlayer.GetModPlayer<OrchidGuardian>().GuardianItemCharge >= 180f)
+					if (guardian.GuardianItemCharge >= 180f)
 					{
 						modifiers.FinalDamage *= HammerItem.SwingDamage;
 					}
@@ -633,8 +636,6 @@ namespace OrchidMod.Content.Guardian
 						modifiers.FinalDamage *= HammerItem.ThrowDamage;
 					}
 				}
-				OrchidGuardian guardian = Main.LocalPlayer.GetModPlayer<OrchidGuardian>();
-				HammerItem.WarhammerModifyHitNPC(Owner, guardian, target, Projectile, ref modifiers, (Projectile.ai[1] < 0 ? guardian.GuardianItemCharge >= 180f : WeakThrow), Projectile.ai[1] < 0, BlockDuration != 0, FirstHit, OffHand);
 			}
 		}
 

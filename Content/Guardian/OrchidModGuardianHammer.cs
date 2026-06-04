@@ -93,8 +93,8 @@ namespace OrchidMod.Content.Guardian
 		public virtual void OnBlockHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { }
 		/// <summary>Called upon landing the first hit of a block</summary>
 		public virtual void OnBlockHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { }
-		/// <summary>Called at the end of the anchor's WarhammerModifyHitNPC() whenever it hits a target, after applying normal warhammer damage multipliers.</summary>
-		public virtual void WarhammerModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref HitModifiers modifiers, bool FullyCharged, bool Melee, bool Block, bool firstHit, bool OffHand) { }
+		/// <summary>Called before default ModifyHit functionality. Return false to prevent normal multipliers like SwingDamage or reduced damage after penetration from applying.</summary>
+		public virtual bool ModifyHit(Player player, OrchidGuardian guardian, Projectile projectile, NPC target, ref HitModifiers modifiers, bool FullyCharged, bool Melee, bool Block, bool firstHit) => true;
 		/// <summary>Called at the end of the anchor's TileCollide(), after applying normal warhammer tilecollide behavior.</summary>
 		public virtual void OnThrowTileCollide(Player player, OrchidGuardian guardian, Projectile projectile, Vector2 oldVelocity, bool OffHand) { }
 		/// <summary>Called on the first frame of a swing, FullyCharged is true if the guardian's hammer charge is full, FullyCharged is true if the guardian's hammer charge is full</summary>

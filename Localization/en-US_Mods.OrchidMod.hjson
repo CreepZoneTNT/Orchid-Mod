@@ -3417,6 +3417,16 @@ Items: {
 		Tooltip: Fully charge to release a burst of sand
 	}
 
+	VampireWarhammer: {
+		DisplayName: Vampire Slayer
+		Tooltip:
+			'''
+			Blocking or fully charging throws a short-lived piercing cross that blocks
+			'Die, monster!'
+			'''
+		InstantChargeText: "Die, monster!"
+	}
+
 	HorizonChandelier: {
 		Tooltip: ""
 		DisplayName: Horizon Chandelier
@@ -3894,6 +3904,7 @@ Projectiles: {
 	GuardianKatarAnchor.DisplayName: Katar
 	HellstoneKatarProjectile.DisplayName: Trailblaze
 	ThoriumGraniteKatarProjectile.DisplayName: Ion Deluge
+	ToyWarhammerProjectile.DisplayName: The Big Honker
 	ThoriumVoidQuarterstaffProjectile.DisplayName: Void
 	ThoriumDemonBloodGauntletProjectile.DisplayName: Thorium Demon Blood Gauntlet Projectile
 	ThoriumNagaQuarterstaffProjectile.DisplayName: Thorium Naga Quarterstaff Projectile

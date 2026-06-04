@@ -38,7 +38,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 
 		public override bool? CanHitNPC(NPC target)
 		{
-			if (!DoneSearching && ChainedEnemies != null && !ChainedEnemies.Contains(target.whoAmI)) return base.CanHitNPC(target);
+			if (!DoneSearching && (ChainedEnemies != null && !ChainedEnemies.Contains(target.whoAmI)) || ChainedEnemies == null) return base.CanHitNPC(target);
 			return false;
 		}
 
@@ -52,6 +52,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 			if (!DoneSearching)
 			{
 				Projectile.timeLeft = 900;
+				Projectile.extraUpdates = ChainedEnemies != null ? 9 : 0;
 
 				if (CurrentNode == null || !CurrentNode.active || CurrentNode.friendly) DoneSearching = true;
 
@@ -61,23 +62,23 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 				NPC nextTarget = null;
 				foreach (NPC npc in Main.npc)
 				{
-					if (npc.active && !npc.friendly && !npc.dontTakeDamage && npc.Center.DistanceSQ(CurrentNode.Center) < distanceSq && !ChainedEnemies.Contains(npc.whoAmI)) 
+					if (npc.active && !npc.friendly && !npc.dontTakeDamage && CurrentNode != null && ChainedEnemies != null && npc.Center.DistanceSQ(CurrentNode.Center) < distanceSq && !ChainedEnemies.Contains(npc.whoAmI)) 
 					{
 						distanceSq = npc.Center.DistanceSQ(CurrentNode.Center);
 						nextTarget = npc;
 					}
 				}
-				if (nextTarget != null) Projectile.velocity = Projectile.Center.DirectionTo(nextTarget.Center) * 60f;
+				if (nextTarget != null) Projectile.velocity = Projectile.Center.DirectionTo(nextTarget.Center) * 10f;
 				else DoneSearching = true;
 				
 			}
-			if (ChainedEnemies.Count > 0)
+			if (ChainedEnemies != null && ChainedEnemies.Count > 0)
 			{
 				for (int i = 0; i < ChainedEnemies.Count - 1; i++)
 				{
 					NPC node = Main.npc[i];
 					if (node == null || !node.active) Projectile.Kill();
-					if (ChainedEnemies.Count > 1 && i > 0)
+					else if (ChainedEnemies.Count > 1 && i > 0)
 					{
 						Dust.QuickDustLine(Main.npc[i - 1].Center, node.Center, 10f, Color.Aqua);
 					}

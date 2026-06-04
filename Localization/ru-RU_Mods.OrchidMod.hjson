@@ -3289,8 +3289,8 @@ Items: {
 		/* Tooltip:
 			'''
 			[c/FF0000:Test Item]
-			Jab is replaced by a powerful sweep
-			Fully charge while underwater to propel yourself to your cursor, ending in a massive full sweep attack
+			Shoots lingering bubbles on jab 
+			Pop bubbles with charged attacks or fully charge while underwater to propel yourself to your cursor
 			''' */
 	}
 
@@ -3300,6 +3300,7 @@ Items: {
 			'''
 			[c/FF0000:Test Item]
 			Fully charging creates a damage-sharing link between enemies
+			'The wonders of the world shall be connected'
 			''' */
 	}
 
@@ -3309,7 +3310,7 @@ Items: {
 			'''
 			[c/FF0000:Test Item]
 			Attacks grant Cold Energy charge
-			At full Cold Energy charge, your next slam will release a giant snowflake
+			At full Cold Energy charge, your next charged attack will release a giant snowflake
 			''' */
 	}
 
@@ -3349,7 +3350,7 @@ Items: {
 	}
 
 	ThoriumGuardianVoidHead: {
-		// DisplayName: Thorium Guardian Void Head
+		// DisplayName: Void Sentinel Helmet
 		/* Tooltip:
 			'''
 			[c/FF0000:Test Item]
@@ -3421,6 +3422,21 @@ Items: {
 	HorizonBrick: {
 		// Tooltip: ""
 		// DisplayName: Horizon Brick
+	}
+
+	ThoriumTerrariumQuarterstaff: {
+		// DisplayName: Thorium Terrarium Quarterstaff
+		// Tooltip: ""
+	}
+
+	ThoriumBlackKatar: {
+		// DisplayName: The Black Katar
+		/* Tooltip:
+			'''
+			[c/FF0000:Test Item]
+			Parries summon a shadow clone that imitates your movement after a delay
+			Dealing damage grants you stacking damage and withers enemies at 50 stacks
+			''' */
 	}
 }
 
@@ -3887,6 +3903,7 @@ Projectiles: {
 	// ThoriumDreadGauntletProjectile.DisplayName: Dread Grappleclaw
 	// ThoriumDreadGauntletProjectileAlt.DisplayName: Thorium Dread Gauntlet Projectile Alt
 	// VoidArmorTail.DisplayName: Void Armor Tail
+	// ThoriumBlackKatarProjectile.DisplayName: Thorium Black Katar Projectile
 }
 
 Configs: {

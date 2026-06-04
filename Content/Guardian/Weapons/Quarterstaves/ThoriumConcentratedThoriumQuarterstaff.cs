@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using OrchidMod.Common.Attributes;
+using OrchidMod.Content.Guardian.Misc;
 using OrchidMod.Content.Guardian.Projectiles.Quarterstaves;
 using Terraria;
 using Terraria.Audio;
@@ -32,6 +33,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			if (OrchidMod.ThoriumMod != null)
 				CreateRecipe()
 				.AddTile(thoriumMod, "SoulForgeNew")
+				.AddIngredient(thoriumMod, "IllumiteIngot", 6)
+				.AddIngredient<GuardianEmpressMaterial>(8)
 				.AddIngredient(thoriumMod, "ConcentratedThorium", 8)
 				.Register();
 		}

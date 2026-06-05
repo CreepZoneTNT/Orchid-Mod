@@ -9,7 +9,7 @@ namespace OrchidMod.Content.Guardian.Accessories
 		public override void SafeSetDefaults()
 		{
 			Item.width = 26;
-			Item.height = 26;
+			Item.height = 30;
 			Item.value = Item.sellPrice(0, 0, 15, 0);
 			Item.rare = ItemRarityID.Blue;
 			Item.accessory = true;

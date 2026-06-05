@@ -86,6 +86,7 @@ namespace OrchidMod
 		public bool GuardianHammerDetonator = false;
 		/// <summary> Multiplier applied to the velocity of all warhammer throws. Defaults to 1f.</summary>
 		public float GuardianHammerThrowVelocity = 1f;
+		public bool GuardianThoriumCenser = false; // Life Quartz Censer
 
 		// Debug bonus resources that do not get updated (for use with DragonLens)
 		
@@ -472,6 +473,7 @@ namespace OrchidMod
 			GuardianChainTexture = null;
 			GuardianHammerMagnet = 0f;
 			GuardianHammerThrowVelocity = 1f;
+			GuardianThoriumCenser = false;
 			if (!GuardianBronzeShieldBuff) GuardianBronzeShieldDamage = 0;
 
 			GuardianMeteorite = false;
@@ -691,6 +693,27 @@ namespace OrchidMod
 
 		// Below are custom Guardian Methods
 
+		public void OnUseSlam()
+		{
+			if (GuardianThoriumCenser && OrchidMod.ThoriumMod != null)
+			{
+				Player lowestHealthPlayer = Player;
+				foreach (Player player in Main.player)
+				{ // targets the lowest heath nearby player
+					if (player.DistanceSQ(Player.Center) < 800f && player.active && !player.dead && player.statLife < lowestHealthPlayer.statLife) 
+					{ // 16 * 50 = 800f for a 50 tiles range
+						lowestHealthPlayer = player;
+					}
+				}
+
+				// This is how the War Forger applies its shield, where 5f is the shield amount, and 25f is the maximum shield amount that can be applied
+				int projectileType = OrchidMod.ThoriumMod.Find<ModProjectile>("HealerShield").Type;
+				Projectile.NewProjectile(Player.GetSource_FromThis(), lowestHealthPlayer.Center, Vector2.Zero, projectileType, 0, 0.0f, Player.whoAmI, 5f, 25f, 0.0f);
+			}
+		}
+
+		public void OnUseGuard() {}
+
 		public void AddSlam(int nb = 1)
 		{
 			if (nb > 0 && GuardianSlamRecharging < 0) GuardianSlamRecharging = 0;
@@ -719,6 +742,11 @@ namespace OrchidMod
 
 		public bool UseSlam(int nb = 1, bool checkOnly = false, bool showUICost = false)
 		{
+			if (showUICost)
+			{
+				SlamCostUI = nb;
+			}
+
 			if (GuardianHorizon && Player.statLife > Player.statLifeMax2 * 0.5f && Player.statLife > 20)
 			{ // Horizon armor set consumes health instead of guardian charges
 				if (!checkOnly)
@@ -726,10 +754,12 @@ namespace OrchidMod
 					Player.statLife -= 20;
 					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
-				}
-				if (showUICost)
-				{
-					SlamCostUI = nb;
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseSlam();
+					}
 				}
 				return true;
 			}
@@ -745,6 +775,12 @@ namespace OrchidMod
 					GuardianSlam += nb2;
 					GuardianSlamRecharging = 0;
 					SoundEngine.PlaySound(SoundID.Item56, Player.Center);
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseSlam();
+					}
 				}
 				else return true;
 			}
@@ -756,6 +792,12 @@ namespace OrchidMod
 					GuardianSlam -= nb;
 					if (GuardianBamboo) Player.AddBuff(ModContent.BuffType<BambooBuff>(), 300);
 					if (GuardianSlamRecharging < 0) GuardianSlamRecharging = 0;
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseSlam();
+					}
 				}
 				return true;
 			}
@@ -764,6 +806,11 @@ namespace OrchidMod
 
 		public bool UseGuard(int nb = 1, bool checkOnly = false, bool showUICost = false)
 		{
+			if (showUICost)
+			{
+				GuardCostUI = nb;
+			}
+
 			if (GuardianHorizon && Player.statLife > Player.statLifeMax2 * 0.5f && Player.statLife > 20)
 			{ // Horizon armor set consumes health instead of guardian charges
 				if (!checkOnly)
@@ -771,10 +818,12 @@ namespace OrchidMod
 					Player.statLife -= 20;
 					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
-				}
-				if (showUICost)
-				{
-					GuardCostUI = nb;
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseGuard();
+					}
 				}
 				return true;
 			}
@@ -790,6 +839,12 @@ namespace OrchidMod
 					GuardianGuard += nb2;
 					GuardianGuardRecharging = 0;
 					SoundEngine.PlaySound(SoundID.Item56, Player.Center);
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseGuard();
+					}
 				}
 				else return true;
 			}
@@ -801,6 +856,12 @@ namespace OrchidMod
 					GuardianGuard -= nb;
 					if (GuardianBamboo) Player.AddBuff(ModContent.BuffType<BambooBuff>(), 300);
 					if (GuardianGuardRecharging < 0) GuardianGuardRecharging = 0;
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseGuard();
+					}
 				}
 				return true;
 			}

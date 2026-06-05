@@ -161,6 +161,8 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 					return firstColor ? new Color(130, 190, 30) : new Color(230, 40, 80);
 				case "KiarArt":
 					return firstColor ? new Color(123, 68, 223) : new Color(73, 218, 177);
+				case "Zandiow":
+					return firstColor ? new Color(0, 150, 0) : new Color(0, 0, 150);
 			}
 		}
 

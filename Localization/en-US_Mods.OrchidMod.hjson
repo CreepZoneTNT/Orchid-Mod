@@ -3408,7 +3408,12 @@ Items: {
 			Blocking or fully charging throws a short-lived piercing cross that blocks
 			'Die, monster!'
 			'''
-		InstantChargeText: "Die, monster!"
+		InstantChargeText: Die, monster!
+	}
+
+	ThoriumLifeQuartzCenser: {
+		DisplayName: Life Censer
+		Tooltip: Spending a slam shields the lowest health nearby ally life by 5
 	}
 }
 
@@ -4146,3 +4151,5 @@ Conditions: {
 	EnableContentGambler: Gambler content is enabled
 	EnableContentShapeshifter: Shapeshifter content is enabled
 }
+
+RecipeGroups.Any: Mods.OrchidMod.RecipeGroups.Any

@@ -37,7 +37,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			Item.height = 56;
 			Item.value = Item.sellPrice(0, 4);
 			Item.rare = ItemRarityID.Pink;
-			Item.useTime = 40;
+			Item.useTime = 60;
 			ParryDuration = 120;
 			Item.knockBack = 6f;
 			Item.damage = 200;
@@ -51,6 +51,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 
 		public override void SafeHoldItem(Player player)
 		{
+			ChargeRate = player.HasBuff<GuardianVoidQuarterstaffBuff>() ? 6.5f : 1f;
 		}
 
 		public override void ExtraAIQuarterstaff(Player player, OrchidGuardian guardian, Projectile projectile)
@@ -276,7 +277,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 				}
 
 				Tile hitTile = Framing.GetTileSafely((int)(point.X / 16f), (int)(point.Y / 16));
-				if (hitTile.HasTile && Main.tileSolid[hitTile.TileType] && !Main.tileSolidTop[hitTile.TileType]) 
+				if (hitTile.HasUnactuatedTile && Main.tileSolid[hitTile.TileType] && !Main.tileSolidTop[hitTile.TileType]) 
 				{
 					finalPoint = point;
 					break;

@@ -2766,7 +2766,7 @@ Items: {
 
 	ThoriumViscountQuarterstaff: {
 		DisplayName: Pipistrelle
-		Tooltip: Counterattacks turn you into a swarm of bats, ignoring 20 defense
+		Tooltip: Counterattacks turn you into a swarm of bats, ignoring 25 defense
 	}
 
 	ThoriumThoriumQuarterstaff: {
@@ -3413,7 +3413,7 @@ Items: {
 
 	ThoriumLifeQuartzCenser: {
 		DisplayName: Life Censer
-		Tooltip: Spending a slam shields the lowest health nearby ally life by 5
+		Tooltip: Spending a slam shields the lowest health nearby ally life by 5, up to 10
 	}
 }
 

@@ -706,9 +706,9 @@ namespace OrchidMod
 					}
 				}
 
-				// This is how the War Forger applies its shield, where 5f is the shield amount, and 25f is the maximum shield amount that can be applied
+				// This is how the War Forger applies its shield, where 5f is the shield amount, and 10f is the maximum shield amount that can be applied
 				int projectileType = OrchidMod.ThoriumMod.Find<ModProjectile>("HealerShield").Type;
-				Projectile.NewProjectile(Player.GetSource_FromThis(), lowestHealthPlayer.Center, Vector2.Zero, projectileType, 0, 0.0f, Player.whoAmI, 5f, 25f, 0.0f);
+				Projectile.NewProjectile(Player.GetSource_FromThis(), lowestHealthPlayer.Center, Vector2.Zero, projectileType, 0, 0.0f, Player.whoAmI, 5f, 10f, 0.0f);
 			}
 		}
 

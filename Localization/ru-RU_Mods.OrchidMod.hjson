@@ -3414,7 +3414,7 @@ Items: {
 
 	ThoriumLifeQuartzCenser: {
 		// DisplayName: Life Censer
-		// Tooltip: Spending a slam shields the lowest health nearby ally life by 5
+		// Tooltip: Spending a slam shields the lowest health nearby ally life by 5, up to 10
 	}
 }
 

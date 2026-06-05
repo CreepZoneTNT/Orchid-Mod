@@ -26,7 +26,7 @@ namespace OrchidMod.Content.Guardian.Accessories
 			if (OrchidMod.ThoriumMod != null)
 			{
 				var recipe = CreateRecipe();
-				recipe.AddTile(TileID.WorkBenches);
+				recipe.AddTile(TileID.Anvils);
 				recipe.AddRecipeGroup(OrchidRecipes.AnySilverBarGroup, 6);
 				recipe.AddIngredient(OrchidMod.ThoriumMod, "LifeQuartz", 4);
 				recipe.AddIngredient(OrchidMod.ThoriumMod, "SmoothCoal", 4);

@@ -700,11 +700,23 @@ namespace OrchidMod
 				Player lowestHealthPlayer = Player;
 				foreach (Player player in Main.player)
 				{ // targets the lowest heath nearby player
-					if (player.DistanceSQ(Player.Center) < 800f && player.active && !player.dead && player.statLife < lowestHealthPlayer.statLife) 
+					if (player.DistanceSQ(Player.Center) < 800f && player.active && !player.dead && player.statLife < lowestHealthPlayer.statLife)
 					{ // 16 * 50 = 800f for a 50 tiles range
 						lowestHealthPlayer = player;
 					}
 				}
+
+				/* Ended up being unused, but this is how I would check for the players shield health, potentially to target unshielded players.
+				foreach (ModPlayer thoriumPlayer in Player.ModPlayers)
+				{
+					if (thoriumPlayer.Name == "ThoriumPlayer" && thoriumPlayer.Mod == OrchidMod.ThoriumMod)
+					{
+						FieldInfo field = thoriumPlayer.GetType().GetField("shieldHealth", BindingFlags.Public | BindingFlags.Instance);
+						int shieldHealth = (int)field.GetValue(thoriumPlayer);
+						break;
+					}
+				}
+				*/
 
 				// This is how the War Forger applies its shield, where 5f is the shield amount, and 10f is the maximum shield amount that can be applied
 				int projectileType = OrchidMod.ThoriumMod.Find<ModProjectile>("HealerShield").Type;

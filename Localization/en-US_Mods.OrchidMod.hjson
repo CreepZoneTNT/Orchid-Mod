@@ -2866,7 +2866,7 @@ Items: {
 	}
 
 	ShawlOfTheWind: {
-		DisplayName: Shawl Of The Wind
+		DisplayName: Shawl of the Wind
 		Tooltip:
 			'''
 			12% increased movement speed

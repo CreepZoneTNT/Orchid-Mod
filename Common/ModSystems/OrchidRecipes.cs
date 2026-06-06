@@ -13,8 +13,35 @@ namespace OrchidMod.Common.ModSystems
 {
 	public class OrchidRecipes : ModSystem
 	{
+		public static int AnyCopperBarGroup { get; private set; }
+
+		public static int AnySilverBarGroup { get; private set; }
+
+		public static int AnyGoldBarGroup { get; private set; }
+
+		public static int AnyDemoniteBarGroup { get; private set; }
+
+		public static int AnyCobaltBarGroup { get; private set; }
+
+		public static int AnyMythrilBarGroup { get; private set; }
+
+		public static int AnyAdamantiteBarGroup { get; private set; }
+
+		public static LocalizedText RecipeGroupAnyText { get; private set; }
+
+		public override void OnModLoad()
+		{
+			string str = "RecipeGroups.";
+			if (RecipeGroupAnyText != null)
+				return;
+			RecipeGroupAnyText = ((ModType)this).Mod.GetLocalization(str + "Any", (Func<string>)null);
+		}
+
+
 		public override void AddRecipeGroups()
 		{
+			string any = Language.GetTextValue("LegacyMisc.37");
+
 			var thoriumMod = OrchidMod.ThoriumMod;
 			if (OrchidMod.ThoriumMod != null)
 			{
@@ -22,9 +49,31 @@ namespace OrchidMod.Common.ModSystems
 				thoriumMod.TryFind<ModItem>("RangedThorHammer", out ModItem thorsHammerRanged);
 				thoriumMod.TryFind<ModItem>("MagicThorHammer", out ModItem thorsHammerMagic);
 				
-				RecipeGroup group = new RecipeGroup(() => $"{Language.GetTextValue("LegacyMisc.37")} " + thorsHammerMelee.DisplayName.ToString().Split(':').First(), thorsHammerMelee.Type, thorsHammerRanged.Type, thorsHammerMagic.Type);
+				RecipeGroup group = new RecipeGroup(() => $"{any} " + thorsHammerMelee.DisplayName.ToString().Split(':').First(), thorsHammerMelee.Type, thorsHammerRanged.Type, thorsHammerMagic.Type);
 				RecipeGroup.RegisterGroup("ThorsHammers", group);
 			}
+
+			// Taken from the Thorium Mod
+			AnyCopperBarGroup = RecipeGroup.RegisterGroup("CopperBar", new RecipeGroup(()
+				=> RecipeGroupAnyText.Format([any, Lang.GetItemNameValue(ItemID.CopperBar)]), [ItemID.CopperBar, ItemID.TinBar]));
+
+			AnySilverBarGroup = RecipeGroup.RegisterGroup("SilverBar", new RecipeGroup(()
+				=> RecipeGroupAnyText.Format([any, Lang.GetItemNameValue(ItemID.CopperBar)]), [ItemID.SilverBar, ItemID.TungstenBar]));
+
+			AnyGoldBarGroup = RecipeGroup.RegisterGroup("GoldBar", new RecipeGroup(()
+				=> RecipeGroupAnyText.Format([any, Lang.GetItemNameValue(ItemID.CopperBar)]), [ItemID.GoldBar, ItemID.PlatinumBar]));
+
+			AnyDemoniteBarGroup = RecipeGroup.RegisterGroup("DemoniteBar", new RecipeGroup(()
+				=> RecipeGroupAnyText.Format([any, Lang.GetItemNameValue(ItemID.CopperBar)]), [ItemID.DemoniteBar, ItemID.CrimtaneBar]));
+
+			AnyCobaltBarGroup = RecipeGroup.RegisterGroup("CobaltBar", new RecipeGroup(()
+				=> RecipeGroupAnyText.Format([any, Lang.GetItemNameValue(ItemID.CopperBar)]), [ItemID.CobaltBar, ItemID.PalladiumBar]));
+
+			AnyMythrilBarGroup = RecipeGroup.RegisterGroup("MythrilBar", new RecipeGroup(()
+				=> RecipeGroupAnyText.Format([any, Lang.GetItemNameValue(ItemID.CopperBar)]), [ItemID.MythrilBar, ItemID.OrichalcumBar]));
+
+			AnyAdamantiteBarGroup = RecipeGroup.RegisterGroup("AdamantiteBar", new RecipeGroup(()
+				=> RecipeGroupAnyText.Format([any, Lang.GetItemNameValue(ItemID.CopperBar)]), [ItemID.AdamantiteBar, ItemID.TitaniumBar]));
 		}
 
 		public override void PostAddRecipes()

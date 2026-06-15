@@ -6,6 +6,7 @@ using OrchidMod.Content.Guardian.Weapons.Shields;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -65,6 +66,10 @@ namespace OrchidMod.Common.ModObjects
 		public List<Projectile> TitaniumShards = new List<Projectile>();
 		/// <summary>If true, all player Drawlayers will not render.</summary>
 		public bool HideAllDrawLayers = false;
+		/// <summary>If true, the players Smart Cursor will be enabled next time they un-shapeshift or stop holding a guardian weapon.</summary>
+		public bool SmartCursorTrigger = false;
+		/// <summary>If true, prevents SmartCursorTrigger from being modified again until the player un-shapeshifts or stops holding a guardian weapon.</summary>
+		public bool SmartCursorCheck = false;
 
 		// Equipment Fields (General)
 
@@ -112,6 +117,50 @@ namespace OrchidMod.Common.ModObjects
 						Player.selectedItem = originalSelectedItem;
 						autoRevertSelectedItem = false;
 					}
+				}
+			}
+		}
+
+		public override void PostUpdate()
+		{
+			if (Main.cSmartCursorModeIsToggleAndNotHold && ModContent.GetInstance<OrchidClientConfig>().SmartSmartCursor && Player.whoAmI == Main.myPlayer)
+			{
+				if (Player.HeldItem.ModItem != null && (Player.HeldItem.ModItem is OrchidModGuardianItem && Player.HeldItem.damage > 0 && !Player.HeldItem.accessory) || Player.GetModPlayer<OrchidShapeshifter>().IsShapeshifted)
+				{ // if the player is holding a guardian weapon or shapeshifted
+					if (!SmartCursorCheck)
+					{ // disable smart cursor automatically and remember it
+						SmartCursorCheck = true;
+
+						if (Main.SmartCursorWanted || Main.SmartCursorShowing)
+						{
+							SmartCursorTrigger = true;
+							Main.SmartCursorWanted_Mouse = false;
+							Main.SmartCursorWanted_GamePad = false;
+							Main.SmartCursorShowing = false;
+						}
+					}
+					else if (Main.SmartCursorWanted || Main.SmartCursorShowing)
+					{ // disable the override if the player manually toggles smart cursor after it has been disabled
+						SmartCursorTrigger = false;
+					}
+				}
+				else
+				{ // re-enable smart cursor if it was disabled above
+					if (SmartCursorTrigger)
+					{ // from tmodloader code : Main.cs L2769
+						if (PlayerInput.SteamDeckIsUsed && PlayerInput.SettingsForUI.CurrentCursorMode == CursorMode.Mouse)
+						{
+							Main.SmartCursorWanted_Mouse = true;
+						}
+						else if (PlayerInput.UsingGamepad)
+						{
+							Main.SmartCursorWanted_GamePad = true;
+						}
+						else Main.SmartCursorWanted_Mouse = true;
+					}
+
+					SmartCursorCheck = false;
+					SmartCursorTrigger = false;
 				}
 			}
 		}

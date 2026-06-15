@@ -4023,6 +4023,11 @@ Configs: {
 			Label: Frost Walker UI uses colored icon
 			Tooltip: The Frost Walker's special 'snowflake charge' UI will use a colored icon (the Ice Gauntlet's crystal projectile) instead of a monochrome variant
 		}
+
+		SmartSmartCursor: {
+			Label: Smart Smart Cursor
+			Tooltip: Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting. No effect if Smart Cursor isn't set to 'Toggle'.
+		}
 	}
 
 	OrchidServerConfig: {

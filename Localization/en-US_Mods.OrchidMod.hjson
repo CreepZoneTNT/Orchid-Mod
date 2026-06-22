@@ -3415,6 +3415,19 @@ Items: {
 		DisplayName: Life Censer
 		Tooltip: Spending a slam shields the lowest health nearby ally life by 5, up to 10
 	}
+
+	ConsolariaLepusEggNest: {
+		DisplayName: Consolaria Lepus Egg Nest
+		Tooltip: ""
+	}
+
+	DepthDiverHelmet.Tooltip: Regenerates guards over time
+	DepthDiverChestplate.Tooltip:
+		'''
+		Increases maximum guards by 2
+		Enemies are more likely to target you
+		'''
+	DepthDiverGreaves.Tooltip: Increases maximum guards by 2
 }
 
 NPCs: {
@@ -3876,6 +3889,7 @@ Projectiles: {
 	ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
 	GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
 	ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
+	ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
 }
 
 Configs: {

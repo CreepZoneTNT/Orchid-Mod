@@ -3909,7 +3909,11 @@ Configs: {
 
 		ShowModTags: {
 			Label: Show Mod Tags
-			Tooltip: Enables/Disables the display of cross-content items tooltips (Load Crossmod-Content without required mods must be enabled in Orchid Server Config)
+			Tooltip:
+				'''
+				Enables/Disables the display of cross-content items tooltips
+				(Load Crossmod-Content without required mods must be enabled in Orchid Server Config)
+				'''
 		}
 
 		GuardianUseOldHammerUi: {
@@ -3939,17 +3943,25 @@ Configs: {
 
 		ShapeshifterUseHairColor: {
 			Label: Use Hair Color for Wildshapes
-			Tooltip: Applies the 'Peculiar Hairpin' accessory effect at all times, and has it apply the default wildshape color instead. The hairpin can still be used to apply dye to wildshape hair.
+			Tooltip:
+				'''
+				Applies the 'Peculiar Hairpin' accessory effect at all times, and has it apply the default wildshape color instead.
+				The hairpin can still be used to apply dye to wildshape hair
+				'''
 		}
 
 		ShapeshifterHookDelay: {
 			Label: Shawl Dash Hook Delay
-			Tooltip: While a 'Shawl' accessory is equipped, how long should the hook key be held (in frames) before the hook is fired.
+			Tooltip: While a 'Shawl' accessory is equipped, how long should the hook key be held (in frames) before the hook is fired
 		}
 
 		ShapeshifterHookDashRelease: {
 			Label: Shawl Dash on release
-			Tooltip: Triggers 'Shawl' accessory dashes when releasing the hook key instead of pressing it (allowing to launch a hook without dashing)
+			Tooltip:
+				'''
+				Triggers 'Shawl' accessory dashes when releasing the hook key instead of pressing it
+				(allowing to launch a hook without dashing)
+				''' 
 		}
 
 		ShapeshifterScrollDelay: {
@@ -3994,7 +4006,11 @@ Configs: {
 
 		SmartSmartCursor: {
 			Label: Smart Smart Cursor
-			Tooltip: Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting. No effect if Smart Cursor isn't set to 'Toggle'.
+			Tooltip:
+				'''
+				Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.
+				No effect if Smart Cursor isn't set to 'Toggle'
+				'''
 		}
 	}
 

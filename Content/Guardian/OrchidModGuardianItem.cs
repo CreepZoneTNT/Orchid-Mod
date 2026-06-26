@@ -14,7 +14,7 @@ namespace OrchidMod.Content.Guardian
 		public bool IsLocalPlayer(Player player) => player.whoAmI == Main.myPlayer;
 
 		/// <summary>The relevant anchor type this item spawns, if not null.</summary>
-		public virtual int? AnchorType => null;
+		public virtual int AnchorType => -1;
 		/// <summary> Called when an anchor spawned by this item calls <c>OrchidGuardian.OnAttack</c> to trigger attack-related effects like set bonuses or accessories. Modify the <c>GuardianAttackInfo</c> reference to change what attack-related effects it triggers. <c>GuardianAttackInfo.Counter</c> will automatically be set to <c>true</c> if <c>GuardianAttackInfo.Slam</c> is <c>true</c> and the player meets the conditions for a counterattack, and if <c>GuardianAttackInfo.Counter</c> is <c>true</c> after this function, <c>OrchidGuardian.GuardianCounterTime</c> will be reset. Return <c>false</c> to prevent triggering any effects. Returns <c>true</c> by default. </summary>
 		public virtual bool ModifyAttackInfo(ref GuardianAttackInfo info) => true;
 

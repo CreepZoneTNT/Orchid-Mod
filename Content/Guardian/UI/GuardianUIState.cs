@@ -502,9 +502,9 @@ namespace OrchidMod.Content.Guardian.UI
 						}
 
 
-						if (guardianItem.AnchorType != null)
+						if (guardianItem.AnchorType != -1)
 						{
-							Projectile mainAnchor = Main.projectile.FirstOrDefault(proj => proj.whoAmI < Main.maxProjectiles && proj.active && proj.owner == player.whoAmI && proj.type == guardianItem.AnchorType.Value);
+							Projectile mainAnchor = Main.projectile.FirstOrDefault(proj => proj.whoAmI < Main.maxProjectiles && proj.active && proj.owner == player.whoAmI && proj.type == guardianItem.AnchorType);
 							Color color = Color.White;
 							switch (guardianItem)
 							{

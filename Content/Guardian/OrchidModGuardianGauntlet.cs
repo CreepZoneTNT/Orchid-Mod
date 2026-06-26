@@ -67,7 +67,7 @@ namespace OrchidMod.Content.Guardian
 		public float ParryDashSpeed = 0f; // Velocity of the parry dash
 		public float ChargeSpeedMultiplier = 1f; // Multiplies charge speed while holding left click
 
-		public override int? AnchorType => ModContent.ProjectileType<GuardianGauntletAnchor>();
+		public override int AnchorType => ModContent.ProjectileType<GuardianGauntletAnchor>();
 
 		public sealed override void SetDefaults()
 		{

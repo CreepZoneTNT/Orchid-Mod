@@ -83,7 +83,7 @@ namespace OrchidMod.Content.Guardian
 		/// <summary>Draws extra UI elements on the GuardianUIState while held.</summary>
 		public virtual void PavisePostDrawUI(SpriteBatch spriteBatch, Player player, ref Color lightColor, Projectile projectile) { }
 
-		public override int? AnchorType => ModContent.ProjectileType<GuardianShieldAnchor>();
+		public override int AnchorType => ModContent.ProjectileType<GuardianShieldAnchor>();
 		public sealed override void SetDefaults()
 		{
 			Item.DamageType = ModContent.GetInstance<GuardianDamageClass>();

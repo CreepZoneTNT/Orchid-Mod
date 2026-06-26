@@ -20,6 +20,8 @@ namespace OrchidMod.Content.Guardian
 {
 	public class OrchidGuardian : ModPlayer
 	{
+		public ModPlayer ThoriumPlayer;
+		public static Type ThoriumPlayerType;
 		public static ModKeybind ThoriumArmorKey;
 		public static ModKeybind ThoriumAccessoryKey;
 
@@ -286,7 +288,11 @@ namespace OrchidMod.Content.Guardian
 			CSGodMode = null;
 			HMGodMode = null;
 			DLGodMode = null;
-			
+
+			modPlayer = null;
+
+			ThoriumPlayer = null;
+			ThoriumPlayerType = null;
 			ThoriumArmorKey = null;
 			ThoriumAccessoryKey = null;
 		}
@@ -294,6 +300,23 @@ namespace OrchidMod.Content.Guardian
 		public override void Initialize()
 		{
 			modPlayer = Player.GetModPlayer<OrchidPlayer>();
+
+			var thoriumMod = OrchidMod.ThoriumMod;
+			if (thoriumMod != null)
+			{
+				// Ended up being unused, but this is how I would check for the players shield health, potentially to target unshielded players.
+				foreach (ModPlayer thoriumPlayer in Player.ModPlayers)
+				{
+					if (thoriumPlayer.Name == "ThoriumPlayer" && thoriumPlayer.Mod == thoriumMod)
+					{
+						ThoriumPlayer = thoriumPlayer;
+						ThoriumPlayerType = thoriumPlayer.GetType();
+						// FieldInfo field = thoriumPlayer.GetType().GetField("shieldHealth", BindingFlags.Public | BindingFlags.Instance);
+						// int shieldHealth = (int)field.GetValue(thoriumPlayer);
+						break;
+					}
+				}
+			}
 		}
 
 		public override void OnRespawn()
@@ -425,9 +448,9 @@ namespace OrchidMod.Content.Guardian
 		public override void ResetEffects()
 		{
 		
-			bool csGodMode = CheatSheet != null && CSGodMode != null && CSGodMode?.GetValue(null) is true;
-			bool hmGodMode = HerosMod != null && HMGodMode != null && HMGodMode?.GetValue(null) is true;
-			bool dlGodMode = DragonLens != null && DLGodMode != null && DLGodMode?.GetValue(null) is true;
+			bool csGodMode = CheatSheet != null && CSGodMode != null && CSGodMode?.GetValue(Player) is true;
+			bool hmGodMode = HerosMod != null && HMGodMode != null && HMGodMode?.GetValue(Player) is true;
+			bool dlGodMode = DragonLens != null && DLGodMode != null && DLGodMode?.GetValue(Player) is true;
 			CrossModGodMode = csGodMode || hmGodMode || dlGodMode;
 
 			// Resetting Core guardian fields
@@ -1325,5 +1348,7 @@ namespace OrchidMod.Content.Guardian
 			if (GuardianItemCharge < 180f) return 3;
 			return 4;
 		}
+		
+		public void ThoriumForceShieldHealth() {}
 	}
 }

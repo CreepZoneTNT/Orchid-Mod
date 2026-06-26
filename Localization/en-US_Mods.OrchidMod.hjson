@@ -3240,11 +3240,11 @@ Items: {
 
 	ToyWarhammers: {
 		DisplayName: The Big Honkers
-		Tooltip: 
-            '''
-            'Honk honk'
-            Lets you dual wield a pair of very squeaky hammers
-            '''
+		Tooltip:
+			'''
+			'Honk honk'
+			Lets you dual wield a pair of very squeaky hammers
+			'''
 	}
 
 	ThoriumValadiumWarhammer: {

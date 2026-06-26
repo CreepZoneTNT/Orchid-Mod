@@ -79,7 +79,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
                         SoundEngine.PlaySound(SoundID.Item109, player.Center);
                         if (waterAttack == 0) 
                         {
-	                        StartLunge(player, (Main.MouseWorld - player.Center).ToRotation());
+	                        StartLunge(player, projectile, (Main.MouseWorld - player.Center).ToRotation());
                             waterAttack = 1;
                             waterAttackCooldown = 10;
                         }
@@ -126,7 +126,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 	            {
 		            bubble.Kill();
 		            projectile.ai[0] = 40;
-		            StartLunge(player, (Main.MouseWorld - player.Center).ToRotation());
+		            StartLunge(player, projectile, (Main.MouseWorld - player.Center).ToRotation());
 		            SoundEngine.PlaySound(SoundID.Item150);
 		            waterAttackSuper++;
 		            if (waterAttackSuper == 3)
@@ -152,13 +152,6 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
                     player.armorEffectDrawShadowEOCShield = true;
                     if (underWater) ((WaterShaderData)Filters.Scene["WaterDistortion"].GetShader()).QueueRipple(projectile.Center, 2.5f, RippleShape.Circle);
                     
-                    if (IsLocalPlayer(player))
-                    {
-                        ref Vector2 forcedVelocity = ref orchidPlayer.ForcedVelocityVector;
-                        forcedVelocity = Vector2.UnitX.RotatedBy(forcedVelocity.ToRotation().AngleTowards(projectile.AngleTo(Main.MouseWorld), MathHelper.Pi/(waterAttackCooldown > 8 ? 15 : 60))) * forcedVelocity.Length() * 0.99f;
-                        projectile.ai[1] = Vector2.Normalize(forcedVelocity).ToRotation() - MathHelper.PiOver2;
-					    projectile.Center = player.MountedCenter.Floor() + Vector2.UnitY.RotatedBy(projectile.ai[1]) * (38f - (float)Math.Sin(0.0523f * (30 - projectile.ai[0])) * 24f);
-                    }
                     
                     if (projectile.ai[0] < 20 || attackInput)
                     {
@@ -260,13 +253,24 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			}
 		}
 
-		public void StartLunge(Player player, float direction)
+		public void StartLunge(Player player, Projectile projectile, float direction)
 		{
 			if (player.velocity.Y == 0) player.position.Y -= 16;
+
 			OrchidPlayer orchidPlayer = player.OrchidPlayer();
-			orchidPlayer.ForcedVelocityVector = Vector2.UnitX.RotatedBy(direction) * 20f;
+			Vector2 velocity = Vector2.UnitX.RotatedBy(direction) * 20f;
+			orchidPlayer.ForcedVelocityVector = velocity;
 			orchidPlayer.ForcedVelocityTimer = 60;
+			orchidPlayer.PlayerImmunity = 20;
 			orchidPlayer.ForcedVelocityUpkeep = 0;
+			
+			int dashType = ModContent.ProjectileType<ThoriumNagaQuarterstaffProjectileDash>();
+			if (player.ownedProjectileCounts[dashType] != 1)
+			{
+				Projectile dash = Projectile.NewProjectileDirect(projectile.GetSource_FromAI(), projectile.Center, velocity, dashType, 0, 0);
+				((ThoriumNagaQuarterstaffProjectileDash)dash.ModProjectile).Anchor = projectile;
+			}
+			
 		}
     }    
 }

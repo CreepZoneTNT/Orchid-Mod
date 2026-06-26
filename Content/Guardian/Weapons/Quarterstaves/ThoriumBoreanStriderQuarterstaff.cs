@@ -98,62 +98,62 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			        break;
 	        }
 
-	        // Code borrowed from FlamingQuarterstaff
-	        bool bigAttack = projectile.ai[0] > 14 || projectile.ai[2] < 0;
-	        if (Main.rand.NextBool(bigAttack ? 1 : 4))
-	        {
-		        Dust dust = Dust.NewDustDirect(Tip - new Vector2(8),
-			        12,
-			        12,
-			        DustID.HallowSpray,
-			        SpeedY: -Main.rand.NextFloat(3f),
-			        Scale: 0.75f);
-		        switch (Main.rand.Next(10))
-		        {
-			        default:
-				        dust.velocity *= 0.25f;
-				        dust.velocity += player.velocity * 0.5f;
-				        dust.scale *= 2.5f;
-				        goto case 8;
-			        case 6:
-			        case 7:
-			        case 8:
-				        dust.noGravity = true;
-				        dust.velocity *= 0.8f;
-				        if (bigAttack)
-				        {
-					        if (projectile.ai[0] > 14) //swing
-						        dust.velocity += new Vector2(
-							        -player.direction * (float)Math.Cos(projectile.ai[0] * 0.2f),
-							        -1).RotatedBy(projectile.rotation + MathHelper.PiOver4) * Main.rand.NextFloat(4f,
-							        8f);
-					        else //counter
-						        dust.velocity += new Vector2(1,
-							        -1).RotatedBy(projectile.rotation + Main.rand.NextFloat(MathHelper.PiOver2)) * Main.rand.NextFloat(8f);
-					        if (Main.rand.NextBool())
-					        {
-						        dust.scale += Main.rand.NextFloat(2f);
-						        dust.velocity *= Main.rand.NextFloat(0.2f,
-							        0.6f);
-					        }
-
-					        dust.fadeIn += Main.rand.NextFloat(2.5f);
-				        }
-				        else if (projectile.ai[0] <= -30 && projectile.ai[0] >= -39) //jab
-				        {
-					        dust.velocity += new Vector2(-1,
-						        1).RotatedBy(projectile.rotation) * (projectile.ai[0] + 30) * Main.rand.NextFloat(0.6f,
-						        1.2f);
-					        dust.fadeIn += Main.rand.NextFloat(1f);
-				        }
-
-				        break;
-			        case 9:
-				        dust.scale *= Main.rand.NextFloat(0.5f,
-					        1f);
-				        break;
-		        }
-	        }
+	        // // Code borrowed from FlamingQuarterstaff
+	        // bool bigAttack = projectile.ai[0] > 14 || projectile.ai[2] < 0;
+	        // if (Main.rand.NextBool(bigAttack ? 1 : 4))
+	        // {
+		       //  Dust dust = Dust.NewDustDirect(Tip - new Vector2(8),
+			      //   12,
+			      //   12,
+			      //   DustID.HallowSpray,
+			      //   SpeedY: -Main.rand.NextFloat(3f),
+			      //   Scale: 0.75f);
+		       //  switch (Main.rand.Next(10))
+		       //  {
+			      //   default:
+				     //    dust.velocity *= 0.25f;
+				     //    dust.velocity += player.velocity * 0.5f;
+				     //    dust.scale *= 2.5f;
+				     //    goto case 8;
+			      //   case 6:
+			      //   case 7:
+			      //   case 8:
+				     //    dust.noGravity = true;
+				     //    dust.velocity *= 0.8f;
+				     //    if (bigAttack)
+				     //    {
+					    //     if (projectile.ai[0] > 14) //swing
+						   //      dust.velocity += new Vector2(
+							  //       -player.direction * (float)Math.Cos(projectile.ai[0] * 0.2f),
+							  //       -1).RotatedBy(projectile.rotation + MathHelper.PiOver4) * Main.rand.NextFloat(4f,
+							  //       8f);
+					    //     else //counter
+						   //      dust.velocity += new Vector2(1,
+							  //       -1).RotatedBy(projectile.rotation + Main.rand.NextFloat(MathHelper.PiOver2)) * Main.rand.NextFloat(8f);
+					    //     if (Main.rand.NextBool())
+					    //     {
+						   //      dust.scale += Main.rand.NextFloat(2f);
+						   //      dust.velocity *= Main.rand.NextFloat(0.2f,
+							  //       0.6f);
+					    //     }
+	        //
+					    //     dust.fadeIn += Main.rand.NextFloat(2.5f);
+				     //    }
+				     //    else if (projectile.ai[0] <= -30 && projectile.ai[0] >= -39) //jab
+				     //    {
+					    //     dust.velocity += new Vector2(-1,
+						   //      1).RotatedBy(projectile.rotation) * (projectile.ai[0] + 30) * Main.rand.NextFloat(0.6f,
+						   //      1.2f);
+					    //     dust.fadeIn += Main.rand.NextFloat(1f);
+				     //    }
+	        //
+				     //    break;
+			      //   case 9:
+				     //    dust.scale *= Main.rand.NextFloat(0.5f,
+					    //     1f);
+				     //    break;
+		       //  }
+	        // }
         }
 
         public override void OnAttack(Player player, OrchidGuardian guardian, Projectile projectile, bool jabAttack, bool counterAttack)
@@ -202,39 +202,39 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
             }
         }
 
-        public override void QuarterstaffPostDrawUI(SpriteBatch spriteBatch, Player player, ref Color lightColor, Projectile projectile)
-        {
-	        Vector2 position = (player.position + new Vector2(player.width * 0.5f, player.height + player.gfxOffY + 12)).Floor();
-	        Vector2 drawpos = new Vector2(position.X + 22, position.Y - 94 * player.gravDir + 3f * (player.gravDir - 1)) - Main.screenPosition;
-
-	        Texture2D snowflakeUIOff = ModContent.Request<Texture2D>(Texture + "_UIOff").Value;
-	        Texture2D snowflakeUIOn = ModContent.Request<Texture2D>(Texture + "_UIOn").Value;
-	        Texture2D snowflakeUIReady = ModContent.Request<Texture2D>(Texture + "_UIReady").Value;
-	        
-	        if (OrchidMod.OrchidClientConfig.GuardianThoriumBoreanStriderColorUI)
-		        snowflakeUIOn = ModContent.Request<Texture2D>(ModContent.GetInstance<IceGauntletProjectile>().Texture).Value;
-
-	        
-	        
-	        int val = 26;
-	        float stacks = SnowflakeStacks / 10f; 
-	        while (stacks < 1)
-	        {
-		        stacks += 0.0385f;
-		        val--;
-	        }
-	        Rectangle rectangle = snowflakeUIOff.Bounds;
-	        rectangle.Height = val;
-	        rectangle.Y = snowflakeUIOff.Height - val;
-	        
-	        if (SnowflakeStacks >= 10)
-				spriteBatch.Draw(snowflakeUIReady, drawpos - new Vector2(2f, 2f), null, Color.White * 0.8f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-	        
-	        spriteBatch.Draw(snowflakeUIOff, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-	        drawpos.Y += snowflakeUIOff.Height - val;
-	        spriteBatch.Draw(snowflakeUIOn, drawpos, rectangle, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-
-        }
+    //     public override void QuarterstaffPostDrawUI(SpriteBatch spriteBatch, Player player, ref Color lightColor, Projectile projectile)
+    //     {
+	   //      Vector2 position = (player.position + new Vector2(player.width * 0.5f, player.height + player.gfxOffY + 12)).Floor();
+	   //      Vector2 drawpos = new Vector2(position.X + 22, position.Y - 94 * player.gravDir + 3f * (player.gravDir - 1)) - Main.screenPosition;
+    //
+	   //      Texture2D snowflakeUIOff = ModContent.Request<Texture2D>(Texture + "_UIOff").Value;
+	   //      Texture2D snowflakeUIOn = ModContent.Request<Texture2D>(Texture + "_UIOn").Value;
+	   //      Texture2D snowflakeUIReady = ModContent.Request<Texture2D>(Texture + "_UIReady").Value;
+	   //      
+	   //      if (OrchidMod.OrchidClientConfig.GuardianThoriumBoreanStriderColorUI)
+		  //       snowflakeUIOn = ModContent.Request<Texture2D>(ModContent.GetInstance<IceGauntletProjectile>().Texture).Value;
+    //
+	   //      
+	   //      
+	   //      int val = 26;
+	   //      float stacks = SnowflakeStacks / 10f; 
+	   //      while (stacks < 1)
+	   //      {
+		  //       stacks += 0.0385f;
+		  //       val--;
+	   //      }
+	   //      Rectangle rectangle = snowflakeUIOff.Bounds;
+	   //      rectangle.Height = val;
+	   //      rectangle.Y = snowflakeUIOff.Height - val;
+	   //      
+	   //      if (SnowflakeStacks >= 10)
+				// spriteBatch.Draw(snowflakeUIReady, drawpos - new Vector2(2f, 2f), null, Color.White * 0.8f, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+	   //      
+	   //      spriteBatch.Draw(snowflakeUIOff, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+	   //      drawpos.Y += snowflakeUIOff.Height - val;
+	   //      spriteBatch.Draw(snowflakeUIOn, drawpos, rectangle, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+    //
+    //     }
 
         private void DoFullChargeIndicator(Player player, float toAdd)
         {

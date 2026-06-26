@@ -1,15 +1,21 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.Audio;
+using Terraria.Localization;
+using Terraria.ModLoader;
+using Terraria.Utilities;
 
 namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 {
     public class ToyWarhammers : OrchidModGuardianHammer
     {
 
-		private SoundStyle SqueakSound = new ("OrchidMod/Assets/Sounds/Squeak") { PitchRange = (-0.4f, 0.4f), MaxInstances = 5, Volume = 0.25f };
+		private SoundStyle SqueakSound = new ("OrchidMod/Assets/Sounds/Squeak") { PitchRange = (-0.4f, 0.4f), MaxInstances = 5, Volume = 0.1f};
 
+		public float VolumeModifier;
+		
         public override void SafeSetDefaults()
         {
             Item.width = 44;
@@ -31,16 +37,45 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 			DualWarhammers = true;
 			hasSpecialHammerTexture = true;
 			CannotBlock = true;
-		}
 
-        public override void OnMeleeHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged, bool OffHand) => SoundEngine.PlaySound(SqueakSound, projectile.Center);
+			VolumeModifier = 1;
+        }
 
-        public override void OnThrowHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak, bool OffHand) => SoundEngine.PlaySound(SqueakSound with { Pitch = Weak ? -0.4f : 0}, projectile.Center);
+        public override int ChoosePrefix(UnifiedRandom rand) => rand.NextBool(100) ? PrefixID.Annoying : -1;
+
+        public override void ApplyPrefix(int pre)
+        {
+	        if (pre == PrefixID.Annoying)
+	        {
+		        Item.knockBack *= 1.15f;
+		        VolumeModifier *= 1.5f;
+	        }
+        }
+
+        public override void OnMeleeHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged, bool OffHand) => SoundEngine.PlaySound(SqueakSound with {Volume = 0.1f * VolumeModifier}, projectile.Center);
+
+        public override void OnThrowHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak, bool OffHand) => SoundEngine.PlaySound(SqueakSound with {Volume = 0.1f * VolumeModifier, Pitch = Weak ? -0.4f : 0}, projectile.Center);
 
         public override void OnThrowTileCollide(Player player, OrchidGuardian guardian, Projectile projectile, Vector2 oldVelocity, bool OffHand)
         {
-            SoundEngine.PlaySound(SqueakSound, projectile.Center);
-            SoundEngine.PlaySound(SoundID.Item16 with { Volume = 0.25f }, projectile.Center);
+            SoundEngine.PlaySound(SqueakSound with {Volume = 0.1f * VolumeModifier}, projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item16 with {Volume = 0.25f}, projectile.Center);
+        }
+
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+	        base.ModifyTooltips(tooltips);
+
+	        if (Item.prefix == PrefixID.Annoying)
+	        {
+		        int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Tooltip1"));
+		        tooltips.Insert(index, new TooltipLine(Mod, "AnnoyingnessPrefix", Language.GetTextValue(Mod.GetLocalizationKey("Items.ToyWarhammers.AnnoyingPrefix"), (VolumeModifier - 1) * 100f))
+			        {
+				        IsModifier = true,
+				        IsModifierBad = VolumeModifier > 1
+			        }
+		        );
+	        }
         }
     }
 }

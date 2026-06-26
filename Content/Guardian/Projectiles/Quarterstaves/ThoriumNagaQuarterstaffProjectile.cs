@@ -34,7 +34,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 		public override void OnSpawn(IEntitySource source)
 		{
 			Projectile.scale = 0f;
-			if (Main.player[Projectile.owner].ownedProjectileCounts[Type] >= 5)
+			if (Main.player[Projectile.owner].ownedProjectileCounts[Type] >= 10)
 			{
 				Projectile oldest = null;
 				int maxTimeSpent = 0;
@@ -54,7 +54,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 		{
 			TimeSpent++;
 
-			if (Projectile.scale < 1f)
+			if (Projectile.scale < 1.5f)
 			{
 				Vector2 oldCenter = Projectile.Center;
 				Projectile.scale += 0.05f;
@@ -67,7 +67,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 			if (Projectile.velocity.Length() < 0.1f)
 			{
 				Projectile.velocity = Vector2.Zero;
-				Projectile.Center += Vector2.UnitY * MathF.Sin(TimeSpent * MathHelper.Pi / 135f) * 0.25f;
+				Projectile.Center += Vector2.UnitY * MathF.Sin(TimeSpent * MathHelper.Pi / 135f) * 0.1f;
 			}
 
 			Projectile.ai[0] = 15f + MathF.Sin(TimeSpent * MathHelper.Pi / 180f) * 3f;

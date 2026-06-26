@@ -3469,6 +3469,11 @@ Items: {
 		Enemies are more likely to target you
 		'''
 	DepthDiverGreaves.Tooltip: Increases maximum guards by 2
+
+	GuardianLanternShield: {
+		DisplayName: Guardian Lantern Shield
+		Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -3936,6 +3941,8 @@ Projectiles: {
 	VoidArmorTail.DisplayName: Void Armor Tail
 	ThoriumBlackKatarProjectile.DisplayName: Shadow Clone
 	ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
+	GuardianLanternShieldAnchor.DisplayName: Guardian Lantern Shield Anchor
+	ThoriumNagaQuarterstaffProjectileDash.DisplayName: Thorium Naga Quarterstaff Projectile Dash
 }
 
 Configs: {
@@ -4007,7 +4014,7 @@ Configs: {
 				'''
 				Triggers 'Shawl' accessory dashes when releasing the hook key instead of pressing it
 				(allowing to launch a hook without dashing)
-				''' 
+				'''
 		}
 
 		ShapeshifterScrollDelay: {

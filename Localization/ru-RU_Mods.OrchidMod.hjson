@@ -257,8 +257,13 @@ Buffs: {
 	}
 
 	GuardianVoidQuarterstaffBuff: {
-		// Description: Void Rush
-		// DisplayName: 150% increased Flux Ripper attack speed
+		// DisplayName: Void Rush
+		// Description: 150% increased Flux Ripper attack speed
+	}
+
+	GuardianDreadGauntletBuff: {
+		// DisplayName: Dread Reaper's Fury
+		// Description: 60% increased melee speed and 20% increased movement speed, at a cost...
 	}
 }
 
@@ -3236,7 +3241,11 @@ Items: {
 
 	ToyWarhammers: {
 		// DisplayName: The Big Honkers
-		// Tooltip: Lets you dual wield a pair of very squeaky hammers
+		/* Tooltip:
+			'''
+			'Honk honk'
+			Lets you dual wield a pair of very squeaky hammers
+			''' */
 	}
 
 	ThoriumValadiumWarhammer: {
@@ -3284,8 +3293,8 @@ Items: {
 		/* Tooltip:
 			'''
 			[c/FF0000:Test Item]
-			Jab is replaced by a powerful sweep
-			Fully charge while underwater to propel yourself to your cursor, ending in a massive full sweep attack
+			Shoots lingering bubbles on jab 
+			Pop bubbles with charged attacks or fully charge while underwater to propel yourself to your cursor
 			''' */
 	}
 
@@ -3295,6 +3304,7 @@ Items: {
 			'''
 			[c/FF0000:Test Item]
 			Fully charging creates a damage-sharing link between enemies
+			'The wonders of the world shall be connected'
 			''' */
 	}
 
@@ -3304,13 +3314,18 @@ Items: {
 			'''
 			[c/FF0000:Test Item]
 			Attacks grant Cold Energy charge
-			At full Cold Energy charge, your next slam will release a giant snowflake
+			At full Cold Energy charge, your next charged attack will release a giant snowflake
 			''' */
 	}
 
 	ThoriumDreadGauntlet: {
 		// DisplayName: Dread Reaper's Claw
-		// Tooltip: ""
+		/* Tooltip:
+			'''
+			Hooking an enemy refunds a guard, deals damage, and triggers your active parry
+			Parrying increases speed for a short time, and launches kunai on punch
+			''' */
+		// Parry: "{0} click fires a grappling claw, costing 2 guards"
 	}
 
 	ThoriumGuardianTitanHead: {
@@ -3339,7 +3354,7 @@ Items: {
 	}
 
 	ThoriumGuardianVoidHead: {
-		// DisplayName: Thorium Guardian Void Head
+		// DisplayName: Void Sentinel Helmet
 		/* Tooltip:
 			'''
 			[c/FF0000:Test Item]
@@ -3350,9 +3365,10 @@ Items: {
 			''' */
 		/* SetBonus:
 			'''
-			Decreases max life by 250
-			Guardian attacks briefly grant massively increased health and resource regeration
-			While blocking or parrying you will attract nearby blockable projectiles
+			Decreases max life by 100
+			Summons a stinger tail above you
+			Pressing the 'Armor Ability' key consumes life to stab toward your cursor
+			On hit you gain massively increased life and guardian resource regeneration 
 			''' */
 	}
 
@@ -3417,6 +3433,31 @@ Items: {
 		// Tooltip: Spending a slam shields the lowest health nearby ally life by 5, up to 10
 	}
 
+	HorizonChandelier: {
+		// Tooltip: ""
+		// DisplayName: Horizon Chandelier
+	}
+
+	HorizonBrick: {
+		// Tooltip: ""
+		// DisplayName: Horizon Brick
+	}
+
+	ThoriumTerrariumQuarterstaff: {
+		// DisplayName: Thorium Terrarium Quarterstaff
+		// Tooltip: ""
+	}
+
+	ThoriumBlackKatar: {
+		// DisplayName: The Black Katar
+		/* Tooltip:
+			'''
+			[c/FF0000:Test Item]
+			Parries summon a shadow clone that imitates your movement after a delay
+			Dealing damage grants you stacking damage and withers enemies at 50 stacks
+			''' */
+	}
+
 	ConsolariaLepusEggNest: {
 		// DisplayName: Consolaria Lepus Egg Nest
 		// Tooltip: ""
@@ -3429,6 +3470,11 @@ Items: {
 		Enemies are more likely to target you
 		''' */
 	// DepthDiverGreaves.Tooltip: Increases maximum guards by 2
+
+	GuardianLanternShield: {
+		// DisplayName: Guardian Lantern Shield
+		// Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -3890,7 +3936,14 @@ Projectiles: {
 	// ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
 	// GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
 	// ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
+	// ThoriumBoreanStriderQuarterstaffProjectile.DisplayName: Thorium Borean Strider Quarterstaff Projectile
+	// ThoriumDreadGauntletProjectile.DisplayName: Dread Grappleclaw
+	// ThoriumDreadGauntletProjectileAlt.DisplayName: Thorium Dread Gauntlet Projectile Alt
+	// VoidArmorTail.DisplayName: Void Armor Tail
+	// ThoriumBlackKatarProjectile.DisplayName: Shadow Clone
 	// ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
+	// GuardianLanternShieldAnchor.DisplayName: Guardian Lantern Shield Anchor
+	// ThoriumNagaQuarterstaffProjectileDash.DisplayName: Thorium Naga Quarterstaff Projectile Dash
 }
 
 Configs: {
@@ -4015,7 +4068,11 @@ Configs: {
 
 		SmartSmartCursor: {
 			// Label: Smart Smart Cursor
-			// Tooltip: Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.\nNo effect if Smart Cursor isn't set to 'Toggle'.
+			/* Tooltip:
+				'''
+				Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.
+				No effect if Smart Cursor isn't set to 'Toggle'
+				''' */
 		}
 	}
 

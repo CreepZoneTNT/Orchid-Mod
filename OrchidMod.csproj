@@ -20,6 +20,10 @@
 	  <Reference Include="OrchidMineshaft">
 	    <HintPath>lib\OrchidMineshaft.dll</HintPath>
 	  </Reference>
+      <Reference Include="ThoriumMod">
+        <HintPath>..\ModAssemblies\ThoriumMod_v1.7.2.6.dll</HintPath>
+        <Private>false</Private>
+      </Reference>
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Content\Guardian\Projectiles\Standards\" />

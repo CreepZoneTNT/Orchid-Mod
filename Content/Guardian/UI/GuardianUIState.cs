@@ -409,6 +409,24 @@ namespace OrchidMod.Content.Guardian.UI
 						chargeTextureOff = textureBlockOff;
 						chargeTextureReady = textureBlockReady;
 					}
+					
+					if (guardianItem is GuardianLanternShield lantern && (maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f)))
+					{
+						Projectile lanternShieldProj = Main.projectile.FirstOrDefault(proj => proj.whoAmI < Main.maxProjectiles && proj.active && proj.owner == player.whoAmI && proj.type == ModContent.ProjectileType<GuardianLanternShieldAnchor>());
+						if (lanternShieldProj.ai[1] == -1f)
+						{
+							chargeTextureOn = textureGauntletOn;
+							chargeTextureOff = textureGauntletOff;
+							chargeTextureReady = textureGauntletReady;
+						}
+						else
+						{
+							chargeTextureOn = textureBlockOn;
+							chargeTextureOff = textureBlockOff;
+							chargeTextureReady = textureBlockReady;
+							
+						}
+					}
 
 					// Parry duration display on standard weapons
 					int shieldType = ModContent.ProjectileType<GuardianShieldAnchor>();

@@ -316,7 +316,7 @@ namespace OrchidMod.Content.Guardian
 						Projectile.rotation = aimedLocation.ToRotation();
 						if (guardianItem.shouldFlip)
 						{
-							if (aimedLocation.X < 0 || (isSlamming is 1 or 2 && IsRotationLocked && -Vector2.UnitX.RotatedBy(LockedRotation).X < 0))
+							if (aimedLocation.X < 0 || (Projectile.localAI[1] != 0 && Projectile.Center.X < owner.Center.X) || (isSlamming is 1 or 2 && IsRotationLocked && -Vector2.UnitX.RotatedBy(LockedRotation).X < 0))
 							{
 								Projectile.spriteDirection = -1;
 							}

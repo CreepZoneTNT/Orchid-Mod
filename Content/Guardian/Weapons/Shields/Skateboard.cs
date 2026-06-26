@@ -100,8 +100,10 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 						owner.fallStart = (int)(owner.position.Y / 16f);
 						owner.fallStart2 = (int)(owner.position.Y / 16f);
 						owner.position.Y += (collision.Y - 1.7f);
+						owner.oldVelocity = owner.velocity;
 						owner.velocity.X = playerVelocity;
 						owner.velocity.Y = 0.1f;
+						owner.ChangeDir((owner.velocity.X > 0).ToDirectionInt());
 
 						if (playerVelocity < 0) TimeSpent -= 10;
 						else if (playerVelocity > 0) TimeSpent += 9;
@@ -113,15 +115,52 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 						
 
 						if (Main.rand.NextBool(4)) SoundEngine.PlaySound(SoundID.Item55, projectile.Center);
-						//
-						// if (AirTime == 0 && Main.keyState.IsKeyDown(Keys.Space))
-						// {
-						// 	owner.velocity.Y = -8f;
-						// 	owner.position.Y -= collision.Y + 1.7f;
-						// 	owner.wingTime = 0f;
-						// 	owner.eocDash = 0;
-						// 	SoundEngine.PlaySound(SoundID.Item32);
-						// }
+						
+						if (AirTime == 0 && owner.controlJump)
+						{
+							owner.velocity.Y = -8f;
+							owner.position.Y -= collision.Y + 1.7f;
+							SoundEngine.PlaySound(SoundID.Item32);
+						}
+						
+						Point point = (projectile.Center + Vector2.UnitX * projectile.height * 0.5f * owner.direction + owner.oldVelocity).ToTileCoordinates();
+						Tile hitTile = Framing.GetTileSafely(point);
+						if (hitTile.HasUnactuatedTile && Main.tileSolid[hitTile.TileType])
+						{
+							int toClimb = 16;
+							if (hitTile.IsHalfBlock)
+								toClimb -= 8;
+							for (int i = 1; i < 5; i++)
+							{
+								Tile aboveTile = Framing.GetTileSafely(point.X, point.Y - i);
+								if (aboveTile.HasUnactuatedTile && Main.tileSolid[aboveTile.TileType])
+								{
+									toClimb = 16 * (i + 1);
+									if (aboveTile.IsHalfBlock)
+										toClimb -= 8;
+								}
+								else continue;
+								if (toClimb >= 40) // Trying to climb over 2.5 tiles: halt
+								{
+									if (AirTime == 0 && owner.controlJump)
+									{
+										playerVelocity *= -1;
+									}
+									else
+									{
+										projectile.ai[0] = 1f;
+										toClimb = 0;
+										SoundEngine.PlaySound(SoundID.Item175 with {Pitch = -0.8f}, owner.Center);
+										break;
+										
+									}
+								}
+							}
+
+							AirTime = 0;
+							owner.position.Y -= toClimb - projectile.gfxOffY;
+							if (IsLocalPlayer(owner) && toClimb > 0) Main.SetCameraLerp(0.1f, 3);
+						}
 					}
 					else
 					{
@@ -137,6 +176,13 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 						
 						projectile.ai[0]++;
 					}
+					
+					owner.jump = 0;
+					owner.rocketTime = 0;
+					owner.wingTime = 0f;
+					owner.eocDash = 0;
+					owner.timeSinceLastDashStarted = 0;
+					owner.dashTime = 0;
 				}
 			}
 			else

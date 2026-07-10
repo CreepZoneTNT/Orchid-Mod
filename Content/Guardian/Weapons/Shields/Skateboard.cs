@@ -116,12 +116,12 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 
 						if (Main.rand.NextBool(4)) SoundEngine.PlaySound(SoundID.Item55, projectile.Center);
 						
-						if (AirTime == 0 && owner.controlJump)
-						{
-							owner.velocity.Y = -8f;
-							owner.position.Y -= collision.Y + 1.7f;
-							SoundEngine.PlaySound(SoundID.Item32);
-						}
+						// if (AirTime == 0 && owner.controlJump)
+						// {
+						// 	owner.velocity.Y = -8f;
+						// 	owner.position.Y -= collision.Y + 1.7f;
+						// 	SoundEngine.PlaySound(SoundID.Item32);
+						// }
 						
 						Point point = (projectile.Center + Vector2.UnitX * projectile.height * 0.5f * owner.direction + owner.oldVelocity).ToTileCoordinates();
 						Tile hitTile = Framing.GetTileSafely(point);
@@ -142,18 +142,18 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 								else continue;
 								if (toClimb >= 40) // Trying to climb over 2.5 tiles: halt
 								{
-									if (AirTime == 0 && owner.controlJump)
-									{
-										playerVelocity *= -1;
-									}
-									else
-									{
+									// if (AirTime == 0 && owner.controlJump)
+									// {
+									// 	playerVelocity *= -1;
+									// }
+									// else
+									// {
 										projectile.ai[0] = 1f;
 										toClimb = 0;
 										SoundEngine.PlaySound(SoundID.Item175 with {Pitch = -0.8f}, owner.Center);
 										break;
 										
-									}
+									// }
 								}
 							}
 

@@ -113,6 +113,8 @@ namespace OrchidMod.Content.Guardian
 		public float GuardianItemCharge = 0f; // Player Warhammer Throw Charge, max is 180f
 		public bool GuardianParry = false; // Player is currently parrying
 		public bool GuardianParryBuffer = false; // Player is currently parrying (1 frame buffer)
+		public int ParryTimeSpent = 0;
+		public bool PerfectParry = false;
 		/// <summary> Cooldown in frames between starting a new punch charge since starting the last one. Can begin a punch when 0 or lower, goes down to -10. Half of the gauntlet's punch animation time is added when a charge is started. </summary>
 		public int GauntletPunchCooldown = 0;
 		public bool GuardianStandardBuffer = false; // used to delay the deactivation of various standards effects by 1 frame
@@ -136,9 +138,49 @@ namespace OrchidMod.Content.Guardian
 		public int GuardianBadgeHopliteLevel = 0; // goes up to 2 for bonus katar charge speed
 
 		public const int GuardianRechargeTime = 600;
+		
+		
+		// Equipment delegates: they get called at the end of Guardian methods
+		public delegate void OnUseSlamDelegate(Player player, OrchidGuardian guardian);
+		public delegate void OnUseGuardDelegate(Player player, OrchidGuardian guardian);
+		public delegate void AddSlamDelegate(Player player, OrchidGuardian guardian, int nb);
+		public delegate void AddGuardDelegate(Player player, OrchidGuardian guardian, int nb);
+		public delegate bool UseSlamDelegate(Player player, OrchidGuardian guardian, int nb);
+		public delegate bool UseGuardDelegate(Player player, OrchidGuardian guardian, int nb);
+		public delegate void DoParryItemParryDelegate(Player player, OrchidGuardian guardian, Entity aggressor);
+		public delegate void OnBlockFirstDelegate(Player player, OrchidGuardian guardian, Projectile anchor, Entity aggressor, ref int toAdd, bool parry);
+		public delegate void OnBlockDelegate(Player player, OrchidGuardian guardian, Projectile anchor, Entity aggressor, bool parry);
+
+		
+		public OnUseSlamDelegate onUseSlamDelegate;
+		public OnUseGuardDelegate onUseGuardDelegate;
+		public AddSlamDelegate addSlamDelegate;
+		public AddGuardDelegate addGuardDelegate;
+		public UseSlamDelegate useSlamDelegate;
+		public UseGuardDelegate useGuardDelegate;
+		public DoParryItemParryDelegate doParryItemParryDelegate;
+		public OnBlockFirstDelegate onBlockFirstDelegate;
+		public OnBlockDelegate onBlockDelegate;
 
 		public int GetGuardianDamage(float damage) => (int)(Player.GetDamage<GuardianDamageClass>().ApplyTo(damage) + Player.GetDamage(DamageClass.Generic).ApplyTo(damage) - damage);
 		public int GetGuardianCrit(int addedCrit = 0) => (int)(Player.GetCritChance<GuardianDamageClass>() + Player.GetCritChance<GenericDamageClass>() + addedCrit);
+
+		public bool IsPerfectParry(int window, ref int toAdd)
+		{
+			bool perfect = ParryTimeSpent.Between(0, window);
+			if (perfect)
+			{
+				if (!PerfectParry)
+				{
+					toAdd++;
+
+					SoundEngine.PlaySound(SoundID.Item129, Player.Center);
+					CombatText.NewText(Player.getRect(), Color.Coral, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.PerfectParry"), true);
+				}
+				return true;
+			}
+			return false;
+		}
 
 		public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
 		{
@@ -350,19 +392,19 @@ namespace OrchidMod.Content.Guardian
 				GuardianJewelerGauntlet = 0;
 			}
 			
-			int type = ModContent.ProjectileType<VoidArmorTail>();
-			Projectile voidTail = Main.projectile.FirstOrDefault(proj => proj.whoAmI < Main.maxProjectiles && proj.active && proj.owner == Player.whoAmI && proj.type == type);
-			if (GuardianVoid)
-			{
-				Vector2 target = Player.Center + new Vector2(20f * Player.direction, -40f) + Player.velocity * 0.8f;
-				if (voidTail == null) Projectile.NewProjectileDirect(Player.GetSource_FromAI(), target, Vector2.Zero, type, GetGuardianDamage(80), 4f, Player.whoAmI, target.X, target.Y);
-				else
-				{
-					(voidTail.ai[0], voidTail.ai[1]) = (target.X, target.Y);
-				}
-			}
-			else
-				voidTail?.Kill();
+			// int type = ModContent.ProjectileType<VoidArmorTail>();
+			// Projectile voidTail = Main.projectile.FirstOrDefault(proj => proj.whoAmI < Main.maxProjectiles && proj.active && proj.owner == Player.whoAmI && proj.type == type);
+			// if (GuardianVoid)
+			// {
+			// 	Vector2 target = Player.Center + new Vector2(20f * Player.direction, -40f) + Player.velocity * 0.8f;
+			// 	if (voidTail == null) Projectile.NewProjectileDirect(Player.GetSource_FromAI(), target, Vector2.Zero, type, GetGuardianDamage(80), 4f, Player.whoAmI, target.X, target.Y);
+			// 	else
+			// 	{
+			// 		(voidTail.ai[0], voidTail.ai[1]) = (target.X, target.Y);
+			// 	}
+			// }
+			// else
+			// 	voidTail?.Kill();
 
 			if (GuardianParry) {
 				if (GuardianCrystalNinja && Player.dashDelay < 0) DoParryItemParry(null);
@@ -403,38 +445,38 @@ namespace OrchidMod.Content.Guardian
 				{
 					if (GuardianVoid)
 					{
-						int type = ModContent.ProjectileType<VoidArmorTail>();
-						foreach (Projectile proj in Main.projectile)
-						{
-							if (proj.active && proj.owner == Player.whoAmI && proj.type == type && proj.ModProjectile is VoidArmorTail voidTail && proj.ai[2] == 0)
-							{
-								if (!Main.dedServ)
-								{
-									int voidDust = thoriumMod.Find<ModDust>("VoidHeartDust").Type;
-									for (int i = 0; i < 10; i++)
-									{
-										Dust dust = Dust.NewDustPerfect(Player.Center, voidDust, Main.rand.NextVector2CircularEdge(2.5f, 2.5f));
-										dust.noGravity = true;
-									}
-
-									SoundEngine.PlaySound(SoundID.Item104, Player.Center);
-								}
-
-								int hpToSteal = Player.statLifeMax2 / 10;
-								if (Player.statLife - hpToSteal < 0)
-									Player.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromFormattable("{0} gave too much of their life energy to the Void", Player.name)), Player.statLifeMax2, Player.direction);
-								else
-								{
-									Player.statLife -= hpToSteal;
-									CombatText.NewText(Player.getRect(), CombatText.DamagedFriendly, hpToSteal, dot: true);
-								}
-								voidTail.stabDirection = Player.Center.DirectionTo(Main.MouseWorld);
-								proj.ai[2] = 20;
-								break;
-							}
-						}
-
-						
+						// int type = ModContent.ProjectileType<VoidArmorTail>();
+						// foreach (Projectile proj in Main.projectile)
+						// {
+						// 	if (proj.active && proj.owner == Player.whoAmI && proj.type == type && proj.ModProjectile is VoidArmorTail voidTail && proj.ai[2] == 0)
+						// 	{
+						// 		if (!Main.dedServ)
+						// 		{
+						// 			int voidDust = thoriumMod.Find<ModDust>("VoidHeartDust").Type;
+						// 			for (int i = 0; i < 10; i++)
+						// 			{
+						// 				Dust dust = Dust.NewDustPerfect(Player.Center, voidDust, Main.rand.NextVector2CircularEdge(2.5f, 2.5f));
+						// 				dust.noGravity = true;
+						// 			}
+						//
+						// 			SoundEngine.PlaySound(SoundID.Item104, Player.Center);
+						// 		}
+						//
+						// 		int hpToSteal = Player.statLifeMax2 / 10;
+						// 		if (Player.statLife - hpToSteal < 0)
+						// 			Player.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromFormattable("{0} gave too much of their life energy to the Void", Player.name)), Player.statLifeMax2, Player.direction);
+						// 		else
+						// 		{
+						// 			Player.statLife -= hpToSteal;
+						// 			CombatText.NewText(Player.getRect(), CombatText.DamagedFriendly, hpToSteal, dot: true);
+						// 		}
+						// 		voidTail.stabDirection = Player.Center.DirectionTo(Main.MouseWorld);
+						// 		proj.ai[2] = 20;
+						// 		break;
+						// 	}
+						// }
+						//
+						//
 					}
 				}
 			}
@@ -497,6 +539,11 @@ namespace OrchidMod.Content.Guardian
 				GuardianStaffRocketCooldown--;
 			}
 
+			if (GuardianParry)
+				ParryTimeSpent++;
+			else
+				ParryTimeSpent = 0;
+
 			if (GuardianItemCharge > 0)
 			{
 				ChargeHoldTimer++;
@@ -554,6 +601,8 @@ namespace OrchidMod.Content.Guardian
 
 			if (GuardianParryBuffer) GuardianParryBuffer = false;
 			else GuardianParry = false;
+			
+			if (PerfectParry) PerfectParry = false;
 
 			SlamCostUI = 0;
 			GuardCostUI = 0;
@@ -618,6 +667,16 @@ namespace OrchidMod.Content.Guardian
 			GuardianGuardMax += GuardianDebugBonusGuards;
 			GuardianSlamMax += GuardianDebugBonusSlams;
 			GuardianBonusRune += GuardianDebugBonusRunes;
+
+			onUseSlamDelegate = null;
+			onUseGuardDelegate = null;
+			addSlamDelegate = null;
+			addGuardDelegate = null;
+			useSlamDelegate = null;
+			useGuardDelegate = null;
+			doParryItemParryDelegate = null;
+			onBlockFirstDelegate = null;
+			onBlockDelegate = null;
 		}
 
 		public override void PreUpdateMovement()
@@ -812,36 +871,65 @@ namespace OrchidMod.Content.Guardian
 
 		public void OnUseSlam()
 		{
-			if (GuardianThoriumCenser && OrchidMod.ThoriumMod != null)
-			{
-				Player lowestHealthPlayer = Player;
-				foreach (Player player in Main.player)
-				{ // targets the lowest heath nearby player
-					if (player.DistanceSQ(Player.Center) < 800f && player.active && !player.dead && player.statLife < lowestHealthPlayer.statLife)
-					{ // 16 * 50 = 800f for a 50 tiles range
-						lowestHealthPlayer = player;
-					}
-				}
-
-				/* Ended up being unused, but this is how I would check for the players shield health, potentially to target unshielded players.
-				foreach (ModPlayer thoriumPlayer in Player.ModPlayers)
+			// if (GuardianThoriumCenser && OrchidMod.ThoriumMod != null)
+			// {
+			// 	Player lowestHealthPlayer = Player;
+			// 	foreach (Player player in Main.player)
+			// 	{ // targets the lowest heath nearby player
+			// 		if (player.DistanceSQ(Player.Center) < 800f && player.active && !player.dead && player.statLife < lowestHealthPlayer.statLife)
+			// 		{ // 16 * 50 = 800f for a 50 tiles range
+			// 			lowestHealthPlayer = player;
+			// 		}
+			// 	}
+			//
+			// 	/* Ended up being unused, but this is how I would check for the players shield health, potentially to target unshielded players.
+			// 	foreach (ModPlayer thoriumPlayer in Player.ModPlayers)
+			// 	{
+			// 		if (thoriumPlayer.Name == "ThoriumPlayer" && thoriumPlayer.Mod == OrchidMod.ThoriumMod)
+			// 		{
+			// 			FieldInfo field = thoriumPlayer.GetType().GetField("shieldHealth", BindingFlags.Public | BindingFlags.Instance);
+			// 			int shieldHealth = (int)field.GetValue(thoriumPlayer);
+			// 			break;
+			// 		}
+			// 	}
+			// 	*/
+			//
+			// 	// This is how the War Forger applies its shield, where 5f is the shield amount, and 10f is the maximum shield amount that can be applied
+			// 	int projectileType = OrchidMod.ThoriumMod.Find<ModProjectile>("HealerShield").Type;
+			// 	Projectile.NewProjectile(Player.GetSource_FromThis(), lowestHealthPlayer.Center, Vector2.Zero, projectileType, 0, 0.0f, Player.whoAmI, 5f, 10f, 0.0f);
+			// }
+			
+			if (onUseSlamDelegate != null)
+				foreach (Delegate del in onUseSlamDelegate.GetInvocationList())
 				{
-					if (thoriumPlayer.Name == "ThoriumPlayer" && thoriumPlayer.Mod == OrchidMod.ThoriumMod)
+					try
 					{
-						FieldInfo field = thoriumPlayer.GetType().GetField("shieldHealth", BindingFlags.Public | BindingFlags.Instance);
-						int shieldHealth = (int)field.GetValue(thoriumPlayer);
-						break;
+						if (del is OnUseSlamDelegate onUseSlam)
+							onUseSlam(Player, this);
+					}
+					catch
+					{
+						Mod.Logger.Error("OnUseGuard delegate failed!");
 					}
 				}
-				*/
-
-				// This is how the War Forger applies its shield, where 5f is the shield amount, and 10f is the maximum shield amount that can be applied
-				int projectileType = OrchidMod.ThoriumMod.Find<ModProjectile>("HealerShield").Type;
-				Projectile.NewProjectile(Player.GetSource_FromThis(), lowestHealthPlayer.Center, Vector2.Zero, projectileType, 0, 0.0f, Player.whoAmI, 5f, 10f, 0.0f);
-			}
 		}
 
-		public void OnUseGuard() {}
+		public void OnUseGuard()
+		{
+			if (onUseGuardDelegate != null)
+				foreach (Delegate del in onUseGuardDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is OnUseGuardDelegate onUseGuard)
+							onUseGuard(Player, this);
+					}
+					catch
+					{
+						Mod.Logger.Error("OnUseGuard delegate failed!");
+					}
+				}
+		}
 
 		public void AddSlam(int nb = 1)
 		{
@@ -854,6 +942,20 @@ namespace OrchidMod.Content.Guardian
 				CombatText.NewText(rect, Color.LightCyan, "+" + Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.Slam", nb), false, true);
 				GuardianSlam += nb;
 			}
+
+			if (addSlamDelegate != null)
+				foreach (Delegate del in addSlamDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is AddSlamDelegate addSlam)
+							addSlam(Player, this, nb);
+					}
+					catch
+					{
+						Mod.Logger.Error("AddGuard delegate failed!");
+					}
+				}
 		}
 
 		public void AddGuard(int nb = 1)
@@ -866,7 +968,21 @@ namespace OrchidMod.Content.Guardian
 				rect.Y -= 64;
 				CombatText.NewText(rect, Color.LightSkyBlue, "+" + Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.Guard", nb), false, true);
 				GuardianGuard += nb;
-			}
+			} 
+			
+			if (addGuardDelegate != null)
+				foreach (Delegate del in addGuardDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is AddGuardDelegate addGuard)
+							addGuard(Player, this, nb);
+					}
+					catch
+					{
+						Mod.Logger.Error("AddGuard delegate failed!");
+					}
+				}
 		}
 
 		public bool UseSlam(int nb = 1, bool checkOnly = false, bool showUICost = false)
@@ -930,6 +1046,26 @@ namespace OrchidMod.Content.Guardian
 				}
 				return true;
 			}
+
+			if (useSlamDelegate != null && !checkOnly)
+			{
+				bool delegateOutput = true;
+				foreach (Delegate del in useSlamDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is UseSlamDelegate useSlam)
+							delegateOutput &= useSlam(Player, this, nb);
+					}
+					catch
+					{
+						Mod.Logger.Error("UseSlam delegate failed!");
+					}
+				}
+
+				return delegateOutput;
+			}
+			
 			return false;
 		}
 
@@ -994,6 +1130,27 @@ namespace OrchidMod.Content.Guardian
 				}
 				return true;
 			}
+			
+			
+			if (useGuardDelegate != null && !checkOnly)
+			{
+				bool delegateOutput = true;
+				foreach (Delegate del in useGuardDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is UseGuardDelegate useGuard)
+							delegateOutput &= useGuard(Player, this, nb);
+					}
+					catch
+					{
+						Mod.Logger.Error("UseGuard delegate failed!");
+					}
+				}
+
+				return delegateOutput;
+			}
+			
 			return false;
 		}
 
@@ -1029,14 +1186,16 @@ namespace OrchidMod.Content.Guardian
 		}
 
 		public void OnBlockAnyFirst(Projectile anchor, ref int toAdd, bool parry)
-		{ // Called by both FirstBlockEffect methods to do universal on-first-block effect
+		{
+			// Called by both FirstBlockEffect methods to do universal on-first-block effect
 			if (GuardianMeteorite && Main.rand.NextBool(2))
 			{
 				toAdd++;
 			}
 
 			if (GuardianHoneyPotion)
-			{ // Heal the player if they have the honey potion effect
+			{
+				// Heal the player if they have the honey potion effect
 				modPlayer.TryHeal((int)(Player.statLifeMax2 * 0.01f));
 			}
 
@@ -1050,6 +1209,20 @@ namespace OrchidMod.Content.Guardian
 				else if (anchor.ModProjectile is GuardianQuarterstaffAnchor && Player.inventory[Player.selectedItem].ModItem is OrchidModGuardianQuarterstaff qs)
 					GuardianCounterTime = (int)(40 / (qs.CounterSpeed * Player.GetTotalAttackSpeed<MeleeDamageClass>()));
 			}
+			
+			if (onBlockFirstDelegate != null)
+				foreach (Delegate del in onBlockFirstDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is OnBlockFirstDelegate onBlock)
+							onBlock(Player, this, anchor, null, ref toAdd, parry);
+					}
+					catch
+					{
+						Mod.Logger.Error("OnBlock (any, first) delegate failed!");
+					}
+				}
 		}
 		public void OnBlockNPCNew(Projectile anchor, NPC target, int toAdd = 1, bool parry = false)
 		{ // Called anytime the player blocks/parries a NPC for the first time (NPC not contained in GuardianBlockedEnemies)
@@ -1076,12 +1249,44 @@ namespace OrchidMod.Content.Guardian
 			{
 				AddSlam(toAdd);
 			}
+
+			if (onBlockFirstDelegate != null)
+			{
+				foreach (Delegate del in onBlockFirstDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is OnBlockFirstDelegate onBlock)
+							onBlock(Player, this, anchor, target, ref toAdd, parry);
+					}
+					catch
+					{
+						Mod.Logger.Error("OnBlock (any, first) delegate failed!");
+					}
+				}
+			}
 		}
 
 		public void OnBlockProjectileFirst(Projectile anchor, Projectile blockedProjectil0e, int toAdd = 1, bool parry = false)
 		{ // Called anytime the player blocks/parries their first projectile
 			OnBlockAnyFirst(anchor, ref toAdd, parry);
 			AddSlam(toAdd);
+			
+			if (onBlockFirstDelegate != null)
+			{
+				foreach (Delegate del in onBlockFirstDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is OnBlockFirstDelegate onBlock)
+							onBlock(Player, this, anchor, blockedProjectile, ref toAdd, parry);
+					}
+					catch
+					{
+						Mod.Logger.Error("OnBlock (any, first) delegate failed!");
+					}
+				}
+			}
 		}
 
 		public void OnBlockAny(Projectile anchor, bool parry)
@@ -1094,11 +1299,44 @@ namespace OrchidMod.Content.Guardian
 			{
 				Player.AddBuff(ModContent.BuffType<GuardianSpikeBuff>(), 600);
 			}
+
+			if (onBlockDelegate != null)
+			{
+				foreach (Delegate del in onBlockDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is OnBlockDelegate onBlock)
+							onBlock(Player, this, anchor, null, parry);
+					}
+					catch
+					{
+						Mod.Logger.Error("OnBlock (any, not first) delegate failed!");
+					}
+				}
+			}
+			
 		}
 
 		public void OnBlockNPC(Projectile anchor, NPC target, bool parry = false)
 		{ // Called anytime the player blocks/parries a NPC
 			OnBlockAny(anchor, parry);
+
+			if (onBlockDelegate != null)
+			{
+				foreach (Delegate del in onBlockDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is OnBlockDelegate onBlock)
+							onBlock(Player, this, anchor, target, parry);
+					}
+					catch
+					{
+						Mod.Logger.Error("OnBlock (NPC, not first) delegate failed!");
+					}
+				}
+			}
 		}
 
 		public void OnBlockProjectile(Projectile anchor, Projectile blockedProjectile, bool parry = false)
@@ -1163,6 +1401,22 @@ namespace OrchidMod.Content.Guardian
 							projectile.CritChance = (int)(Player.GetCritChance<GuardianDamageClass>() + Player.GetCritChance<GenericDamageClass>());
 							SoundEngine.PlaySound(SoundID.Item21.WithPitchOffset(0.5f).WithVolumeScale(0.7f), anchor.Center);
 						}
+					}
+				}
+			}
+
+			if (onBlockDelegate != null)
+			{
+				foreach (Delegate del in onBlockDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is OnBlockDelegate onBlock)
+							onBlock(Player, this, anchor, blockedProjectile, parry);
+					}
+					catch
+					{
+						Mod.Logger.Error("OnBlock (projectile, not first) delegate failed!");
 					}
 				}
 			}
@@ -1234,6 +1488,20 @@ namespace OrchidMod.Content.Guardian
 				}
 				parryItem.PlayParrySound(Player, this, anchor);
 			}
+			
+			if (doParryItemParryDelegate != null)
+				foreach (Delegate del in doParryItemParryDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is DoParryItemParryDelegate doParry)
+							doParry(Player, this, aggressor);
+					}
+					catch
+					{
+						Mod.Logger.Error("DoParryItemParry delegate failed!");
+					}
+				}
 		}
 
 		public void DoParryItemParrySpecialCases(Projectile anchor)

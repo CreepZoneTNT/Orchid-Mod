@@ -16,6 +16,9 @@ namespace OrchidMod.Common
 		[DefaultValue(false)]
 		public bool ShowModTags { get; set; }
 
+		[DefaultValue(true)]
+		public bool SmartSmartCursor { get; set; }
+
 		[Header("Guardian")]
 		[DefaultValue(false)]
 		[BackgroundColor(151, 120, 79)]
@@ -64,6 +67,10 @@ namespace OrchidMod.Common
 		[DefaultValue(false)]
 		[BackgroundColor(151, 120, 79)]
 		public bool GuardianThoriumThorsHammerConversion { get; set; }
+
+		[DefaultValue(false)]
+		[BackgroundColor(151, 120, 79)]
+		public bool GuardianThoriumBoreanStriderColorUI { get; set; }
 
 		[Header("Shapeshifter")]
 		[DefaultValue(false)]

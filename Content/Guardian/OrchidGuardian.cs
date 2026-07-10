@@ -83,8 +83,12 @@ namespace OrchidMod
 		public float GuardianChain = 0f; // Increases the swing range on Warhammers (additive, 16f = 1 tile)
 		public string GuardianChainTexture = null; // Used to draw the warhammer chain
 		public int GuardianStaffRocket = 0; // If > 0, the player can dash by spending slams with a quarterstaff (1,2,3,4 = red,green,blue,yellow)
-		public bool GuardianHammerMagnet = false; // Standards
-		public bool GuardianHammerDetonator = false; // Standards
+		/// <summary> Throw warhammers will bend in the direction of the cursor when thrown if this is >0f. For reference, the basic Hammer magnet sets this value to 50f. Defaults to 0f.</summary>
+		public float GuardianHammerMagnet = 0f;
+		public bool GuardianHammerDetonator = false;
+		/// <summary> Multiplier applied to the velocity of all warhammer throws. Defaults to 1f.</summary>
+		public float GuardianHammerThrowVelocity = 1f;
+		public bool GuardianThoriumCenser = false; // Life Quartz Censer
 
 		// Debug bonus resources that do not get updated (for use with DragonLens)
 		
@@ -119,8 +123,6 @@ namespace OrchidMod
 		public bool GuardianCounter;
 		/// <summary> Timer for performing a counterattack if GuardianCounter is true. Set to 60 after guarding with a gauntlet, or to the block or counter duration after guarding with a pavise or quarterstaff. Will always be 0 if GuardianCounter is false. </summary>
 		public int GuardianCounterTime = 0;
-		/// <summary> Goes up to 10 as the player deals melee damage with Guardian weapons, but decreases if damage is taken. Affects bonus damage and life/resource regeneration while wearing Void Sentinel armor. </summary>
-		public float GuardianVoidMagnificence = 0;
 		/// <summary> Makes the GuardianCounter indicator flash Horizon colors instead of red. </summary>
 		public bool GuardianCounterHorizon;
 		public int GuardianShieldSpikeReflect = 5; // Shield spikes only fire a projectile if this is >0
@@ -481,6 +483,9 @@ namespace OrchidMod
 			GuardianChain = 0f;
 			GuardianStaffRocket = 0;
 			GuardianChainTexture = null;
+			GuardianHammerMagnet = 0f;
+			GuardianHammerThrowVelocity = 1f;
+			GuardianThoriumCenser = false;
 			if (!GuardianBronzeShieldBuff) GuardianBronzeShieldDamage = 0;
 
 			GuardianMeteorite = false;
@@ -503,7 +508,6 @@ namespace OrchidMod
 			GuardianBronzeShieldBuff = false;
 			GuardianBronzeShieldProtection = false;
 			GuardianBadgeHoplite = false;
-			GuardianHammerMagnet = false;
 			GuardianHammerDetonator = false;
 
 			GuardianGuardMax += GuardianDebugBonusGuards;
@@ -701,6 +705,39 @@ namespace OrchidMod
 
 		// Below are custom Guardian Methods
 
+		public void OnUseSlam()
+		{
+			if (GuardianThoriumCenser && OrchidMod.ThoriumMod != null)
+			{
+				Player lowestHealthPlayer = Player;
+				foreach (Player player in Main.player)
+				{ // targets the lowest heath nearby player
+					if (player.DistanceSQ(Player.Center) < 800f && player.active && !player.dead && player.statLife < lowestHealthPlayer.statLife)
+					{ // 16 * 50 = 800f for a 50 tiles range
+						lowestHealthPlayer = player;
+					}
+				}
+
+				/* Ended up being unused, but this is how I would check for the players shield health, potentially to target unshielded players.
+				foreach (ModPlayer thoriumPlayer in Player.ModPlayers)
+				{
+					if (thoriumPlayer.Name == "ThoriumPlayer" && thoriumPlayer.Mod == OrchidMod.ThoriumMod)
+					{
+						FieldInfo field = thoriumPlayer.GetType().GetField("shieldHealth", BindingFlags.Public | BindingFlags.Instance);
+						int shieldHealth = (int)field.GetValue(thoriumPlayer);
+						break;
+					}
+				}
+				*/
+
+				// This is how the War Forger applies its shield, where 5f is the shield amount, and 10f is the maximum shield amount that can be applied
+				int projectileType = OrchidMod.ThoriumMod.Find<ModProjectile>("HealerShield").Type;
+				Projectile.NewProjectile(Player.GetSource_FromThis(), lowestHealthPlayer.Center, Vector2.Zero, projectileType, 0, 0.0f, Player.whoAmI, 5f, 10f, 0.0f);
+			}
+		}
+
+		public void OnUseGuard() {}
+
 		public void AddSlam(int nb = 1)
 		{
 			if (nb > 0 && GuardianSlamRecharging < 0) GuardianSlamRecharging = 0;
@@ -729,6 +766,11 @@ namespace OrchidMod
 
 		public bool UseSlam(int nb = 1, bool checkOnly = false, bool showUICost = false)
 		{
+			if (showUICost)
+			{
+				SlamCostUI = nb;
+			}
+
 			if (GuardianHorizon && Player.statLife > Player.statLifeMax2 * 0.5f && Player.statLife > 20 * nb)
 			{ // Horizon armor set consumes health instead of guardian charges
 				if (!checkOnly)
@@ -736,10 +778,12 @@ namespace OrchidMod
 					Player.statLife -= 20 * nb;
 					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20 * nb, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
-				}
-				if (showUICost)
-				{
-					SlamCostUI = nb;
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseSlam();
+					}
 				}
 				return true;
 			}
@@ -755,6 +799,12 @@ namespace OrchidMod
 					GuardianSlam += nb2;
 					GuardianSlamRecharging = 0;
 					SoundEngine.PlaySound(SoundID.Item56, Player.Center);
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseSlam();
+					}
 				}
 				else return true;
 			}
@@ -766,6 +816,12 @@ namespace OrchidMod
 					GuardianSlam -= nb;
 					if (GuardianBamboo) Player.AddBuff(ModContent.BuffType<BambooBuff>(), 300);
 					if (GuardianSlamRecharging < 0) GuardianSlamRecharging = 0;
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseSlam();
+					}
 				}
 				return true;
 			}
@@ -774,6 +830,11 @@ namespace OrchidMod
 
 		public bool UseGuard(int nb = 1, bool checkOnly = false, bool showUICost = false)
 		{
+			if (showUICost)
+			{
+				GuardCostUI = nb;
+			}
+
 			if (GuardianHorizon && Player.statLife > Player.statLifeMax2 * 0.5f && Player.statLife > 20 * nb)
 			{ // Horizon armor set consumes health instead of guardian charges
 				if (!checkOnly)
@@ -781,10 +842,12 @@ namespace OrchidMod
 					Player.statLife -= 20 * nb;
 					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20 * nb, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
-				}
-				if (showUICost)
-				{
-					GuardCostUI = nb;
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseGuard();
+					}
 				}
 				return true;
 			}
@@ -800,6 +863,12 @@ namespace OrchidMod
 					GuardianGuard += nb2;
 					GuardianGuardRecharging = 0;
 					SoundEngine.PlaySound(SoundID.Item56, Player.Center);
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseGuard();
+					}
 				}
 				else return true;
 			}
@@ -811,6 +880,12 @@ namespace OrchidMod
 					GuardianGuard -= nb;
 					if (GuardianBamboo) Player.AddBuff(ModContent.BuffType<BambooBuff>(), 300);
 					if (GuardianGuardRecharging < 0) GuardianGuardRecharging = 0;
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseGuard();
+					}
 				}
 				return true;
 			}

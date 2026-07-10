@@ -24,7 +24,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 			Projectile.friendly = false;
 			Projectile.tileCollide = false;
 			Projectile.aiStyle = -1;
-			Projectile.timeLeft = 900;
+			Projectile.timeLeft = 90000;
 			Projectile.scale = 1f;
 			Projectile.penetrate = 1;
 			Projectile.alpha = 255;
@@ -91,6 +91,100 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 			}
 		}
 
+		public static Color GetColor(Player player, bool firstColor)
+		{
+			switch(player.name)
+			{
+				default:
+					return firstColor ? new Color(216, 61, 5) : new Color(112, 161, 255);
+				case "Verveine":
+					return firstColor ? new Color(100, 150, 0) : new Color(0, 150, 150);
+				case "Orchid":
+					return firstColor ? new Color(255, 0, 60) : new Color(255, 213, 223);
+				case "Haidex":
+					return Main.DiscoColor;
+				case "CreepZoneTNT":
+					return firstColor ? new Color(79, 121, 66) : new Color(253, 238, 0);
+				case "IceSpider":
+					return firstColor ? new Color(22, 156, 156) : new Color(169, 254, 255);
+				case "Xrylene":
+					return firstColor ? new Color(247, 67, 85) : new Color(88, 255, 46);
+				case "direwolf420":
+					return firstColor ? new Color(0, 221, 221) : new Color(44, 36, 133);
+				case "Feutor":
+					return firstColor ? new Color(255, 106, 0) : new Color(133, 4, 4);
+				case "L. Mack":
+					return firstColor ? new Color(121, 101, 90) : new Color(102, 50, 19);
+				case "Beefeus":
+					return new Color(255, 0, 60);
+				case "Slime":
+					return firstColor ? new Color(0, 255, 255) : new Color(255, 252, 85);
+				case "Amber":
+					return firstColor ? new Color(200, 130, 100) : new Color(180, 50, 200);
+				case "Freya":
+					return firstColor ? new Color(255, 0, 0) : new Color(155, 150, 255);
+				case "Sonzie":
+					return firstColor ? new Color(170, 22, 50) : new Color(20, 122, 0);
+				case "Barometz":
+					return firstColor ? new Color(250, 120, 177) : new Color(50, 70, 177);
+				case "DivermanSam":
+					return firstColor ? new Color(0, 150, 150) : new Color(200, 150, 50);
+				case "BluNinja":
+					return firstColor ? new Color(5, 82, 255) : new Color(255, 0, 0);
+				case "Adrian":
+					return firstColor ? new Color(200, 0, 200) : new Color(0, 200, 200);
+				case "LucidLizard":
+					return firstColor ? new Color(255, 200, 0) : new Color(255, 0, 100);
+				case "KindP4nda":
+					return firstColor ? new Color(150, 0, 17) : new Color(0, 150, 17);
+				case "GitGudWO":
+					return firstColor ? new Color(150, 150, 150) : new Color(200, 0, 0);
+				case "Kibl":
+					return firstColor ? new Color(0, 50, 200) : new Color(0, 150, 50);
+				case "mcgen":
+					return firstColor ? new Color(135, 80, 135) : new Color(135, 135, 80);
+				case "Laeyrr":
+					return firstColor ? new Color(60, 120, 100) : new Color(110, 70, 200);
+				case "Alino4kaHvoshch":
+					return new Color(107, 157, 254);
+				case "Mio":
+					return new Color(237, 76, 76);
+				case "Macron":
+					return firstColor ? new Color(227, 250, 0) : new Color(127, 0, 255);
+				case "Spear McGee":
+					return firstColor ? new Color(55, 17, 150) : new Color(255, 167, 50);
+				case "Wember":
+					return firstColor ? new Color(255, 15, 150) : new Color(0, 175, 200);
+				case "Chest0":
+					return firstColor ? new Color(50, 85, 255) : new Color(150, 135, 55);
+				case "Beebo Greebo":
+					return firstColor ? new Color(130, 190, 30) : new Color(230, 40, 80);
+				case "KiarArt":
+					return firstColor ? new Color(123, 68, 223) : new Color(73, 218, 177);
+				case "Zandiow":
+					return firstColor ? new Color(0, 150, 0) : new Color(0, 0, 150);
+			}
+		}
+
+		public static void DoColorGradient(Player player, ref Color color, int gradientFactor)
+		{
+			Color firstColor = GetColor(player, true);
+			Color secondColor = GetColor(player, false);
+
+			byte unitR = (byte)(Math.Abs(firstColor.R - secondColor.R) / gradientFactor);
+			byte unitG = (byte)(Math.Abs(firstColor.G - secondColor.G) / gradientFactor);
+			byte unitB = (byte)(Math.Abs(firstColor.B - secondColor.B) / gradientFactor);
+
+			if (firstColor.R < secondColor.R) color.R += unitR;
+			else color.R -= unitR;
+
+			if (firstColor.G < secondColor.G) color.G += unitG;
+			else color.G -= unitG;
+
+			if (firstColor.B < secondColor.B) color.B += unitB;
+			else color.B -= unitB;
+		}
+
 		public override bool OrchidPreDraw(SpriteBatch spriteBatch, ref Color lightColor)
 		{
 			spriteBatch.End(out SpriteBatchSnapshot spriteBatchSnapshot);
@@ -103,14 +197,13 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 
 			float colorMult = 1f;
 			if (Projectile.timeLeft < 20) colorMult *= Projectile.timeLeft / 20f;
-			Color color = new Color(216, 61, 5); // to (112, 152, 255);
+			Player owner = Owner;
+			Color color = GetColor(owner, true);
 			for (int i = 0; i < Positions.Count; i++)
 			{
 				if (i > 5 && i < 55)
 				{
-					color.R -= 2;
-					color.G += 2;
-					color.B += 5;
+					DoColorGradient(owner, ref color, 50);
 				}
 
 				Rectangle rectangle = TextureMain.Bounds;

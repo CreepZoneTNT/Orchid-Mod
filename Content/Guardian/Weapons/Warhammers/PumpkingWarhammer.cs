@@ -49,12 +49,12 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 			EmbeddedScythe = false;
 		}
 
-		public override void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile)
+		public override void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile, bool OffHand)
 		{
 
 			if (projectile.ModProjectile is GuardianHammerAnchor anchor) {
 				
-				anchor.HammerAnimFrame = 1;
+				anchor.Frame = 1;
 
 				int projType = ModContent.ProjectileType<PumpkingWarhammerProjectile>();
 				if (ScytheProjectile != null && ScytheProjectile.active && ScytheProjectile.type == projType && ScytheProjectile.owner == player.whoAmI)
@@ -71,7 +71,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 				}
 				
 
-				anchor.HammerAnimFrame = 0;
+				anchor.Frame = 0;
 				EmbeddedScythe = false;
 				if (Main.rand.NextBool())
 				{
@@ -102,7 +102,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 			}
 		}
 
-		public override bool ThrowAI(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak)
+		public override bool ThrowAI(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak, bool OffHand)
 		{
 			if (EmbeddedScythe && projectile.ModProjectile is GuardianHammerAnchor anchor && anchor.range <= -16 && anchor.BlockDuration <= 0)
 			{
@@ -129,7 +129,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 			return true;
 		}
 
-		public override void OnThrowHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak)
+		public override void OnThrowHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak, bool OffHand)
 		{
 
 			if (EmbeddedScythe && ScytheProjectile != null && ScytheProjectile.active && ScytheProjectile.owner == player.whoAmI)
@@ -140,7 +140,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 			}
 		}
 
-		public override void OnThrow(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak)
+		public override void OnThrow(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak, bool OffHand)
 		{
 			if (Weak && EmbeddedScythe)
 			{

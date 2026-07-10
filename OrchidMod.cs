@@ -26,6 +26,11 @@ namespace OrchidMod
 		public static OrchidMod Instance { get; private set; }
 		public static Mod ThoriumMod { get; private set; }
 		public static Mod BetterCaves { get; private set; }
+		public static Mod Consolaria { get; private set; }
+		
+		public static OrchidClientConfig OrchidClientConfig { get; private set; }
+		
+		public static OrchidServerConfig OrchidServerConfig { get; private set; }
 
 		public static List<AlchemistHiddenReactionRecipe> AlchemistReactionRecipes;
 
@@ -89,14 +94,21 @@ namespace OrchidMod
 
 			ThoriumMod = OrchidUtils.GetModWithPossibleNull("ThoriumMod");
 			BetterCaves = OrchidUtils.GetModWithPossibleNull("VervCaves");
+			Consolaria = OrchidUtils.GetModWithPossibleNull("Consolaria");
 
 			AlchemistReactionRecipes = AlchemistHiddenReactionHelper.ListReactions();
+			
+			OrchidClientConfig = ModContent.GetInstance<OrchidClientConfig>();
+			OrchidServerConfig = ModContent.GetInstance<OrchidServerConfig>();
 		}
 
 		public override void Unload()
 		{
 			AlchemistReactionRecipes = null;
 
+			OrchidServerConfig = null;
+			OrchidClientConfig = null;
+			
 			ThoriumMod = null;
 			BetterCaves = null;
 			Instance = null;

@@ -757,9 +757,9 @@ namespace OrchidMod.Content.Guardian
 			{
 				if (FirstHit)
 				{
-					HammerItem.OnPlayerHitFirst(player, guardian, target, Projectile, hit.Knockback, false, false, false, true);
+					HammerItem.OnPlayerHitFirst(player, guardian, target, Projectile, hit.Knockback, false, false, false, true, OffHand);
 				}
-				HammerItem.OnPlayerHit(player, guardian, target, Projectile, hit.Knockback, false, false, false, true);
+				HammerItem.OnPlayerHit(player, guardian, target, Projectile, hit.Knockback, false, false, false, true, OffHand);
 			}
 			else if (Projectile.ai[1] > 0)
 			{ // Throw
@@ -771,9 +771,9 @@ namespace OrchidMod.Content.Guardian
 					// 	guardian.AddSlam(HammerItem.SlamStacks);
 					// 	guardian.AddGuard(HammerItem.GuardStacks);
 					// }
-					HammerItem.OnPlayerHitFirst(player, guardian, target, Projectile, hit.Knockback, weak, false, true, false);
+					HammerItem.OnPlayerHitFirst(player, guardian, target, Projectile, hit.Knockback, weak, false, true, false, OffHand);
 				}
-				HammerItem.OnPlayerHit(player, guardian, target, Projectile, hit.Knockback, weak, false, true, false);
+				HammerItem.OnPlayerHit(player, guardian, target, Projectile, hit.Knockback, weak, false, true, false, OffHand);
 
 				if (!penetrate && target.statLife > HammerItem.Item.damage)
 				{
@@ -786,7 +786,7 @@ namespace OrchidMod.Content.Guardian
 				bool fullyCharged = guardian.GuardianItemCharge >= 180f;
 				if (FirstHit)
 				{
-					HammerItem.OnPlayerHitFirst(player, guardian, target, Projectile, hit.Knockback, !fullyCharged, true, false, false);
+					HammerItem.OnPlayerHitFirst(player, guardian, target, Projectile, hit.Knockback, !fullyCharged, true, false, false, OffHand);
 					// if (guardian.GuardianItemCharge > 0f)
 					// {
 					// 	guardian.GuardianItemCharge += 60f * HammerItem.SwingChargeGain * player.GetTotalAttackSpeed(DamageClass.Melee);
@@ -796,7 +796,7 @@ namespace OrchidMod.Content.Guardian
 					// 	}
 					// }
 				}
-				HammerItem.OnPlayerHit(player, guardian, target, Projectile, hit.Knockback, !fullyCharged, true, false, false);
+				HammerItem.OnPlayerHit(player, guardian, target, Projectile, hit.Knockback, !fullyCharged, true, false, false, OffHand);
 			}
 		}
 

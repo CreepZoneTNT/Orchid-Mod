@@ -93,6 +93,10 @@ namespace OrchidMod.Content.Guardian
 		public virtual void OnBlockHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { }
 		/// <summary>Called upon landing the first hit of a block</summary>
 		public virtual void OnBlockHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { }
+		/// <summary>Called upon landing any melee swing hit</summary>
+		public virtual void OnPlayerHit(Player player, OrchidGuardian guardian, Player target, Projectile projectile, float knockback, bool Weak, bool Melee, bool Throw, bool Block, bool OffHand) { }
+		/// <summary>Called upon landing the first hit of a melee swing</summary>
+		public virtual void OnPlayerHitFirst(Player player, OrchidGuardian guardian, Player target, Projectile projectile, float knockback, bool Weak, bool Melee, bool Throw, bool Block, bool OffHand) { }
 		/// <summary>Called before default ModifyHit functionality. Return false to prevent normal multipliers like SwingDamage or reduced damage after penetration from applying.</summary>
 		public virtual bool ModifyHit(Player player, OrchidGuardian guardian, Projectile projectile, NPC target, ref HitModifiers modifiers, bool FullyCharged, bool Melee, bool Block, bool firstHit) => true;
 		/// <summary>Called at the end of the anchor's TileCollide(), after applying normal warhammer tilecollide behavior.</summary>

@@ -3961,7 +3961,7 @@ Configs: {
 				'''
 				Triggers 'Shawl' accessory dashes when releasing the hook key instead of pressing it
 				(allowing to launch a hook without dashing)
-				''' 
+				'''
 		}
 
 		ShapeshifterScrollDelay: {

@@ -4015,7 +4015,11 @@ Configs: {
 
 		SmartSmartCursor: {
 			// Label: Smart Smart Cursor
-			// Tooltip: Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.\nNo effect if Smart Cursor isn't set to 'Toggle'.
+			/* Tooltip:
+				'''
+				Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.
+				No effect if Smart Cursor isn't set to 'Toggle'
+				''' */
 		}
 	}
 

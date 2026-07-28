@@ -1,4 +1,5 @@
-﻿using OrchidMod.Content.General.Prefixes;
+﻿using System;
+using OrchidMod.Content.General.Prefixes;
 using OrchidMod.Utilities;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,11 +37,11 @@ namespace OrchidMod.Content.Guardian
 
 		public override void ModifyTooltips(Item item, List<TooltipLine> tooltips)
 		{
+			OrchidGuardian modPlayer = Main.LocalPlayer.GetModPlayer<OrchidGuardian>();
+			
 			// <item><description>"Tooltip#" - A tooltip line of the item. # will be 0 for the first line, 1 for the second, etc.</description></item>
 			if (OrchidMod.ThoriumMod != null)
 			{
-				OrchidGuardian modPlayer = Main.LocalPlayer.GetModPlayer<OrchidGuardian>();
-
 				if (item.type == OrchidMod.ThoriumMod.Find<ModItem>("DepthDiverHelmet").Type)
 				{
 					int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Defense")); // Tooltip#0 doesn't work
@@ -59,6 +60,20 @@ namespace OrchidMod.Content.Guardian
 					tooltips.Insert(index + 2, new TooltipLine(Mod, "Tooltip", Language.GetTextValue(ModContent.GetInstance<OrchidMod>().GetLocalizationKey("Items.DepthDiverGreaves.Tooltip"))));
 				}
 			}
+			
+			if (item.ModItem is OrchidModGuardianItem guardianItem && modPlayer.modifyTooltipsDelegate != null)
+				foreach (Delegate del in modPlayer.modifyTooltipsDelegate.GetInvocationList())
+				{
+					try
+					{
+						if (del is OrchidGuardian.GuardianModifyTooltipsDelegate modify)
+							modify(Main.LocalPlayer, modPlayer, guardianItem, tooltips);
+					}
+					catch
+					{
+						Mod.Logger.Error("ModifyTooltips delegate failed!");
+					}
+				}
 		}
 	}
 }

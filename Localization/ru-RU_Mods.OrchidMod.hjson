@@ -3429,6 +3429,23 @@ Items: {
 		Enemies are more likely to target you
 		''' */
 	// DepthDiverGreaves.Tooltip: Increases maximum guards by 2
+
+	GuardianDelegateTest: {
+		// DisplayName: Guardian Delegate Test
+		/* Tooltip:
+			'''
+			Consuming slams launches a nail in a random direction
+			Inflicts Daybroken on the first enemy blocked or parried
+			Slams and guards have a chance not to be consumed as the player approaches critical health
+			Grants a 0.25-second 'Perfect Parry' window
+			Parrying during this time does nothing of utility
+			Gaining more than 1 guard at once says some words of inspiration
+			Reduces resources granted by warhammers and quarterstaves by 50%, but all attacks can grant resources
+			Modifies the tooltips and CombatText to reflect this
+			'Just a bunch of wacky effects to test my Delegates system'
+			[c/FF0000:Test Item]
+			''' */
+	}
 }
 
 NPCs: {
@@ -3891,6 +3908,7 @@ Projectiles: {
 	// GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
 	// ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
 	// ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
+	// ThoriumTerrariumQuarterstaffProjectile.DisplayName: Thorium Terrarium Quarterstaff Projectile
 }
 
 Configs: {
@@ -4015,7 +4033,11 @@ Configs: {
 
 		SmartSmartCursor: {
 			// Label: Smart Smart Cursor
-			// Tooltip: Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.\nNo effect if Smart Cursor isn't set to 'Toggle'.
+			/* Tooltip:
+				'''
+				Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.
+				No effect if Smart Cursor isn't set to 'Toggle'
+				''' */
 		}
 	}
 
@@ -4152,6 +4174,7 @@ UI: {
 		BuffDuration: Длительность эффекта: {0} сек.
 		HorizonLaceShieldStacks: Даёт 3 оч. обороны при полном заряде
 		DamageOfDefense: Наносит противостоящий урон, равный {0}% от вашей защиты
+		// PerfectParry: Perfect parry!
 	}
 
 	DanserItem: {

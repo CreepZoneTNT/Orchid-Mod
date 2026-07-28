@@ -142,7 +142,6 @@ namespace OrchidMod.Content.Guardian
 
 		public const int GuardianRechargeTime = 600;
 		
-		
 		// Equipment delegates: they get called at the end of Guardian methods
 		public delegate void OnUseSlamDelegate(Player player, OrchidGuardian guardian);
 		public delegate void OnUseGuardDelegate(Player player, OrchidGuardian guardian);
@@ -153,17 +152,41 @@ namespace OrchidMod.Content.Guardian
 		public delegate void DoParryItemParryDelegate(Player player, OrchidGuardian guardian, Entity aggressor);
 		public delegate void OnBlockFirstDelegate(Player player, OrchidGuardian guardian, Projectile anchor, Entity aggressor, ref int toAdd, bool parry);
 		public delegate void OnBlockDelegate(Player player, OrchidGuardian guardian, Projectile anchor, Entity aggressor, bool parry);
+		public delegate void GuardianOnHitNPCDelegate(Player player, OrchidGuardian guardian, OrchidModGuardianProjectile proj, NPC target, NPC.HitInfo hit, int damageDone);
 
-		
+		public delegate void GuardianModifyTooltipsDelegate(Player player, OrchidGuardian guardian, OrchidModGuardianItem item, List<TooltipLine> tooltips);
+
+		/// <summary> Called at the end of <see cref="OnUseSlam"/> when a Slam stack is spent. </summary>
 		public OnUseSlamDelegate onUseSlamDelegate;
+		/// <summary> Called at the end of <see cref="OnUseGuard"/> when a Guard stack is spent. </summary>
 		public OnUseGuardDelegate onUseGuardDelegate;
+		/// <summary> Called at the end of <see cref="AddSlam"/> when Slam stacks are granted. </summary>
+		/// <param name="nb">The amount of Slam stacks to be granted.</param>
 		public AddSlamDelegate addSlamDelegate;
+		/// <summary> Called at the end of <see cref="AddGuard"/> when Guard stacks are granted. </summary>
+		/// <param name="nb">The amount of Guard stacks to be granted.</param>
 		public AddGuardDelegate addGuardDelegate;
+		/// <summary> Called at the end of <see cref="UseSlam"/> when Slam stacks are consumed. Return <c>true</c> to continue with default behavior, or <c>false</c> to prevent it.</summary>
+		/// <param name="nb">The amount of Slams to be consumed.</param>
 		public UseSlamDelegate useSlamDelegate;
+		/// <summary> Called at the end of <see cref="UseGuard"/> when Guard stacks are consumed. Return <c>true</c> to continue with default behavior, or <c>false</c> to prevent it.</summary>
+		/// <param name="nb">The amount of Guards to be consumed.</param>
 		public UseGuardDelegate useGuardDelegate;
+		/// <summary>
+		/// Called at the end of <see cref="DoParryItemParry"/> when the player parries a source of damage.
+		/// </summary>
+		/// <remarks>
+		/// <c>aggressor</c> is based on the type of <see cref="Entity"/> that triggered the damage: <see cref="NPC"/>, <see cref="Projectile"/>, <see cref="Item"/>, or <c>null</c> if the damage came from something else.
+		/// Make sure to check what exactly <c>aggressor</c> is if you want your delegate's effect to run only for a certain kind of attack (ex. applying a debuff on parry). Otherwise, the effect will run any time a parry occurs. 
+		/// </remarks>
 		public DoParryItemParryDelegate doParryItemParryDelegate;
+		/// <summary> Called at the end of <see cref="OnBlockNPCFirst"/>, <see cref="OnBlockProjectileFirst"/>, and <see cref="OnBlockAnyFirst"/> the first time the player blocks or parries something. Check the value of <c>aggressor</c> </summary>
 		public OnBlockFirstDelegate onBlockFirstDelegate;
+		/// <summary>Called at the end of <see cref="OnBlockNPC"/>, <see cref="OnBlockProjectile"/>, and <see cref="OnBlockAny"/> any time the player blocks or parries something. </summary>
 		public OnBlockDelegate onBlockDelegate;
+		/// <summary> Called at the end of <see cref="OnHitNPCWithProj"/> whenever a <see cref="OrchidModGuardianProjectile"/> (weapon anchors, secondary projectiles) hits an enemy. </summary>
+		public GuardianOnHitNPCDelegate onHitNPCDelegate;
+		public GuardianModifyTooltipsDelegate modifyTooltipsDelegate;
 
 		public int GetGuardianDamage(float damage) => (int)(Player.GetDamage<GuardianDamageClass>().ApplyTo(damage) + Player.GetDamage(DamageClass.Generic).ApplyTo(damage) - damage);
 		public int GetGuardianCrit(int addedCrit = 0) => (int)(Player.GetCritChance<GuardianDamageClass>() + Player.GetCritChance<GenericDamageClass>() + addedCrit);
@@ -681,6 +704,8 @@ namespace OrchidMod.Content.Guardian
 			doParryItemParryDelegate = null;
 			onBlockFirstDelegate = null;
 			onBlockDelegate = null;
+			onHitNPCDelegate = null;
+			modifyTooltipsDelegate = null;
 		}
 
 		public override void PreUpdateMovement()
@@ -857,6 +882,19 @@ namespace OrchidMod.Content.Guardian
 					}
 				}
 
+				if (onHitNPCDelegate != null)
+					foreach (Delegate del in onHitNPCDelegate.GetInvocationList())
+					{
+						try
+						{
+							if (del is GuardianOnHitNPCDelegate onHit)
+								onHit(Player, this, orchidProj, target, hit, damageDone);
+						}
+						catch
+						{
+							Mod.Logger.Error("OnHitNPC delegate failed!");
+						}
+					}
 				//..
 			}
 		}
@@ -1033,24 +1071,7 @@ namespace OrchidMod.Content.Guardian
 				}
 				else return true;
 			}
-
-			if (GuardianSlam >= nb)
-			{
-				if (!checkOnly)
-				{
-					GuardianSlam -= nb;
-					if (GuardianBamboo) Player.AddBuff(ModContent.BuffType<BambooBuff>(), 300);
-					if (GuardianSlamRecharging < 0) GuardianSlamRecharging = 0;
-
-					while (nb > 0)
-					{
-						nb--;
-						OnUseSlam();
-					}
-				}
-				return true;
-			}
-
+			
 			if (useSlamDelegate != null && !checkOnly)
 			{
 				bool delegateOutput = true;
@@ -1067,7 +1088,24 @@ namespace OrchidMod.Content.Guardian
 					}
 				}
 
-				return delegateOutput;
+				if (!delegateOutput) return false;
+			}
+
+			if (GuardianSlam >= nb)
+			{
+				if (!checkOnly)
+				{
+					GuardianSlam -= nb;
+					if (GuardianBamboo) Player.AddBuff(ModContent.BuffType<BambooBuff>(), 300);
+					if (GuardianSlamRecharging < 0) GuardianSlamRecharging = 0;
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseSlam();
+					}
+				}
+				return true;
 			}
 			
 			return false;
@@ -1117,23 +1155,6 @@ namespace OrchidMod.Content.Guardian
 				}
 				else return true;
 			}
-
-			if (GuardianGuard >= nb)
-			{
-				if (!checkOnly)
-				{
-					GuardianGuard -= nb;
-					if (GuardianBamboo) Player.AddBuff(ModContent.BuffType<BambooBuff>(), 300);
-					if (GuardianGuardRecharging < 0) GuardianGuardRecharging = 0;
-
-					while (nb > 0)
-					{
-						nb--;
-						OnUseGuard();
-					}
-				}
-				return true;
-			}
 			
 			
 			if (useGuardDelegate != null && !checkOnly)
@@ -1152,7 +1173,24 @@ namespace OrchidMod.Content.Guardian
 					}
 				}
 
-				return delegateOutput;
+				if (!delegateOutput) return false;
+			}
+
+			if (GuardianGuard >= nb)
+			{
+				if (!checkOnly)
+				{
+					GuardianGuard -= nb;
+					if (GuardianBamboo) Player.AddBuff(ModContent.BuffType<BambooBuff>(), 300);
+					if (GuardianGuardRecharging < 0) GuardianGuardRecharging = 0;
+
+					while (nb > 0)
+					{
+						nb--;
+						OnUseGuard();
+					}
+				}
+				return true;
 			}
 			
 			return false;
@@ -1265,7 +1303,7 @@ namespace OrchidMod.Content.Guardian
 					}
 					catch
 					{
-						Mod.Logger.Error("OnBlock (any, first) delegate failed!");
+						Mod.Logger.Error("OnBlock (npc, first) delegate failed!");
 					}
 				}
 			}
@@ -1287,7 +1325,7 @@ namespace OrchidMod.Content.Guardian
 					}
 					catch
 					{
-						Mod.Logger.Error("OnBlock (any, first) delegate failed!");
+						Mod.Logger.Error("OnBlock (projectile, first) delegate failed!");
 					}
 				}
 			}

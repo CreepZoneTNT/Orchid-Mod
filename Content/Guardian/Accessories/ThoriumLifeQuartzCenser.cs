@@ -22,8 +22,11 @@ namespace OrchidMod.Content.Guardian.Accessories
 		public override void UpdateAccessory(Player player, bool hideVisual)
 		{
 			OrchidGuardian modPlayer = player.GetModPlayer<OrchidGuardian>();
-			modPlayer.GuardianThoriumCenser = true;
-			modPlayer.onUseSlamDelegate += HealTeammates;
+			if (!modPlayer.GuardianThoriumCenser)
+			{
+				modPlayer.GuardianThoriumCenser = true;
+				modPlayer.onUseSlamDelegate += HealTeammates;
+			}
 		}
 		
 		public void HealTeammates(Player player, OrchidGuardian guardian)

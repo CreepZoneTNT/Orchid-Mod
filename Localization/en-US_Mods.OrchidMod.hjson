@@ -3428,6 +3428,23 @@ Items: {
 		Enemies are more likely to target you
 		'''
 	DepthDiverGreaves.Tooltip: Increases maximum guards by 2
+
+	GuardianDelegateTest: {
+		DisplayName: Guardian Delegate Test
+		Tooltip:
+			'''
+			Consuming slams launches a nail in a random direction
+			Inflicts Daybroken on the first enemy blocked or parried
+			Slams and guards have a chance not to be consumed as the player approaches critical health
+			Grants a 0.25-second 'Perfect Parry' window
+			Parrying during this time does nothing of utility
+			Gaining more than 1 guard at once says some words of inspiration
+			Reduces resources granted by warhammers and quarterstaves by 50%, but all attacks can grant resources
+			Modifies the tooltips and CombatText to reflect this
+			'Just a bunch of wacky effects to test my Delegates system'
+			[c/FF0000:Test Item]
+			'''
+	}
 }
 
 NPCs: {
@@ -3890,6 +3907,7 @@ Projectiles: {
 	GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
 	ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
 	ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
+	ThoriumTerrariumQuarterstaffProjectile.DisplayName: Thorium Terrarium Quarterstaff Projectile
 }
 
 Configs: {
@@ -3961,7 +3979,7 @@ Configs: {
 				'''
 				Triggers 'Shawl' accessory dashes when releasing the hook key instead of pressing it
 				(allowing to launch a hook without dashing)
-				''' 
+				'''
 		}
 
 		ShapeshifterScrollDelay: {
@@ -4135,6 +4153,7 @@ UI: {
 		BuffDuration: "{0} second buff duration"
 		HorizonLaceShieldStacks: Grants 3 guards when fully charged
 		DamageOfDefense: Deals {0}% of defense as opposing damage
+		PerfectParry: Perfect parry!
 	}
 
 	DanserItem: {

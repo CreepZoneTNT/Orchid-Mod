@@ -121,18 +121,17 @@ namespace OrchidMod.Content.Guardian
 		{
 			if (player.whoAmI == Main.myPlayer && !player.cursed)
 			{
-				var projectileType = ModContent.ProjectileType<GuardianQuarterstaffAnchor>();
-				if (player.ownedProjectileCounts[projectileType] > 0)
+				if (player.ownedProjectileCounts[AnchorType] > 0)
 				{
 
 					var guardian = player.GetModPlayer<OrchidGuardian>();
-					var proj = Main.projectile.First(i => i.active && i.owner == player.whoAmI && i.type == projectileType);
+					var proj = Main.projectile.First(i => i.active && i.owner == player.whoAmI && i.type == AnchorType);
 					if (proj != null && proj.ModProjectile is GuardianQuarterstaffAnchor anchor)
 					{
 						bool shouldBlock = Main.mouseRight && Main.mouseRightRelease;
 						bool shouldCharge = Main.mouseLeft;
 						
-						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs)
+						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
 						{
 							shouldBlock = Main.mouseLeft && Main.mouseLeftRelease;
 							shouldCharge = Main.mouseRight;
@@ -167,23 +166,21 @@ namespace OrchidMod.Content.Guardian
 
 		public sealed override void HoldItem(Player player)
 		{
-			var projectileType = ModContent.ProjectileType<GuardianQuarterstaffAnchor>();
 			var guardian = player.GetModPlayer<OrchidGuardian>();
 			guardian.GuardianDisplayUI = 300;
 
-			if (player.ownedProjectileCounts[projectileType] != 1)
+			if (player.ownedProjectileCounts[AnchorType] != 1)
 			{
 				foreach (Projectile projectile in Main.projectile)
 				{
-					if (projectile.active && projectile.owner == player.whoAmI && projectile.type == projectileType)
+					if (projectile.active && projectile.owner == player.whoAmI && projectile.type == AnchorType)
 					{
 						projectile.Kill();
 					}
 				}
 
-				var index = Projectile.NewProjectile(Item.GetSource_FromThis(), player.Center.X, player.Center.Y, 0f, 0f, projectileType, 0, 0f, player.whoAmI);
+				var proj = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center, Vector2.Zero, AnchorType, 0, 0f, player.whoAmI);
 
-				var proj = Main.projectile[index];
 				if (proj.ModProjectile is not GuardianQuarterstaffAnchor quarterstaff)
 				{
 					proj.Kill();
@@ -195,7 +192,7 @@ namespace OrchidMod.Content.Guardian
 			}
 			else
 			{
-				var proj = Main.projectile.First(i => i.active && i.owner == player.whoAmI && i.type == projectileType);
+				var proj = Main.projectile.First(i => i.active && i.owner == player.whoAmI && i.type == AnchorType);
 				if (proj != null && proj.ModProjectile is GuardianQuarterstaffAnchor quarterstaff)
 				{
 					if (quarterstaff.SelectedItem != player.selectedItem)
@@ -221,7 +218,7 @@ namespace OrchidMod.Content.Guardian
 			int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Knockback"));
 			tooltips.Insert(index + 1, new TooltipLine(Mod, "ParryDuration", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ParryDuration", OrchidUtils.FramesToSeconds((int)(ParryDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianParryDuration)))));
 
-			string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
+			string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
 			tooltips.Insert(index + 2, new TooltipLine(Mod, "ClickInfo", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.Parry", click))
 			{
 				OverrideColor = new Color(175, 255, 175)

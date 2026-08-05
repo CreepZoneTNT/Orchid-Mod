@@ -191,7 +191,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Gauntlets
 		public override void SafeModifyTooltips(List<TooltipLine> tooltips)
 		{
 			TooltipLine ttip = tooltips.FirstOrDefault(x => x.Mod.Equals("OrchidMod") && x.Name.Equals("ClickInfo"));
-			string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
+			string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
 			if (ttip != null)
 			{
 				ttip.Text = Language.GetTextValue(Mod.GetLocalizationKey("Items.ThoriumDreadGauntlet.Parry"), click);

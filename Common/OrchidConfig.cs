@@ -42,11 +42,11 @@ namespace OrchidMod.Common
 
 		[DefaultValue(false)]
 		[BackgroundColor(151, 120, 79)]
-		public bool GuardianSwapPaviseImputs { get; set; }
+		public bool GuardianSwapPaviseInputs { get; set; }
 
 		[DefaultValue(false)]
 		[BackgroundColor(151, 120, 79)]
-		public bool GuardianSwapGauntletImputs { get; set; }
+		public bool GuardianSwapGauntletInputs { get; set; }
 
 		[Increment(1)]
 		[Range(0, 30)]
@@ -68,9 +68,10 @@ namespace OrchidMod.Common
 		[BackgroundColor(151, 120, 79)]
 		public bool GuardianThoriumThorsHammerConversion { get; set; }
 
+		
 		[DefaultValue(false)]
 		[BackgroundColor(151, 120, 79)]
-		public bool GuardianThoriumBoreanStriderColorUI { get; set; }
+		public bool GuardianFencingBlade { get; set; }
 
 		[Header("Shapeshifter")]
 		[DefaultValue(false)]

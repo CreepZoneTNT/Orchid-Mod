@@ -254,7 +254,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 						bool jabInput = Main.mouseRight;
 						bool chargeInput = Main.mouseLeft;
 
-						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs)
+						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
 						{
 							jabInput = Main.mouseLeft;
 							chargeInput = Main.mouseRight;

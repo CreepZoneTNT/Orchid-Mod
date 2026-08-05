@@ -341,7 +341,7 @@ namespace OrchidMod.Content.Guardian
 					else if (OffHandKatar && projectile.localAI[1] == 0f) Projectile.rotation += MathHelper.Pi;
 
 
-					if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? !Main.mouseRight : !Main.mouseLeft) && owner.whoAmI == Main.myPlayer && guardian.GuardianItemCharge >= 180f && !OffHandKatar)
+					if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs ? !Main.mouseRight : !Main.mouseLeft) && owner.whoAmI == Main.myPlayer && guardian.GuardianItemCharge >= 180f && !OffHandKatar)
 					{
 						Projectile.ai[0] = -2f; // fully charged
 						Projectile.ai[1] = Vector2.Normalize(Main.MouseWorld - owner.MountedCenter).ToRotation() - MathHelper.PiOver2;
@@ -374,14 +374,14 @@ namespace OrchidMod.Content.Guardian
 						if (!OffHandKatar)
 						{
 							guardianItem.ChargeJabCostUI(owner, guardian, Projectile);
-							if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? Main.mouseLeft : Main.mouseRight) && owner.whoAmI == Main.myPlayer && guardianItem.ChargeJabCost(owner, guardian, Projectile, true))
+							if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs ? Main.mouseLeft : Main.mouseRight) && owner.whoAmI == Main.myPlayer && guardianItem.ChargeJabCost(owner, guardian, Projectile, true))
 							{
 								guardianItem.ChargeJabCost(owner, guardian, Projectile, false);
 								Projectile.ai[0] = -1f; // not fully charged
 								Projectile.ai[1] = Vector2.Normalize(Main.MouseWorld - owner.MountedCenter).ToRotation() - MathHelper.PiOver2;
 								Projectile.netUpdate = true;
 							}
-							else if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? !Main.mouseRight : !Main.mouseLeft) && owner.whoAmI == Main.myPlayer)
+							else if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs ? !Main.mouseRight : !Main.mouseLeft) && owner.whoAmI == Main.myPlayer)
 							{
 								if (IsLocalOwner && guardian.GuardianItemCharge >= 180f)
 								{

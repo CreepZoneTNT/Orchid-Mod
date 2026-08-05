@@ -255,7 +255,7 @@ namespace OrchidMod.Content.Guardian
 						{
 							bool blockInput = Main.mouseRight;
 
-							if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs)
+							if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
 							{
 								blockInput = Main.mouseRight;
 							}
@@ -313,7 +313,7 @@ namespace OrchidMod.Content.Guardian
 						bool jabInput = Main.mouseRight;
 						bool chargeInput = Main.mouseLeft;
 
-						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs)
+						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
 						{
 							jabInput = Main.mouseLeft;
 							chargeInput = Main.mouseRight;

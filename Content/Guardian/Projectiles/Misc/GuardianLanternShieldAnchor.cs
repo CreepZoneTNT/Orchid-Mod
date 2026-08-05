@@ -136,7 +136,7 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 			bool blockInput = Main.mouseRight;
 			bool punchInput = Main.mouseLeft;
 
-			if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs)
+			if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
 			{
 				blockInput = Main.mouseLeft;
 				punchInput = Main.mouseRight;

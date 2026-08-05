@@ -3974,13 +3974,13 @@ Configs: {
 			Tooltip: Use the old Guardian Hammer UI (Paper Mario style)
 		}
 
-		GuardianSwapPaviseImputs: {
-			Label: Swap Pavise Imputs
+		GuardianSwapPaviseInputs: {
+			Label: Swap Pavise Inputs
 			Tooltip: Swap Left and Right click inputs for Guardian Pavises
 		}
 
-		GuardianSwapGauntletImputs: {
-			Label: Swap Parry Items Imputs
+		GuardianSwapGauntletInputs: {
+			Label: Swap Parry Items Inputs
 			Tooltip: Swap Left and Right click inputs for Guardian Parry Items (Gauntlets, Quarterstaves, ...)
 		}
 

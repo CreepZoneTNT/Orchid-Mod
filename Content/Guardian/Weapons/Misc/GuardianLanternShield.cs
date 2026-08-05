@@ -65,7 +65,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 		public override void OnParry(Player player, OrchidGuardian guardian, Entity aggressor, Projectile anchor)
 		{
 			
-			bool swap = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs;
+			bool swap = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs;
 			bool punchHold = swap ? Main.mouseRight : Main.mouseLeft;
 			bool guardHold = swap ? Main.mouseLeft : Main.mouseRight;
 			
@@ -87,7 +87,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 					Projectile proj = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == projectileType);
 					if (proj != null && proj.ModProjectile is GuardianLanternShieldAnchor anchor)
 					{
-						bool swap = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs;
+						bool swap = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs;
 						bool punchHold = swap ? Main.mouseRight : Main.mouseLeft;
 						bool punchTap = swap ? Main.mouseRightRelease : Main.mouseLeftRelease;
 						bool guardHold = swap ? Main.mouseLeft : Main.mouseRight;
@@ -176,7 +176,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 			tooltips.Insert(index + 1, new TooltipLine(Mod, "ParryDuration", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ParryDuration", OrchidUtils.FramesToSeconds((int)(ParryDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianBlockDuration)))));
 			tooltips.Insert(index + 2, new TooltipLine(Mod, "BlockDuration", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.BlockDuration", OrchidUtils.FramesToSeconds((int)(ParryDuration * BlockDurationMult * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianBlockDuration)))));
 
-			string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapPaviseImputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
+			string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapPaviseInputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
 			tooltips.Insert(index + 2, new TooltipLine(Mod, "ClickInfo", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.Block", click))
 			{
 				OverrideColor = new Color(175, 255, 175)

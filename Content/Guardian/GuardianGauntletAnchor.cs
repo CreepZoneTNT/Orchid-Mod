@@ -271,7 +271,7 @@ namespace OrchidMod.Content.Guardian
 						}
 						else if (CanInstantSlam(guardianItem)) guardian.SlamCostUI = 1;
 
-						if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? !Main.mouseRight : !Main.mouseLeft) && owner.whoAmI == Main.myPlayer)
+						if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs ? !Main.mouseRight : !Main.mouseLeft) && owner.whoAmI == Main.myPlayer)
 						{
 							if ((CanInstantSlam(guardianItem) || ModContent.GetInstance<OrchidClientConfig>().GuardianGauntletAlwaysSlam) && guardian.UseSlam(1, true))
 							{ // Consume a slam to fully charge if the player has one

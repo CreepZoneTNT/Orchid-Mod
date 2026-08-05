@@ -113,7 +113,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 						bool shouldBlock = Main.mouseRight && Main.mouseRightRelease;
 						bool shouldCharge = Main.mouseLeft && Main.mouseLeftRelease;
 
-						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs)
+						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
 						{
 							shouldBlock = Main.mouseLeft && Main.mouseLeftRelease;
 							shouldCharge = Main.mouseRight && Main.mouseRightRelease;
@@ -210,7 +210,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 				OverrideColor = new Color(175, 255, 175)
 			});
 
-			string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
+			string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
 			tooltips.Insert(index + 4, new TooltipLine(Mod, "ClickInfo", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.Parry", click))
 			{
 				OverrideColor = new Color(175, 255, 175)

@@ -145,7 +145,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 	            if (underWater && Main.rand.NextBool(4)) Dust.NewDustDirect(projectile.Center, player.width, player.height, DustID.BreatheBubble, Scale: Main.rand.NextFloat(1.5f, 3.5f));
                     
                 bool attackInput = Main.mouseLeft && Main.mouseLeftRelease;
-                if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs) attackInput = Main.mouseRight && Main.mouseRightRelease;
+                if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs) attackInput = Main.mouseRight && Main.mouseRightRelease;
                 
                 if (waterAttack == 1) 
                 {

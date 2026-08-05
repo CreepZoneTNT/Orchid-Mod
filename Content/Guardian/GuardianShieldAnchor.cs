@@ -380,7 +380,7 @@ namespace OrchidMod.Content.Guardian
 					}
 					else guardian.GuardCostUI = 1;
 
-					bool input = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapPaviseImputs ? Main.mouseLeft : Main.mouseRight;
+					bool input = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapPaviseInputs ? Main.mouseLeft : Main.mouseRight;
 					if (!input)
 					{
 						if (guardian.UseGuard(1, true) || guardian.GuardianItemCharge >= 180f)

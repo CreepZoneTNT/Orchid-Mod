@@ -45,7 +45,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 			HorizonColorLoader.Add("Orchid", firstColor => firstColor ? new Color(255, 0, 60) : new Color(255, 213, 223));
 			
 			HorizonColorLoader.Add("Verveine", firstColor => firstColor ? new Color(100, 150, 0) : new Color(0, 150, 150));
-			HorizonColorLoader.Add("Amber", firstColor => firstColor ? new Color(200, 130, 100) : new Color(180, 50, 200));
+			HorizonColorLoader.Add("Amber", firstColor => firstColor ? new Color(255, 0, 0) : new Color(155, 150, 255));
 			HorizonColorLoader.Add("LucidLizard", firstColor => firstColor ? new Color(255, 200, 0) : new Color(255, 0, 100));
 			HorizonColorLoader.Add("CreepZoneTNT", firstColor => firstColor ? new Color(79, 121, 66) : new Color(253, 238, 0));
 			
@@ -59,12 +59,11 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 			HorizonColorLoader.Add("direwolf420", firstColor => firstColor ? new Color(0, 221, 221) : new Color(44, 36, 133));
 			HorizonColorLoader.Add("DivermanSam", firstColor => firstColor ? new Color(0, 150, 150) : new Color(200, 150, 50));
 			HorizonColorLoader.Add("Feutor", firstColor => firstColor ? new Color(255, 106, 0) : new Color(133, 4, 4));
-			HorizonColorLoader.Add("Freya", firstColor => firstColor ? new Color(255, 0, 0) : new Color(155, 150, 255));
 			HorizonColorLoader.Add("GitGudWO", firstColor => firstColor ? new Color(150, 150, 150) : new Color(200, 0, 0));
 			HorizonColorLoader.Add("Haidex", firstColor => Main.DiscoColor);
 			HorizonColorLoader.Add("IceSpider", firstColor => firstColor ? new Color(22, 156, 156) : new Color(169, 254, 255));
 			HorizonColorLoader.Add("KiarArt", firstColor => firstColor ? new Color(123, 68, 223) : new Color(73, 218, 177));
-			HorizonColorLoader.Add("Kibl", firstColor => firstColor ? new Color(0, 50, 200) : new Color(0, 150, 50));
+			HorizonColorLoader.Add("Krux", firstColor => firstColor ? new Color(0, 50, 200) : new Color(0, 150, 50));
 			HorizonColorLoader.Add("KindP4nda", firstColor => firstColor ? new Color(150, 0, 17) : new Color(0, 150, 17));
 			HorizonColorLoader.Add("Laeyrr", firstColor => firstColor ? new Color(60, 120, 100) : new Color(110, 70, 200));
 			HorizonColorLoader.Add("L. Mack", firstColor => firstColor ? new Color(121, 101, 90) : new Color(102, 50, 19));

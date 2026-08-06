@@ -3475,6 +3475,11 @@ Items: {
 		// DisplayName: Guardian Lantern Shield
 		// Tooltip: ""
 	}
+
+	KingSlimeFencingBlade: {
+		// DisplayName: King Slime Fencing Blade
+		// Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -3944,6 +3949,9 @@ Projectiles: {
 	// ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
 	// GuardianLanternShieldAnchor.DisplayName: Guardian Lantern Shield Anchor
 	// ThoriumNagaQuarterstaffProjectileDash.DisplayName: Thorium Naga Quarterstaff Projectile Dash
+	// ThoriumTerrariumQuarterstaffProjectile.DisplayName: Thorium Terrarium Quarterstaff Projectile
+	// GuardianFencingBladeAnchor.DisplayName: Guardian Fencing Blade Anchor
+	// FencingBladeSlashProjectile.DisplayName: Fencing Blade Slash Projectile
 }
 
 Configs: {
@@ -3975,12 +3983,12 @@ Configs: {
 			Tooltip: Использовать старый интерфейс молотов хранителя (в стиле Paper Mario)
 		}
 
-		GuardianSwapPaviseImputs: {
+		GuardianSwapPaviseInputs: {
 			Label: Поменять клавиши функционала павез
 			Tooltip: Меняет местами ЛКМ и ПКМ для функционала павез хранителя
 		}
 
-		GuardianSwapGauntletImputs: {
+		GuardianSwapGauntletInputs: {
 			Label: Поменять клавишу предметов парирования
 			Tooltip: Меняет местами ЛКМ и ПКМ для предметов хранителя, использующих парирование (перчатки, боевые шесты и т.д.)
 		}
@@ -4073,6 +4081,11 @@ Configs: {
 				Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.
 				No effect if Smart Cursor isn't set to 'Toggle'
 				''' */
+		}
+
+		GuardianFencingBlade: {
+			// Label: Guardian Fencing Blade
+			// Tooltip: ""
 		}
 	}
 

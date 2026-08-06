@@ -4,6 +4,15 @@
         <name>OrchidMod</name>
     </assembly>
     <members>
+        <member name="P:OrchidMod.Common.ModObjects.OrchidModProjectile.IsLocalOwner">
+            <summary>If true, then the index of this projectile's owner matches the local player's index. Used for running code only on the owner's end.</summary>
+        </member>
+        <member name="P:OrchidMod.Common.ModObjects.OrchidModProjectile.Owner">
+            <summary>Shorthand for the Player instance this projectile belongs to.</summary>
+        </member>
+        <member name="P:OrchidMod.Common.ModObjects.OrchidModProjectile.ModPlayer">
+            <summary>Shorthand for the <see cref="P:OrchidMod.Common.ModObjects.OrchidModProjectile.Owner"/>'s OrchidPlayer instance.</summary>
+        </member>
         <member name="F:OrchidMod.Common.ModObjects.OrchidPlayer.LastHitNPC">
             <summary> The last NPC referenced in OnHitNPC() for this player</summary>
         </member>
@@ -66,6 +75,9 @@
         <member name="M:OrchidMod.Common.ModObjects.OrchidPlayer.SpawnTitaniumShards(Terraria.DataStructures.IEntitySource,System.Int32,System.Int32)">
             <summary>Spawns custom Orchid Titanium Shards, and refreshes the player's Titanium Barrier buff.</summary>
         </member>
+        <member name="P:OrchidMod.Content.Guardian.GuardianFencingBladeAnchor.UseFrame">
+            <summary>The vertical frame of the </summary>
+        </member>
         <member name="M:OrchidMod.Content.Guardian.GuardianQuarterstaffAnchor.DoAnimStyle(System.Int32,System.Single,Terraria.Audio.SoundStyle,System.Boolean)">
             <summary>Executes the given animation style. <c>ai</c> should begin at 40 and decrement to 0 for the animation to play in correct order.</summary>
             <remarks>Animation style IDs<br/>
@@ -120,6 +132,13 @@
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidGuardian.ResetStandards(System.Boolean)">
             <summary>Resets all boolean-controlled Standard effects. Called in OrchidGuardian.ResetEffects and GuardianStandardAnchor when a standard is switched. forceReset controls whether to respect OrchidGuardian.GuardianStandardBuffer to give one frame  of leeway.</summary>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.SheathTexture">
+            <summary>The texture for the sheath. Must have 3 frames stacked vertically: one for when idle, one for when charging, and for one when attacking.</summary>
+            <remarks>Although the sheath texture needs 3 vertical textures, you could add extra animation frames horizontally. Remember to override the <c>drawRectangle</c> property of <see cref="!:GetBladeTexture"/> to get the </remarks>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.FencingBladeFrames">
+            <summary>The amount of frames per  </summary>
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.OnPunch(Terraria.Player,OrchidMod.Content.Guardian.OrchidGuardian,Terraria.Projectile,System.Boolean,System.Boolean,System.Boolean@,System.Int32@)">
             <summary> Called right before a punch projectile is spawned. Return false to prevent normal punch projectiles from spawning. </summary>
@@ -417,6 +436,9 @@
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianParryItem.PlayParrySound(Terraria.Player,OrchidMod.Content.Guardian.OrchidGuardian,Terraria.Projectile)">
             <summary> Responsible for playing the sound when the player parries with this weapon. Default behavior is <c>SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(Main.rand.NextFloat(0.4f, 0.6f)), player.Center);</c> </summary>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.OrchidModGuardianProjectile.Guardian">
+            <summary>Shorthand for the <see cref="P:OrchidMod.Common.ModObjects.OrchidModProjectile.Owner">Owner</see>'s OrchidGuardian instance.</summary>
         </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianProjectile.FirstHit">
             <summary>Set to false in ModifyHitNPC when this projectile or specific anchor attack hits an enemy a second time. Flagged before most hit functions.</summary>

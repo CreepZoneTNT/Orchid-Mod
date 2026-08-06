@@ -55,6 +55,10 @@ namespace OrchidMod.Content.Guardian.UI
 		public static Texture2D textureKatarOn;
 		public static Texture2D textureKatarOff;
 		public static Texture2D textureKatarReady;
+		
+		public static Texture2D textureFencingBladeOn;
+		public static Texture2D textureFencingBladeOff;
+		public static Texture2D textureFencingBladeReady;
 
 		public static Texture2D textureHorizonLanceOn;
 		public static Texture2D textureHorizonLanceOff;
@@ -126,6 +130,10 @@ namespace OrchidMod.Content.Guardian.UI
 			textureKatarOn = ModContent.Request<Texture2D>(path + "KatarOn", AssetRequestMode.ImmediateLoad).Value;
 			textureKatarOff = ModContent.Request<Texture2D>(path + "KatarOff", AssetRequestMode.ImmediateLoad).Value;
 			textureKatarReady = ModContent.Request<Texture2D>(path + "KatarReady", AssetRequestMode.ImmediateLoad).Value;
+			
+			textureFencingBladeOn = ModContent.Request<Texture2D>(path + "FencingBladeOn", AssetRequestMode.ImmediateLoad).Value;
+			textureFencingBladeOff = ModContent.Request<Texture2D>(path + "FencingBladeOff", AssetRequestMode.ImmediateLoad).Value;
+			textureFencingBladeReady = ModContent.Request<Texture2D>(path + "FencingBladeReady", AssetRequestMode.ImmediateLoad).Value;
 
 			textureHammerOn = ModContent.Request<Texture2D>(path + "HammerOn", AssetRequestMode.ImmediateLoad).Value;
 			textureHammerOff = ModContent.Request<Texture2D>(path + "HammerOff", AssetRequestMode.ImmediateLoad).Value;
@@ -408,6 +416,16 @@ namespace OrchidMod.Content.Guardian.UI
 						chargeTextureOn = textureBlockOn;
 						chargeTextureOff = textureBlockOff;
 						chargeTextureReady = textureBlockReady;
+					}
+					
+					if (guardianItem is OrchidModGuardianFencingBlade)
+					{
+						if (maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f))
+						{
+							chargeTextureOn = textureFencingBladeOn;
+							chargeTextureOff = textureFencingBladeOff;
+							chargeTextureReady = textureFencingBladeReady;
+						}
 					}
 					
 					if (guardianItem is GuardianLanternShield lantern && (maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f)))

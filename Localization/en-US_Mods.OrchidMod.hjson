@@ -3472,7 +3472,15 @@ Items: {
 
 	GuardianLanternShield: {
 		DisplayName: Guardian Lantern Shield
-		Tooltip: ""
+		Tooltip: 
+		    '''
+		    Can emit light with a torch
+		    '''
+	}
+
+	KingSlimeFencingBlade: {
+		DisplayName: Slimy Shinken
+		Tooltip: "Reinforced attacks coat enemies in slime"
 	}
 }
 
@@ -3927,22 +3935,20 @@ Projectiles: {
 	GuardianKatarAnchor.DisplayName: Katar
 	HellstoneKatarProjectile.DisplayName: Trailblaze
 	ThoriumGraniteKatarProjectile.DisplayName: Ion Deluge
-	ToyWarhammerProjectile.DisplayName: The Big Honker
 	ThoriumVoidQuarterstaffProjectile.DisplayName: Void
 	ThoriumDemonBloodGauntletProjectile.DisplayName: Thorium Demon Blood Gauntlet Projectile
 	ThoriumNagaQuarterstaffProjectile.DisplayName: Thorium Naga Quarterstaff Projectile
-	ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Thorium Concentrated Thorium Quarterstaff Projectile
-	ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
-	GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
 	ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
 	ThoriumBoreanStriderQuarterstaffProjectile.DisplayName: Thorium Borean Strider Quarterstaff Projectile
-	ThoriumDreadGauntletProjectile.DisplayName: Dread Grappleclaw
 	ThoriumDreadGauntletProjectileAlt.DisplayName: Thorium Dread Gauntlet Projectile Alt
 	VoidArmorTail.DisplayName: Void Armor Tail
 	ThoriumBlackKatarProjectile.DisplayName: Shadow Clone
 	ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
 	GuardianLanternShieldAnchor.DisplayName: Guardian Lantern Shield Anchor
 	ThoriumNagaQuarterstaffProjectileDash.DisplayName: Thorium Naga Quarterstaff Projectile Dash
+	ThoriumTerrariumQuarterstaffProjectile.DisplayName: Bifrost
+	GuardianFencingBladeAnchor.DisplayName: Fencing Blade
+	FencingBladeSlashProjectile.DisplayName: Fencing Blade Slash
 }
 
 Configs: {
@@ -4064,6 +4070,11 @@ Configs: {
 				Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.
 				No effect if Smart Cursor isn't set to 'Toggle'
 				'''
+		}
+
+		GuardianFencingBlade: {
+			Label: Guardian Fencing Blade
+			Tooltip: ""
 		}
 	}
 

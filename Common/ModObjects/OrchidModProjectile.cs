@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using OrchidMod.Common.Global.Projectiles;
 using OrchidMod.Content.General.Projectiles;
 using System;
+using OrchidMod.Utilities;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -18,8 +19,14 @@ namespace OrchidMod.Common.ModObjects
 		public bool Initialized; // Used in various AI.
 		public bool projOwner = false;
 
+
+		/// <summary>If true, then the index of this projectile's owner matches the local player's index. Used for running code only on the owner's end.</summary>
 		public bool IsLocalOwner => Projectile.owner == Main.myPlayer;
+		/// <summary>Shorthand for the Player instance this projectile belongs to.</summary>
 		public Player Owner => Main.player[Projectile.owner];
+		
+		/// <summary>Shorthand for the <see cref="Owner"/>'s OrchidPlayer instance.</summary>
+		public OrchidPlayer ModPlayer => Main.player[Projectile.owner].OrchidPlayer();
 		public static bool IsValidTarget(NPC npc, bool includecritter = false) => npc.active && !npc.dontTakeDamage && !npc.friendly && (includecritter || !npc.CountsAsACritter);
 
 		public sealed override bool PreAI()
@@ -82,6 +89,7 @@ namespace OrchidMod.Common.ModObjects
 			spriteBatch.Draw(texture, projectile.position - Main.screenPosition + projectile.Size * 0.5f + new Vector2(offsetX, offsetY), null, color, projectile.rotation, texture.Size() * 0.5f, projectile.scale, projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0f);
 		}
 
+		// We could maybe update this system, it looks like it has potential?
 		public void PreDrawTrail(SpriteBatch spriteBatch, Color lightColor)
 		{
 			float offSet = projectileTrailOffset + 0.5f;

@@ -63,7 +63,6 @@ public static partial class OrchidUtils
 		Vector2 refPointY = rectangle.Center() + Vector2.UnitY * rectangle.Height / 4f * (circle.Origin.Y > rectangle.Center().Y).ToDirectionInt();
 		return rectangle.Contains(Circle.ClosestPointInCircle(circle, rectangle.Center()).ToPoint()) || rectangle.Contains(Circle.ClosestPointInCircle(circle, refPointX).ToPoint()) || rectangle.Contains(Circle.ClosestPointInCircle(circle, refPointY).ToPoint());
 	}
-
 	
 	public static bool CheckAABBvCircularCollision(Vector2 rectPosition, Vector2 rectDimensions, Vector2 circOrigin, float circRadius)
 	{
@@ -71,5 +70,8 @@ public static partial class OrchidUtils
 		Circle circle = new Circle(circOrigin, circRadius);
 		return CheckAABBvCircularCollision(rectangle, circle);
 	}
-	
+
+	public static Vector2 Scale(this Vector2 value, float factorX = 1f, float factorY = 1f) => new Vector2(value.X * factorX, value.Y * factorY);
+	public static void Scale(ref Vector2 original, out Vector2 result, float factorX = 1f, float factorY = 1f) => result = new Vector2(original.X * factorX, original.Y * factorY);
+
 }

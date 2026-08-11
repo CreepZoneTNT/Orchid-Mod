@@ -777,10 +777,12 @@ namespace OrchidMod
 					Player.statLife -= 20;
 					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
-				}
-				if (showUICost)
-				{
-					SlamCostUI = nb;
+					
+					while (nb > 0)
+					{
+						nb--;
+						OnUseSlam();
+					}
 				}
 				return true;
 			}
@@ -839,10 +841,12 @@ namespace OrchidMod
 					Player.statLife -= 20;
 					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
-				}
-				if (showUICost)
-				{
-					GuardCostUI = nb;
+					
+					while (nb > 0)
+					{
+						nb--;
+						OnUseGuard();
+					}
 				}
 				return true;
 			}

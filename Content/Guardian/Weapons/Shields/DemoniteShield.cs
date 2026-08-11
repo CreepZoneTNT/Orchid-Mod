@@ -48,7 +48,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			}
 		}
 
-		public override void ExtraAIShield(Projectile projectile)
+		public override void ExtraAIShield(Player player, Projectile projectile)
 		{
 			if (projectile.ai[0] > 0 && Main.rand.NextBool(15))
 				Dust.NewDustDirect(projectile.position, projectile.width, projectile.height, DustID.Demonite, 0f, 0f, 200, default, 1.2f);

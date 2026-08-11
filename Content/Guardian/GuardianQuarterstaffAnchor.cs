@@ -294,6 +294,7 @@ namespace OrchidMod.Content.Guardian
 
 					owner.SetCompositeArmFront(true, CompositeArmStretchAmount.Full, MathHelper.PiOver2 * -(0.6f - guardian.GuardianItemCharge * 0.0025f) * owner.direction);
 					owner.SetCompositeArmBack(true, CompositeArmStretchAmount.Full, MathHelper.PiOver2 * -(1f - guardian.GuardianItemCharge * 0.0025f) * owner.direction);
+					owner.heldProj = Projectile.whoAmI;
 
 					if (OldPosition.Count > 0)
 					{
@@ -363,13 +364,7 @@ namespace OrchidMod.Content.Guardian
 						SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing, Projectile.Center);
 						ResetHitStatus(false);
 
-						if (owner.boneGloveItem != null && !owner.boneGloveItem.IsAir && owner.boneGloveTimer == 0)
-						{ // Bone glove compatibility, from vanilla code
-							owner.boneGloveTimer = 60;
-							Vector2 center = owner.Center;
-							Vector2 vector = owner.DirectionTo(owner.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
-							Projectile.NewProjectile(owner.GetSource_ItemUse(owner.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, owner.whoAmI);
-						}
+						guardian.OnAttack(AttackID.QuarterstaffJab, guardianItem);
 					}
 
 					if (Projectile.ai[1] is > -3.14f and < 0f) // Facing Right
@@ -441,14 +436,6 @@ namespace OrchidMod.Content.Guardian
 						Projectile.ResetLocalNPCHitImmunity();
 						SoundEngine.PlaySound(QuarterstaffItem.UseSound, Projectile.Center);
 						ResetHitStatus(true);
-
-						if (owner.boneGloveItem != null && !owner.boneGloveItem.IsAir && owner.boneGloveTimer == 0)
-						{ // Bone glove compatibility, from vanilla code
-							owner.boneGloveTimer = 60;
-							Vector2 center = owner.Center;
-							Vector2 vector = owner.DirectionTo(owner.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
-							Projectile.NewProjectile(owner.GetSource_ItemUse(owner.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, owner.whoAmI);
-						}
 					}
 
 					if (Projectile.ai[1] is > -3.14f and < 0f) // Facing Right
@@ -504,6 +491,7 @@ namespace OrchidMod.Content.Guardian
 					if (Projectile.ai[0] == 41f)
 					{ // First frame of the swing
 						guardianItem.OnAttack(owner, guardian, Projectile, false, false);
+						guardian.OnAttack(AttackID.QuarterstaffCharge, guardianItem);
 					}
 
 					// Animation progress
@@ -581,12 +569,13 @@ namespace OrchidMod.Content.Guardian
 		/// 0: Jab (default jab)<br/>
 		/// 1: Double swing (default swing)<br/>
 		/// 2: Single swing, upward<br/>
-		/// 2: Single swing, downward <br/>
-		/// 3: 360° swing (default counterattack)<br/>
+		/// 3: Single swing, downward <br/>
+		/// 4: 360° swing (default counterattack)<br/>
 		/// </remarks>
 		public void DoAnimStyle(int style, float ai, SoundStyle sound, bool counterAttack)
 		{
 			Player player = Main.player[Projectile.owner];
+			if (style != 4) player.heldProj = Projectile.whoAmI;
 			switch(style)
 			{
 				case 0:

@@ -21,7 +21,7 @@ namespace OrchidMod.Content.Guardian
 		public virtual string ShieldTexture => Texture + "_Shield";
 		public int ShieldFrames = 1;
 
-		public virtual void ExtraAIShield(Projectile projectile) { }
+		public virtual void ExtraAIShield(Player player, Projectile shield) { }
 		public virtual void PostDrawShield(SpriteBatch spriteBatch, Projectile projectile, Player player, Color lightColor) { }
 		public virtual bool PreDrawShield(SpriteBatch spriteBatch, Projectile projectile, Player player, ref Color lightColor) { return true; }
 
@@ -76,7 +76,7 @@ namespace OrchidMod.Content.Guardian
 		/// </summary>
 		public bool lockSlamRotation;
 		/// <summary>How fast the pavise rotates towards the player cursor while blocking. Arbitrary value, defaults to 10f.</summary>
-		public float parryRotation;
+		public float blockRotation;
 		/// <summary>Charge speed multiplier for this item. Defaults to 1f.</summary>
 		public float ChargeSpeedMultiplier;
 		
@@ -100,7 +100,7 @@ namespace OrchidMod.Content.Guardian
 			discreteAimRotation = 0;
 			lockSlamRotation = false;
 			ShieldFrames = 1;
-			parryRotation = 10f;
+			blockRotation = 10f;
 			ChargeSpeedMultiplier = 1f;
 
 			OrchidGlobalItemPerEntity orchidItem = Item.GetGlobalItem<OrchidGlobalItemPerEntity>();

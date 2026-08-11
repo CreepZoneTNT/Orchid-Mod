@@ -31,7 +31,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			distance = 26f;
 			slamDistance = 150f;
 			blockDuration = 600;
-			parryRotation = 0f;
+			blockRotation = 0f;
 		}
 
 		public override void Slam(Player player, Projectile shield, bool WeakSlam)
@@ -74,7 +74,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			 Main.EntitySpriteDraw(ModContent.Request<Texture2D>(Texture + "_Glow").Value, position, frame, Color, 0, new Vector2(frame.Width / 2, frame.Height / 2), scale, SpriteEffects.None);
 		}
 
-		public override void ExtraAIShield(Projectile projectile)
+		public override void ExtraAIShield(Player owner, Projectile projectile)
 		{
 			if (projectile.ai[1] > 0f) // is slamming
 			{
@@ -95,7 +95,6 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 
 			if (projectile.ai[0] > 0f && projectile.ModProjectile is GuardianShieldAnchor anchor) // is blocking
 			{
-				Player owner = Main.player[projectile.owner];
 				Vector2 collision = Collision.TileCollision(owner.position + new Vector2((owner.width - Item.width) * 0.5f, owner.height), Vector2.UnitY * 12f, Item.width, 14, false, false, (int)owner.gravDir);
 				if (playerVelocity != 0f && ((owner.velocity.X == 0f || owner.grapCount > 0 && owner.mount.Type != MountID.None) || collision != Vector2.UnitY * 12f)) // Player hit a tile, stop skating
 				{

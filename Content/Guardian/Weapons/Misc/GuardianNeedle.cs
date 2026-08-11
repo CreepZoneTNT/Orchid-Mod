@@ -137,6 +137,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 								Gore gore = Gore.NewGoreDirect(player.GetSource_FromAI(), player.Center + new Vector2(Main.rand.NextFloat(-24f, 0f), Main.rand.NextFloat(-24f, 0f)), Vector2.UnitY.RotatedByRandom(MathHelper.Pi), 61 + Main.rand.Next(3));
 								gore.rotation = Main.rand.NextFloat(MathHelper.Pi);
 							}
+
+							guardian.OnAttack(AttackID.KatarDash, this);
 						}
 
 						if (shouldCharge && guardian.GuardianItemCharge == 0f && proj.ai[0] == 0f && proj.ai[2] >= -10f)
@@ -193,6 +195,12 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 				}
 			}
 			SafeHoldItem(player);
+		}
+
+		public override bool ModifyAttackInfo(ref GuardianAttackInfo info)
+		{
+			if (info.Defense) info.SetOffense().SetCounter();
+			return true;
 		}
 
 		public override void ModifyTooltips(List<TooltipLine> tooltips)

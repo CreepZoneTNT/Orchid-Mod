@@ -73,9 +73,9 @@ namespace OrchidMod.Content.Guardian.Weapons.Gauntlets
 
 		public override bool OnPunch(Player player, OrchidGuardian guardian, Projectile projectile, bool offHandGauntlet, bool fullyManuallyCharged, ref bool charged, ref int damage)
 		{
-			if ((guardian.GuardianCounterTime > 0 && (charged || guardian.UseSlam(1))) || (projectile.ModProjectile is GuardianGauntletAnchor anchor && anchor.Ding))
+			if ((guardian.GuardianCounterTime > 0 && (charged || guardian.UseSlam(1))) || fullyManuallyCharged)
 			{
-				guardian.GuardianCounterTime = 0;
+				//guardian.GuardianCounterTime = 0;
 				SoundEngine.PlaySound(SoundID.Item14, player.Center);
 				Vector2 playerDashVelocity = Vector2.UnitY.RotatedBy((Main.MouseWorld - player.Center).ToRotation() - MathHelper.PiOver2) * 15f;
 				guardian.modPlayer.ForcedVelocityVector = playerDashVelocity;
@@ -100,6 +100,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Gauntlets
 					dust.scale *= 0.5f + i / 20f;
 					dust.velocity *= 2f - i / 20f;
 				}
+				charged = true; //for OnAttack
 				return false;
 			}
 			return true;

@@ -20,7 +20,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			distance = 30f;
 			slamDistance = 65f;
 			blockDuration = 90;
-			parryRotation = 50f;
+			blockRotation = 50f;
 		}
 
 		public override void AddRecipes()

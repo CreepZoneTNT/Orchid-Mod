@@ -15,6 +15,8 @@ using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using System.Linq;
+using OrchidMod.Content.Guardian.Accessories;
 
 namespace OrchidMod.Content.Guardian
 {
@@ -77,7 +79,8 @@ namespace OrchidMod.Content.Guardian
 		public int GuardianStandardStarScouterWarpCD = 0; //Holds cooldown and animation for warp effect
 		public bool GuardianHoneyPotion = false; // Misc
 		public bool GuardianInfiniteResources = false;
-		public bool GuardianShowDebugVisuals = false;
+		public int GuardianDebugVisuals = 0;
+		public int OldGuardianDebugVisuals = 0;
 		public byte GuardianJewelerGauntlet = 0;
 		public bool GuardianBronzeShieldBuff = false;
 		public float GuardianBronzeShieldDamage = 0;
@@ -609,7 +612,16 @@ namespace OrchidMod.Content.Guardian
 			GuardianMonsterFang = false;
 			// GuardianInfiniteResources = false;
 			GuardianInfiniteResources = (Player.creativeGodMode || CrossModGodMode);
-			GuardianShowDebugVisuals = false;
+			if (OldGuardianDebugVisuals != GuardianDebugVisuals)
+			{
+				if (Main.myPlayer == Player.whoAmI)
+				{
+					if (GuardianDebugVisuals == 1) CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "Enabled shield check", true);
+					if (GuardianDebugVisuals == 1) CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "Enabled attackinfo display", true);
+				}
+				OldGuardianDebugVisuals = GuardianDebugVisuals;
+			}
+			GuardianDebugVisuals = 0;
 			GuardianBronzeShieldBuff = false;
 			GuardianBronzeShieldProtection = false;
 			GuardianBadgeHoplite = false;
@@ -883,7 +895,7 @@ namespace OrchidMod.Content.Guardian
 					Player.statLife -= 20;
 					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
-
+					
 					while (nb > 0)
 					{
 						nb--;
@@ -947,7 +959,7 @@ namespace OrchidMod.Content.Guardian
 					Player.statLife -= 20;
 					CombatText.NewText(Player.Hitbox, CombatText.DamagedFriendly, 20, false, true);
 					SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack, Player.Center);
-
+					
 					while (nb > 0)
 					{
 						nb--;
@@ -1168,7 +1180,16 @@ namespace OrchidMod.Content.Guardian
 			}
 		}
 
+		/// <remarks> Calls <c>OnAttack</c> with <c>AttackID.Parry</c>. Use overload to override. </remarks>
+		/// <inheritdoc cref="DoParryItemParry(Entity, GuardianAttackInfo)"/>
 		public void DoParryItemParry(Entity aggressor)
+		{
+			DoParryItemParry(aggressor, AttackID.Parry);
+		}
+
+		/// <summary> Performs parrying actions if the player is holding a parryItem, including giving the player invulnerability, triggering the parryItem's parrying related functions, and the player's responses to guarding enemies or projectiles, depending on the aggressor. </summary>
+		/// <remarks> <c>attack</c> is the GuardianAttackInfo that will be supplied for <c>OnAttack</c>, and defaults to <c>AttackID.Parry</c> in simplified overload. </remarks>
+		public void DoParryItemParry(Entity aggressor, GuardianAttackInfo attack)
 		{
 			GuardianParryBuffer = false;
 
@@ -1233,6 +1254,8 @@ namespace OrchidMod.Content.Guardian
 					}
 				}
 				parryItem.PlayParrySound(Player, this, anchor);
+
+				OnAttack(attack, parryItem);
 			}
 		}
 
@@ -1337,6 +1360,36 @@ namespace OrchidMod.Content.Guardian
 						Projectile.NewProjectile(Player.GetSource_Accessory(item), x, y, speedX, speedY, type, starDamage, 5f, Player.whoAmI, 0f, Player.position.Y);
 					}
 				}
+			}
+		}
+
+		/// <summary> Should be called when the player performs any action with a guardian weapon. Uses <c>GuardianAttackInfo</c> to determine attack context. </summary>
+		public void OnAttack(GuardianAttackInfo info, OrchidModGuardianItem guardianItem = null)
+		{
+			if (GuardianCounter && info.Slam && GuardianCounterTime > 0)
+			{
+				info.Counter = true;
+			}
+
+			if (guardianItem != null)
+			{
+				if (!guardianItem.ModifyAttackInfo(ref info)) return;
+			}
+
+			if (info.Counter) GuardianCounterTime = 0;
+			
+			if (info.Offense && Player.boneGloveItem != null && !Player.boneGloveItem.IsAir && Player.boneGloveTimer == 0)
+			{ // Bone glove compatibility, from vanilla code
+				Player.boneGloveTimer = 60;
+				Vector2 center = Player.Center;
+				Vector2 vector = Player.DirectionTo(Player.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
+				Projectile.NewProjectile(Player.GetSource_ItemUse(Player.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, Player.whoAmI);
+			}
+
+			//DEBUG
+			if (GuardianDebugVisuals == 1)
+			{
+				CombatText.NewText(new Rectangle((int)Player.Center.X, Player.Hitbox.Y, 0, 0), Color.White, GuardianTest.AttackTypeString(info) + " (" + (byte)info + ")");
 			}
 		}
 

@@ -296,14 +296,6 @@ namespace OrchidMod.Content.Guardian
 							int damage = guardian.GetGuardianDamage(guardianItem.Item.damage * (charged ? guardianItem.ChargedAttackDamage : guardianItem.SlamDamage));
 							if (guardianItem.OnJab(owner, guardian, Projectile, OffHandKatar, Ding, ref charged, ref damage))
 							{
-								if (owner.boneGloveItem != null && !owner.boneGloveItem.IsAir && owner.boneGloveTimer == 0)
-								{ // Bone glove compatibility, from vanilla code
-									owner.boneGloveTimer = 60;
-									Vector2 center = owner.Center;
-									Vector2 vector = owner.DirectionTo(owner.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
-									Projectile.NewProjectile(owner.GetSource_ItemUse(owner.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, owner.whoAmI);
-								}
-
 								int projectileType = ModContent.ProjectileType<KatarJabProjectile>();
 								float strikeVelocity = guardianItem.JabVelocity * (charged ? 1.25f : 1f) * guardianItem.Item.GetGlobalItem<GuardianPrefixItem>().GetSlamDistance() * owner.GetTotalAttackSpeed(DamageClass.Melee);
 								Vector2 velocity = Vector2.UnitY.RotatedBy((Main.MouseWorld - owner.MountedCenter).ToRotation() - MathHelper.PiOver2) * strikeVelocity * 0.25f;
@@ -323,6 +315,8 @@ namespace OrchidMod.Content.Guardian
 									jabProj.netUpdate = true;
 								}
 								else jabProj.Kill();
+
+								guardian.OnAttack(charged ? AttackID.KatarCharge : AttackID.KatarSlam, guardianItem);
 							}
 						}
 					}

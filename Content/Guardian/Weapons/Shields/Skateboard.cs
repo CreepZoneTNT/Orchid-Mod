@@ -34,7 +34,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			blockDuration = 240;
 			TextureWheels ??= ModContent.Request<Texture2D>(Texture + "_Wheels", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
 			ShieldFrames = 4;
-			parryRotation = 0f;
+			blockRotation = 0f;
 		}
 
 		public override void BlockStart(Player player, Projectile shield)
@@ -66,21 +66,20 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			for (int i = -1; i < 2; i+= 2)
 			{
 				GuardianShieldAnchor anchor = projectile.ModProjectile as GuardianShieldAnchor;
-				if (anchor != null && anchor.ShieldAnimFrame % 2 == 0)
+				if (anchor != null && projectile.frame % 2 == 0)
 				{
-					Vector2 drawPosition = projectile.Center - new Vector2(4f, 8f * i).RotatedBy(projectile.rotation) * (anchor.ShieldAnimFrame == 2 ? -1f : 1f) - Main.screenPosition;
+					Vector2 drawPosition = projectile.Center - new Vector2(4f, 8f * i).RotatedBy(projectile.rotation) * (projectile.frame == 2 ? -1f : 1f) - Main.screenPosition;
 					spriteBatch.Draw(TextureWheels, drawPosition, null, lightColor * (projectile.ai[0] > 0f ? 1f : 0.5f), projectile.rotation + TimeSpent * 0.05f, TextureWheels.Size() * 0.5f, projectile.scale, effect, 0f);
 				}
 				
 			}
 		}
 
-		public override void ExtraAIShield(Projectile projectile)
+		public override void ExtraAIShield(Player owner, Projectile projectile)
 		{
 			TimeSpent++;
 			if (projectile.ai[0] > 0f && projectile.ModProjectile is GuardianShieldAnchor anchor) // is blocking
 			{
-				Player owner = Main.player[projectile.owner];
 				if (playerVelocity != 0f && (owner.velocity.X == 0f || owner.grapCount > 0 && owner.mount.Type != MountID.None)) // Player hit a tile, stop skating
 				{
 					projectile.ai[0] = 1f;
@@ -111,7 +110,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 						// owner.eocDash = 0;
 
 						AirTime = 0;
-						anchor.ShieldAnimFrame = 0;
+						projectile.frame = 0;
 						
 
 						if (Main.rand.NextBool(4)) SoundEngine.PlaySound(SoundID.Item55, projectile.Center);
@@ -165,8 +164,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 					else
 					{
 						AirTime++;
-						if (AirTime % 4 == 0) anchor.ShieldAnimFrame++;
-						if (anchor.ShieldAnimFrame > 3) anchor.ShieldAnimFrame = 0;
+						if (AirTime % 4 == 0) projectile.frame++;
+						if (projectile.frame > 3) projectile.frame = 0;
 						
 						if (playerVelocity == 0) SoundEngine.PlaySound(SoundID.Item53, projectile.Center);
 						playerVelocity = owner.velocity.X;
@@ -188,7 +187,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			else
 			{
 				AirTime = 0;
-				((GuardianShieldAnchor)projectile.ModProjectile).ShieldAnimFrame = 0;
+				projectile.frame = 0;
 			}
 		}
 	}

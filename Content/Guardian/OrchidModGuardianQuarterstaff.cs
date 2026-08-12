@@ -204,6 +204,14 @@ namespace OrchidMod.Content.Guardian
 			SafeHoldItem(player);
 		}
 
+		/// <remarks> Quarterstaves use this by default to set their parry action as <c>Offense</c> and <c>Counter</c>. When overriding this, set <c>Offense</c> and <c>Counter</c> if <c>Defense</c> is set unless intending to replace default quarterstaff counterattack functionality. </remarks>
+		/// <inheritdoc cref="OrchidModGuardianItem.ModifyAttackInfo(ref GuardianAttackInfo)"/>
+		public override bool ModifyAttackInfo(ref GuardianAttackInfo info)
+		{
+			if (info.Defense) info = AttackID.QuarterstaffCounter;
+			return true;
+		}
+
 		public override void ModifyTooltips(List<TooltipLine> tooltips)
 		{
 			var guardian = Main.LocalPlayer.GetModPlayer<OrchidGuardian>();

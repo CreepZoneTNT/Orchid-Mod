@@ -18,7 +18,7 @@ namespace OrchidMod.Content.Guardian
 		public int SelectedItem { get; set; } = -1;
 		public Item ShieldItem => Main.player[Projectile.owner].inventory[this.SelectedItem];
 
-		public int ShieldAnimFrame = 0;
+		//public int ShieldAnimFrame { get => Projectile.frame; set { Projectile.frame = value; }}
 
 		public bool shieldEffectReady = true;
 		public bool NeedNetUpdate = false;
@@ -149,13 +149,7 @@ namespace OrchidMod.Content.Guardian
 							Projectile.height = (int)(texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames);
 						}
 
-						if (owner.boneGloveItem != null && !owner.boneGloveItem.IsAir && owner.boneGloveTimer == 0)
-						{ // Bone glove compatibility, from vanilla code
-							owner.boneGloveTimer = 60;
-							Vector2 center = owner.MountedCenter;
-							Vector2 vector = owner.DirectionTo(owner.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
-							Projectile.NewProjectile(owner.GetSource_ItemUse(owner.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, owner.whoAmI);
-						}
+						guardian.OnAttack(WeakSlam ? AttackID.ShieldBash : AttackID.ShieldSlam, guardianItem);
 					}
 
 					float slamDistance = (int)(guardianItem.slamDistance * guardianItem.Item.GetGlobalItem<GuardianPrefixItem>().GetSlamDistance() * owner.GetTotalAttackSpeed(DamageClass.Melee) * (WeakSlam ? 0.5f : 1f));
@@ -184,6 +178,8 @@ namespace OrchidMod.Content.Guardian
 						Projectile.width = (int)(texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames);
 						Projectile.height = (int)(texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames);
 						aimedLocation += (oldDimensions * 0.5f - new Vector2(texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames, texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames) * 0.5f).Floor();
+
+						guardian.OnAttack(Ding ? AttackID.ShieldCharge : AttackID.ShieldBlock, guardianItem);
 					}
 
 					aimedLocation += owner.MountedCenter.Floor() - oldOwnerPos.Floor();
@@ -191,14 +187,14 @@ namespace OrchidMod.Content.Guardian
 					if (IsLocalOwner)
 					{ // pavise rotation while blocking
 						Vector2 toPavise = Vector2.Normalize(Projectile.Center - owner.MountedCenter.Floor());
-						Vector2 toPaviseClock = toPavise.RotatedBy(0.001f * guardianItem.parryRotation);
-						Vector2 toPaviseCClock = toPavise.RotatedBy(-0.001f * guardianItem.parryRotation);
+						Vector2 toPaviseClock = toPavise.RotatedBy(0.001f * guardianItem.blockRotation);
+						Vector2 toPaviseCClock = toPavise.RotatedBy(-0.001f * guardianItem.blockRotation);
 						Vector2 toCursor = Vector2.Normalize(Main.MouseWorld - owner.MountedCenter.Floor());
 						double angle = Math.Acos(Vector2.Dot(toPavise, toCursor));
 						double angleClock = Math.Acos(Vector2.Dot(toPaviseClock, toCursor));
 						double angleCClock = Math.Acos(Vector2.Dot(toPaviseCClock, toCursor));
 
-						if (angle < guardianItem.parryRotation * 0.0015f || (angle < angleClock && angle < angleCClock))
+						if (angle < guardianItem.blockRotation * 0.0015f || (angle < angleClock && angle < angleCClock))
 						{
 							if (blockRotation != 0)
 							{
@@ -357,7 +353,7 @@ namespace OrchidMod.Content.Guardian
 					}
 				}
 
-				// Projectile rotation offset while parrying
+				// Projectile rotation offset while blocking
 				Vector2 toPlayer = Projectile.Center - owner.Center;
 				Projectile.position -= toPlayer;
 				toPlayer = toPlayer.RotatedBy(Projectile.localAI[1]);
@@ -412,7 +408,7 @@ namespace OrchidMod.Content.Guardian
 
 				if (blockRotation > 0)
 				{
-					Projectile.localAI[1] += guardianItem.parryRotation * 0.001f * (blockRotation == 1 ? 1 : -1);
+					Projectile.localAI[1] += guardianItem.blockRotation * 0.001f * (blockRotation == 1 ? 1 : -1);
 				}
 
 				Projectile.timeLeft = 5;
@@ -427,15 +423,14 @@ namespace OrchidMod.Content.Guardian
 						Projectile.netUpdate = true;
 					}
 					guardianItem.Slam(owner, Projectile, WeakSlam);
-					guardian.GuardianCounterTime = 0;
 				}
 
 				UpdateHitbox();
-				if (guardian.GuardianShowDebugVisuals) SeeHitbox();
+				if (guardian.GuardianDebugVisuals == 1) SeeHitbox();
 			}
 
 			oldOwnerPos = owner.MountedCenter;
-			guardianItem.ExtraAIShield(Projectile);
+			guardianItem.ExtraAIShield(owner, Projectile);
 		}
 
 		// https://stackoverflow.com/questions/5514366/how-to-know-if-a-line-intersects-a-rectangle
@@ -532,7 +527,7 @@ namespace OrchidMod.Content.Guardian
 				float colorMult = (Projectile.ai[1] + Projectile.ai[0] > 0 ? 1f : (0.4f + Math.Abs((1f * Main.player[Main.myPlayer].GetModPlayer<OrchidPlayer>().Timer120 - 60) / 120f)));
 				float flippedRotation = Projectile.rotation + (Projectile.spriteDirection == 1 ? 0 : MathHelper.Pi);
 
-				Rectangle frame = texture.Frame(1, guardianItem.ShieldFrames, 0, ShieldAnimFrame % guardianItem.ShieldFrames);
+				Rectangle frame = texture.Frame(1, guardianItem.ShieldFrames, 0, Projectile.frame % guardianItem.ShieldFrames);
 
 				spriteBatch.Draw(texture, drawPosition, frame, color * colorMult, flippedRotation, frame.Size() * 0.5f, Projectile.scale, effect, 0f);
 

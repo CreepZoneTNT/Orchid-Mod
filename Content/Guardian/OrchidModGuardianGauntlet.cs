@@ -227,6 +227,7 @@ namespace OrchidMod.Content.Guardian
 										projectileOff.ai[0] = (int)(ParryDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianParryDuration);
 										(projectileOff.ModProjectile as GuardianGauntletAnchor).NeedNetUpdate = true;
 									}
+									guardian.OnAttack(AttackID.GauntletGuard, this);
 								}
 							}
 						}

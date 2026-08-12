@@ -145,6 +145,8 @@ namespace OrchidMod.Content.Guardian
 							Projectile.direction = Projectile.spriteDirection;
 							InitialVelocity = Projectile.velocity;
 						}
+
+						guardian.OnAttack(AttackID.HammerBlock, HammerItem);
 					}
 
 					Projectile.rotation += Projectile.velocity.Length() / 45f * (Projectile.velocity.X > 0 ? 1 : -1);
@@ -338,15 +340,7 @@ namespace OrchidMod.Content.Guardian
 
 							if (owner.whoAmI == Main.myPlayer)
 							{
-								if (!Main.mouseLeft && !OffHand)
-								{
-									if (owner.boneGloveItem != null && !owner.boneGloveItem.IsAir && owner.boneGloveTimer == 0 && !OffHand)
-									{ // Bone glove compatibility, from vanilla code
-										owner.boneGloveTimer = 60;
-										Vector2 center = owner.Center;
-										Vector2 vector = owner.DirectionTo(owner.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
-										Projectile.NewProjectile(owner.GetSource_ItemUse(owner.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, owner.whoAmI);
-									}
+								if (!Main.mouseLeft && !OffHand)								{
 
 									if (guardian.GuardianItemCharge > 10f || hammerItem.CannotSwing)
 									{ // Hammer is charged enough to be thrown (or can't be thrown)
@@ -390,14 +384,6 @@ namespace OrchidMod.Content.Guardian
 								}
 								else if (Main.mouseRight && !hammerItem.CannotSwing && (!OffHand || (Main.projectile[hammerItem.GetAnchors(owner)[0]].ai[1] < 0f && Main.projectile[hammerItem.GetAnchors(owner)[0]].ai[1] >= -30f)))
 								{
-									if (owner.boneGloveItem != null && !owner.boneGloveItem.IsAir && owner.boneGloveTimer == 0 && !OffHand)
-									{ // Bone glove compatibility, from vanilla code
-										owner.boneGloveTimer = 60;
-										Vector2 center = owner.Center;
-										Vector2 vector = owner.DirectionTo(owner.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
-										Projectile.NewProjectile(owner.GetSource_ItemUse(owner.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, owner.whoAmI);
-									}
-
 									Projectile.ai[1] = -60f;
 									Projectile.netUpdate = true;
 								}
@@ -421,6 +407,8 @@ namespace OrchidMod.Content.Guardian
 								HammerItem.OnSwing(owner, guardian, Projectile, guardian.GuardianItemCharge >= 180f, OffHand);
 								Projectile.ResetLocalNPCHitImmunity();
 								Projectile.localNPCHitCooldown = -1;
+
+								guardian.OnAttack(AttackID.HammerSwing, HammerItem);
 							}
 
 							Projectile.velocity = Vector2.UnitX * 0.001f * owner.direction; // So enemies are KBd in the right direction
@@ -491,6 +479,8 @@ namespace OrchidMod.Content.Guardian
 							if (!HammerItem.Penetrate) Projectile.localNPCHitCooldown = -1;
 							else Projectile.localNPCHitCooldown = HammerItem.HitCooldown;
 							InitialVelocity = Projectile.velocity;
+
+							guardian.OnAttack(WeakThrow ? AttackID.HammerBash : AttackID.HammerCharge, HammerItem);
 						}
 
 						if (guardian.GuardianHammerMagnet > 0f && !HammerItem.CannotMagnet && Projectile.timeLeft < 598 && range > 0 && BlockDuration == 0 && owner == Main.LocalPlayer && !Main.dedServ)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using OrchidMod.Common.ModObjects;
+using OrchidMod.Content.General.Prefixes;
 using OrchidMod.Content.Guardian.Buffs;
 using OrchidMod.Content.Guardian.Projectiles.Misc;
 using OrchidMod.Content.Guardian.Projectiles.Standards;
@@ -1402,6 +1403,6 @@ namespace OrchidMod.Content.Guardian
 			return 4;
 		}
 		
-		public void ThoriumForceShieldHealth() {}
+		public float GetParryDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianParryDuration;
 	}
 }

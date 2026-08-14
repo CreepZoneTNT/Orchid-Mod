@@ -3479,6 +3479,20 @@ Items: {
 		DisplayName: Slimy Shinken
 		Tooltip: Reinforced attacks coat enemies in slime
 	}
+
+	DeerclopsFencingBlade: {
+		DisplayName: Fencing Sword
+		Tooltip:
+			'''
+			Reinforced attacks ignore 15 points of enemy defense
+			'Enguard! Re-post!'
+			'''
+	}
+
+	ThoriumTemplarFencingBlade: {
+		Tooltip: ""
+		DisplayName: Thorium Templar Fencing Blade
+	}
 }
 
 NPCs: {
@@ -3948,6 +3962,7 @@ Projectiles: {
 	GuardianFencingBladeAnchor.DisplayName: Fencing Blade
 	FencingBladeSlashProjectile.DisplayName: Fencing Blade Slash
 	ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
+	FencingBladeFocusProjectile.DisplayName: Fencing Blade Focus Projectile
 }
 
 Configs: {

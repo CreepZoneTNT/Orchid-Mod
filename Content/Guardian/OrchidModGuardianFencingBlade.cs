@@ -23,29 +23,54 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 	/// <remarks>Although the sheath texture needs 3 vertical textures, you could add extra animation frames horizontally. Remember to override the <c>drawRectangle</c> property of <see cref="GetBladeTexture"/> to get the </remarks>
 	public virtual string SheathTexture => Texture + "_Sheath";
 	public virtual string SheathTextureGlow => Texture + "_Sheath_Glow";
-
-	public float ChargeSpeedMultiplier = 1f;
-	public float SwingSpeed = 1f;
-	public int ParryDuration = 20;
-	public int SwingsPerAttack = 6;
-	public Vector2 HoldOffset = Vector2.Zero;
-	public Vector2 SheathOffset = Vector2.Zero;
-	public float ChargedVelocityMult = 1.5f;
 	
-	/// <summary>The amount of frames per  </summary>
+	public SoundStyle SwingSound = SoundID.Item71 with {MaxInstances = 10, PitchVariance = 0.4f};
+	/// <summary>Multiplies charge speed while holding left click.</summary>
+	public float ChargeRate = 1f;
+	/// <summary>The multiplier for the basic swing attack performed after a failed deflect.</summary>
+	public float SwingSpeed = 1f;
+	/// <summary>The multiplier for the reinforced swing attack performed after a successful deflect or at full charge.</summary>
+	public float ReinforcedSwingSpeed = 1f;
+	public int ParryDuration = 20;
+	/// <summary>The amount of slash projectiles created during the reinforced attack.</summary>
+	/// <remarks>Also affects the attack animation: higher values make the blade swing faster. Use alongside <see cref="ReinforcedSwingSpeed"/> to balance the rate of fire with the attack duration.</remarks>
+	public int SwingsPerAttack = 6;
+	public float SwingDamage = 1f;
+	public float ReinforcedSwingDamage = 0.4f;
+	/// <summary>The percentage of the blade texture's height to offset its position when held.</summary>
+	public float HoldOffset = 0.25f;
+	/// <summary>The offset for the sheath texture when drawn, if <see cref="DrawSheath"/> is enabled.</summary>
+	public Vector2 SheathOffset = Vector2.Zero;
+	public float DashVelocity = 20f;
+	public float SwingVelocity = 0.5f;
+	public float ReinforcedSwingVelocity = 1.5f;
+	/// <summary>Controls the random variation (in radians) that the basic swing attack's slash projectile bends.</summary>
+	/// <remarks>This value is passed into the slash projectile as <c>ai[0]</c>, as the lower and upper bounds of <c>NextFloat</c> when not reinforced.</remarks>
+	public float SwingBend = 0f;
+	/// <summary>Controls the random variation (in radians) that the reinforced attack's slash projectiles bend.</summary>
+	/// <remarks>This value is passed into the slash projectile as <c>ai[0]</c>, as the lower and upper bounds of <c>NextFloat</c> when reinforced.</remarks>
+	public float ReinforcedSwingBend = 0.025f;
+	
+	public int SwingStyle = 0;
+	public int ReinforcedSwingStyle = 1;
+	
+	/// <summary>The amount of animation frames this weapon has.</summary>
 	public int FencingBladeFrames = 1;
+	/// <summary>Whether the sheath should be drawn. If false, the sword will always be drawn.</summary>
 	public bool DrawSheath = true;
 	
 	public virtual void OnHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, NPC.HitInfo hit) { } // Called when hitting a target during an attack
 	public virtual void OnHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, NPC.HitInfo hit) { } // Called when hitting the first target for the first time during an attack
 	public virtual void FencingBladeModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref NPC.HitModifiers modifiers, bool firstHit) { } // anchor's modifyhitNPC
-	public virtual void OnAttack(Player player, OrchidGuardian guardian, Projectile projectile, bool charged, bool first) { } // Called on the first frame of an attack
+	public virtual bool OnSwing(Player player, OrchidGuardian guardian, Projectile projectile, bool reinforced, ref int damage) => true; // Called on the first frame of an attack
+	public virtual void OnStartAttack(Player player, OrchidGuardian guardian, Projectile projectile, bool charged, bool first) { } // Called on the first frame of an attack
 	public virtual void OnParryFencingBlade(Player player, OrchidGuardian guardian, Entity aggressor, Projectile anchor) { } // Called on parrying anything
+	public virtual bool PreDash(Player player, OrchidGuardian guardian, Projectile anchor) => guardian.UseSlam();
 	public virtual void ExtraAIFencingBlade(Player player, OrchidGuardian guardian, Projectile anchor) {}
 	public virtual void PostDrawFencingBlade(SpriteBatch spriteBatch, Projectile projectile, Player player, Color lightColor) { }
 	public virtual bool PreDrawFencingBlade(SpriteBatch spriteBatch, Projectile projectile, Player player, ref Color lightColor) => true;
 	
-	public virtual Color GetColor() => Color.White;
+	public virtual Color GetColor(Player player, OrchidGuardian guardian, Projectile anchor) => Color.White;
 	public virtual Color GetFencingBladeGlowmaskColor(Player player, OrchidGuardian guardian, Projectile projectile, bool sheath, Color lightColor) => Color.White;
 	public virtual bool ProjectileAI(Player player, Projectile projectile, bool charged) => true;
 	
@@ -55,6 +80,8 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 	public sealed override void OnParry(Player player, OrchidGuardian guardian, Entity aggressor, Projectile anchor)
 	{
 		anchor.ai[0] = 61f;
+		anchor.ai[2] = Vector2.Normalize(Main.MouseWorld - player.MountedCenter).ToRotation() - MathHelper.PiOver2;
+		guardian.OnAttack(AttackID.FencingBladeCounter, this);
 		((GuardianFencingBladeAnchor)anchor.ModProjectile).NeedNetUpdate = true;
 		OnParryFencingBlade(player, guardian, aggressor, anchor);
 	}
@@ -146,7 +173,7 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 		{
 			var proj = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == AnchorType);
 			if (proj != null && proj.ModProjectile is GuardianFencingBladeAnchor fencingBlade && fencingBlade.SelectedItem != player.selectedItem)
-					fencingBlade.OnChangeSelectedItem(player);
+				fencingBlade.OnChangeSelectedItem(player);
 		}
 		SafeHoldItem(player);
 	}

@@ -4,46 +4,58 @@
         <name>OrchidMod</name>
     </assembly>
     <members>
+        <member name="F:OrchidMod.Common.ModObjects.OrchidPlayer.ForcedVelocityVector">
+            <summary>Vector the player will be moved every frame if ForcedVelocityTimer > 0, ignoring normal velocity.</summary>
+        </member>
+        <member name="F:OrchidMod.Common.ModObjects.OrchidPlayer.ForcedVelocityUpkeep">
+            <summary>Multiplier of ForcedVelocityVector the player velocity is set to after ForcedVelocityTimer expires.</summary>
+        </member>
+        <member name="F:OrchidMod.Common.ModObjects.OrchidPlayer.ForcedVelocityIgnoresPlatforms">
+            <summary>If set to true, the player will phase through solid-top tiles. resets to false when ForcedVelocityTimer expires.</summary>
+        </member>
+        <member name="F:OrchidMod.Common.ModObjects.OrchidPlayer.ForcedVelocityTimer">
+            <summary>How long should the forced velocity be kept.</summary>
+        </member>
         <member name="F:OrchidMod.Common.ModObjects.OrchidPlayer.LastHitNPC">
-            <summary> The last NPC referenced in OnHitNPC() for this player</summary>
+            <summary>The last NPC referenced in OnHitNPC() for this player</summary>
         </member>
         <member name="F:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTapping">
-            <summary> Set to 15 after a tap, decremented every frame. Registers a double tap and resets to 0 if another tap is input while above 0.</summary>
-            <remarks> Up = 0, Right = 1, Down = 2, Left = 3</remarks>
+            <summary>Set to 15 after a tap, decremented every frame. Registers a double tap and resets to 0 if another tap is input while above 0.</summary>
+            <remarks>Up = 0, Right = 1, Down = 2, Left = 3</remarks>
         </member>
         <member name="F:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTapped">
-            <summary> Set to 15 after a double tap, decremented every frame.</summary>
-            <remarks> Up = 0, Right = 1, Down = 2, Left = 3</remarks>
+            <summary>Set to 15 after a double tap, decremented every frame.</summary>
+            <remarks>Up = 0, Right = 1, Down = 2, Left = 3</remarks>
         </member>
         <member name="P:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTapUp">
-            <summary> The player has double tapped Up on this frame.</summary>
+            <summary>The player has double tapped Up on this frame.</summary>
         </member>
         <member name="P:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTapDown">
-            <summary> The player has double tapped Down on this frame.</summary>
+            <summary>The player has double tapped Down on this frame.</summary>
         </member>
         <member name="P:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTapRight">
-            <summary> The player has double tapped Down on this frame.</summary>
+            <summary>The player has double tapped Down on this frame.</summary>
         </member>
         <member name="P:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTapLeft">
-            <summary> The player has double tapped Right on this frame.</summary>
+            <summary>The player has double tapped Right on this frame.</summary>
         </member>
         <member name="P:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTapSetBonus">
-            <summary> The player has double tapped their Set Bonus key on this frame.</summary>
+            <summary>The player has double tapped their Set Bonus key on this frame.</summary>
         </member>
         <member name="P:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTapAny">
-            <summary> The player has double tapped a direction on this frame.</summary>
+            <summary>The player has double tapped a direction on this frame.</summary>
         </member>
         <member name="P:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTappedUp">
-            <summary> Set to 15 after a double tap. Decremented every frame.</summary>
+            <summary>Set to 15 after a double tap. Decremented every frame.</summary>
         </member>
         <member name="P:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTappedDown">
-            <summary> Set to 15 after a double tap. Decremented every frame.</summary>
+            <summary>Set to 15 after a double tap. Decremented every frame.</summary>
         </member>
         <member name="P:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTappedRight">
-            <summary> Set to 15 after a double tap. Decremented every frame.</summary>
+            <summary>Set to 15 after a double tap. Decremented every frame.</summary>
         </member>
         <member name="P:OrchidMod.Common.ModObjects.OrchidPlayer.DoubleTappedLeft">
-            <summary> Set to 15 after a double tap. Decremented every frame.</summary>
+            <summary>Set to 15 after a double tap. Decremented every frame.</summary>
         </member>
         <member name="F:OrchidMod.Common.ModObjects.OrchidPlayer.TitaniumShards">
             <summary>List of current Orchid Titanium Shards owned by this player.</summary>
@@ -66,14 +78,209 @@
         <member name="M:OrchidMod.Common.ModObjects.OrchidPlayer.SpawnTitaniumShards(Terraria.DataStructures.IEntitySource,System.Int32,System.Int32)">
             <summary>Spawns custom Orchid Titanium Shards, and refreshes the player's Titanium Barrier buff.</summary>
         </member>
+        <member name="F:OrchidMod.Content.Guardian.GuardianAttackInfo.Offense">
+            <summary> Whether this action is responsible for dealing damage or spawning a projectile intended to cause direct damage. Defaults to true when a blank AttackInfo is instanced. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.GuardianAttackInfo.Defense">
+            <summary> Whether this action takes direct action to defend the player, including granting invulnerability, destroying projectiles, or spawning a blocking hitbox. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.GuardianAttackInfo.Guard">
+            <summary> Whether this action is involved in the initiation of a defensive action, including initiating a parry, block or deflect. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.GuardianAttackInfo.Slam">
+            <summary> Whether this action is a slamming attack, including attacks that can consume either a slam or another resource. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.GuardianAttackInfo.charge">
+            <summary> Internal bool not intended for direct use. See <c>Charged</c>. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.GuardianAttackInfo.chargeContext">
+            <summary> Internal bool not intended for direct use. See <c>Jab</c> and <c>Reinforced</c>. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.GuardianAttackInfo.Counter">
+            <summary> Whether this action should be treated as a counterattack. This will automatically be set as part of <c>OrchidGuardian.OnAttack</c> if <c>OrchidGuardian.GuardianCounterTime > 0</c> and <c>Slam</c> is <c>true</c>. </summary>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.GuardianAttackInfo.Charged">
+            <summary> Whether this action consumes a full charge to perform. This is mutually exclusive with <c>Jab</c>, and <c>Reinforced</c> is dependent on this. Setting this to <c>true</c> will disable <c>Jab</c>, and setting this to <c>false</c> will disable <c>Reinforced</c>.</summary>
+            <remarks> See <c>SetCharged()</c>, <c>SetJab()</c>, <c>SetReinforced()</c>, and <c>SetNonCharge()</c> for helper methods for setting these fields. </remarks>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.GuardianAttackInfo.Jab">
+            <summary> Whether this action is a jab, a non-charged attack performed in relation to charging, including during charging or with the primary purpose of accumulating charge or an equivalent resource. </summary>
+            <inheritdoc cref="P:OrchidMod.Content.Guardian.GuardianAttackInfo.Charged"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.GuardianAttackInfo.Reinforced">
+            <summary> Whether this action is reinforced, consuming more than a full charge to perform. This also counts as <c>Charged</c>. </summary>
+            <inheritdoc cref="P:OrchidMod.Content.Guardian.GuardianAttackInfo.Charged"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.GuardianAttackInfo.NonCharge">
+            <summary> Whether this action is unrelated to charging. This will only be true if <c>Charged</c> and <c>Jab</c> are false. </summary>
+            <inheritdoc cref="P:OrchidMod.Content.Guardian.GuardianAttackInfo.Charged"/>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetChargeState(System.Boolean,System.Boolean)">
+            <summary> Use to manually set charge state. </summary>
+            <inheritdoc cref="P:OrchidMod.Content.Guardian.GuardianAttackInfo.Charged"/>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetOffense">
+            <summary> Helper method that flags <c>this.Offense</c> then returns <c>this</c>. </summary>
+            <remarks> Useful for daisy-chaining to quickly set multiple flags. To make a gauntlet slam that also counts as guarding, defending and counterattacking, you can do <c>AttackID.GauntletSlam.SetDefense().SetGuard().SetCounter()</c>.</remarks>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.ResetOffense">
+            <summary> Helper method that disables <c>this.Offense</c> then returns <c>this</c>. </summary>
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetOffense"/>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetDefense">
+            <summary> Helper method that flags <c>this.Defense</c> then returns <c>this</c>. </summary>
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetOffense"/>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetGuard">
+            <summary> Helper method that flags <c>this.Guard</c> then returns <c>this</c>. </summary>
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetOffense"/>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetSlam">
+            <summary> Helper method that flags <c>this.Slam</c> then returns <c>this</c>. </summary>
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetOffense"/>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetCharged">
+            <summary> Helper method that flags <c>this.Charged</c>, disables <c>this.Reinforced</c> and <c>this.Jab</c>, then returns <c>this</c>. Note that <c>Charged</c> is mutually exclusive with <c>Jab</c>. Use <c>SetReinforced</c> instead for reinforced attacks. </summary>
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetOffense"/>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetJab">
+            <summary> Helper method that flags <c>this.Jab</c>, disables <c>this.Charged</c> and <c>this.Reinforced</c>, then returns <c>this</c>. Note that <c>Jab</c> is mutually exclusive with <c>Charged</c> and <c>Reinforced</c>. </summary>
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetOffense"/>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetReinforced">
+            <summary> Helper method that flags <c>this.Charged</c> and <c>this.Reinforced</c>, disables <c>this.Jab</c>, then returns <c>this</c>. Note that <c>Charged</c> is mutually exclusive with <c>Jab</c>. </summary>
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetOffense"/>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetNonCharge">
+            <summary> Helper method that disables <c>this.Charged</c>, <c>this.Reinforced</c>, and <c>this.Jab</c>, then returns <c>this</c>.</summary>
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetOffense"/>
+        </member>
+        <member name="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetCounter">
+            <summary> Helper method that flags <c>this.Counter</c> then returns <c>this</c>. </summary>
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.GuardianAttackInfo.SetOffense"/>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.Bash">
+            <summary> AttackInfo with Offense. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.Defend">
+            <summary> AttackInfo with Defense. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.Guard">
+            <summary> AttackInfo with Guard. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.GuardAttack">
+            <summary> AttackInfo with Offense and Guard. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.Block">
+            <summary> AttackInfo with Defense and Guard. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.BlockAttack">
+            <summary> AttackInfo with Offense, Defense, and Guard. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.Slam">
+            <summary> Attackinfo with Offense and Slam. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.ChargedBuff">
+            <summary> Attackinfo with Charged. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.Charged">
+            <summary> Attackinfo with Offense and Charged. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.ChargedBlock">
+            <summary> Attackinfo with Defense, Guard, and Charged. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.ChargedSlam">
+            <summary> Attackinfo with Offense, Slam and Charged. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.Jab">
+            <summary> Attackinfo with Offense and Jab. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.ReinforcedBuff">
+            <summary> Attackinfo with Reinforced. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.AttackID.CounterDefend">
+            <summary> Attackinfo with Offense, Defense and Counter. </summary>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.ShieldBlock">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Block"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.ShieldCharge">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.ChargedBlock"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.ShieldBash">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Bash"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.ShieldSlam">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Slam"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.HammerSwing">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Jab"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.HammerBash">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Bash"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.HammerCharge">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Charged"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.HammerBlock">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.BlockAttack"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.RuneCharge">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.ChargedBuff"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.RuneReinforce">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.ReinforcedBuff"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.GauntletJab">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Jab"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.GauntletSlam">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Slam"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.GauntletCharge">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.ChargedSlam"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.GauntletGuard">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Guard"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.Parry">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Defend"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.StandardCharge">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.ChargedBuff"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.StandardReinforce">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.ReinforcedBuff"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.QuarterstaffJab">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Jab"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.QuarterstaffCharge">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Charged"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.QuarterstaffGuard">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Guard"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.QuarterstaffCounter">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.CounterDefend"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.KatarSlam">
+            <inheritdoc cref="P:OrchidMod.Content.Guardian.AttackID.KatarSlam"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.KatarCharge">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.Charged"/>
+        </member>
+        <member name="P:OrchidMod.Content.Guardian.AttackID.KatarDash">
+            <inheritdoc cref="F:OrchidMod.Content.Guardian.AttackID.GuardAttack"/>
+        </member>
         <member name="M:OrchidMod.Content.Guardian.GuardianQuarterstaffAnchor.DoAnimStyle(System.Int32,System.Single,Terraria.Audio.SoundStyle,System.Boolean)">
             <summary>Executes the given animation style. <c>ai</c> should begin at 40 and decrement to 0 for the animation to play in correct order.</summary>
             <remarks>Animation style IDs<br/>
             0: Jab (default jab)<br/>
             1: Double swing (default swing)<br/>
             2: Single swing, upward<br/>
-            2: Single swing, downward <br/>
-            3: 360° swing (default counterattack)<br/>
+            3: Single swing, downward <br/>
+            4: 360° swing (default counterattack)<br/>
             </remarks>
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.OnPunch(Terraria.Player,OrchidMod.OrchidGuardian,Terraria.Projectile,System.Boolean,System.Boolean,System.Boolean@,System.Int32@)">
@@ -250,6 +457,9 @@
         <member name="P:OrchidMod.Content.Guardian.OrchidModGuardianItem.AnchorType">
             <summary>The relevant anchor type this item spawns, if not null.</summary>
         </member>
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianItem.ModifyAttackInfo(OrchidMod.Content.Guardian.GuardianAttackInfo@)">
+            <summary> Called when an anchor spawned by this item calls <c>OrchidGuardian.OnAttack</c> to trigger attack-related effects like set bonuses or accessories. Modify the <c>GuardianAttackInfo</c> reference to change what attack-related effects it triggers. <c>GuardianAttackInfo.Counter</c> will automatically be set to <c>true</c> if <c>GuardianAttackInfo.Slam</c> is <c>true</c> and the player meets the conditions for a counterattack, and if <c>GuardianAttackInfo.Counter</c> is <c>true</c> after this function, <c>OrchidGuardian.GuardianCounterTime</c> will be reset. Return <c>false</c> to prevent triggering any effects. Returns <c>true</c> by default. </summary>
+        </member>
         <member name="P:OrchidMod.Content.Guardian.OrchidModGuardianKatar.KatarTexture">
             <summary> Path to the texture of the held katar. </summary>
         </member>
@@ -422,6 +632,10 @@
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianQuarterstaff.QuarterstaffPostDrawUI(Microsoft.Xna.Framework.Graphics.SpriteBatch,Terraria.Player,Microsoft.Xna.Framework.Color@,Terraria.Projectile)">
             <summary>Draws extra UI elements on the GuardianUIState while held.</summary>
         </member>
+        <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianQuarterstaff.ModifyAttackInfo(OrchidMod.Content.Guardian.GuardianAttackInfo@)">
+            <remarks> Quarterstaves use this by default to set their parry action as <c>Offense</c> and <c>Counter</c>. When overriding this, set <c>Offense</c> and <c>Counter</c> if <c>Defense</c> is set unless intending to replace default quarterstaff counterattack functionality. </remarks>
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.OrchidModGuardianItem.ModifyAttackInfo(OrchidMod.Content.Guardian.GuardianAttackInfo@)"/>
+        </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianShield.SlamHitFirst(Terraria.Player,Terraria.Projectile,Terraria.NPC,System.Boolean)">
             <summary>Called once per slam, when the slam first hits an enemy.</summary>
         </member>
@@ -478,7 +692,7 @@
             If true, slams performed with the shield will be locked to the rotation they started with, rather than being free to rotate mid-slam.
             </summary>
         </member>
-        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianShield.parryRotation">
+        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianShield.blockRotation">
             <summary>How fast the pavise rotates towards the player cursor while blocking. Arbitrary value, defaults to 10f.</summary>
         </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianShield.ChargeSpeedMultiplier">
@@ -784,6 +998,17 @@
         </member>
         <member name="M:OrchidMod.OrchidGuardian.ResetStandards(System.Boolean)">
             <summary>Resets all boolean-controlled Standard effects. Called in OrchidGuardian.ResetEffects and GuardianStandardAnchor when a standard is switched. forceReset controls whether to respect OrchidGuardian.GuardianStandardBuffer to give one frame  of leeway.</summary>
+        </member>
+        <member name="M:OrchidMod.OrchidGuardian.DoParryItemParry(Terraria.Entity)">
+            <remarks> Calls <c>OnAttack</c> with <c>AttackID.Parry</c>. Use overload to override. </remarks>
+            <inheritdoc cref="M:OrchidMod.OrchidGuardian.DoParryItemParry(Terraria.Entity,OrchidMod.Content.Guardian.GuardianAttackInfo)"/>
+        </member>
+        <member name="M:OrchidMod.OrchidGuardian.DoParryItemParry(Terraria.Entity,OrchidMod.Content.Guardian.GuardianAttackInfo)">
+            <summary> Performs parrying actions if the player is holding a parryItem, including giving the player invulnerability, triggering the parryItem's parrying related functions, and the player's responses to guarding enemies or projectiles, depending on the aggressor. </summary>
+            <remarks> <c>attack</c> is the GuardianAttackInfo that will be supplied for <c>OnAttack</c>, and defaults to <c>AttackID.Parry</c> in simplified overload. </remarks>
+        </member>
+        <member name="M:OrchidMod.OrchidGuardian.OnAttack(OrchidMod.Content.Guardian.GuardianAttackInfo,OrchidMod.Content.Guardian.OrchidModGuardianItem)">
+            <summary> Should be called when the player performs any action with a guardian weapon. Uses <c>GuardianAttackInfo</c> to determine attack context. </summary>
         </member>
         <member name="F:OrchidMod.OrchidShaman.NearestTarget">
             <summary> Array position in <c>Main.NPC</c> of the nearest valid target NPC for ShamanWeapons to attack. Set to -1 by default and if the player has no active ShamanWeapons.</summary>

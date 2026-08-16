@@ -79,7 +79,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Gauntlets
 				SoundEngine.PlaySound(SoundID.Item14, player.Center);
 				Vector2 playerDashVelocity = Vector2.UnitY.RotatedBy((Main.MouseWorld - player.Center).ToRotation() - MathHelper.PiOver2) * 15f;
 				guardian.modPlayer.ForcedVelocityVector = playerDashVelocity;
-				guardian.modPlayer.ForcedVelocityTimer = 20;
+				guardian.modPlayer.ForcedVelocityTimer = 26;
 				guardian.modPlayer.PlayerImmunity = 20;
 				guardian.modPlayer.ForcedVelocityUpkeep = 0.3f;
 

@@ -29,38 +29,43 @@ namespace OrchidMod.Common.ModObjects
 		public int originalSelectedItem;
 		public bool autoRevertSelectedItem = false;
 		public int PlayerImmunity = 0; // Player is immune if this is >0
-		public Vector2 ForcedVelocityVector = Vector2.Zero; // vector the player will be moved every frame if ForcedVelocityTimer > 0, ignoring normal velocity
-		public float ForcedVelocityUpkeep = 0f; // Should the forced velocity be applied to the player velocity when it ends
-		public int ForcedVelocityTimer = 0; // How long should the forced velocity be kept
+		/// <summary>Vector the player will be moved every frame if ForcedVelocityTimer > 0, ignoring normal velocity.</summary>
+		public Vector2 ForcedVelocityVector = Vector2.Zero;
+		/// <summary>Multiplier of ForcedVelocityVector the player velocity is set to after ForcedVelocityTimer expires.</summary>
+		public float ForcedVelocityUpkeep = 0f;
+		/// <summary>If set to true, the player will phase through solid-top tiles. resets to false when ForcedVelocityTimer expires.</summary>
+		public bool ForcedVelocityIgnoresPlatforms = false;
+		/// <summary>How long should the forced velocity be kept.</summary>
+		public int ForcedVelocityTimer = 0;
 		public bool OrchidDoubleDash = false;
 		public int OrchidDoubleDashCD = 0;
-		/// <summary> The last NPC referenced in OnHitNPC() for this player</summary>
+		/// <summary>The last NPC referenced in OnHitNPC() for this player</summary>
 		public NPC LastHitNPC = null;
-		/// <summary> Set to 15 after a tap, decremented every frame. Registers a double tap and resets to 0 if another tap is input while above 0.</summary>
-		/// <remarks> Up = 0, Right = 1, Down = 2, Left = 3</remarks>
+		/// <summary>Set to 15 after a tap, decremented every frame. Registers a double tap and resets to 0 if another tap is input while above 0.</summary>
+		/// <remarks>Up = 0, Right = 1, Down = 2, Left = 3</remarks>
 		public int[] DoubleTapping = new int[4]; 
-		/// <summary> Set to 15 after a double tap, decremented every frame.</summary>
-		/// <remarks> Up = 0, Right = 1, Down = 2, Left = 3</remarks>
+		/// <summary>Set to 15 after a double tap, decremented every frame.</summary>
+		/// <remarks>Up = 0, Right = 1, Down = 2, Left = 3</remarks>
 		public int[] DoubleTapped = new int[4];
-		/// <summary> The player has double tapped Up on this frame.</summary>
+		/// <summary>The player has double tapped Up on this frame.</summary>
 		public bool DoubleTapUp => DoubleTapped[0] == 15;
-		/// <summary> The player has double tapped Down on this frame.</summary>
+		/// <summary>The player has double tapped Down on this frame.</summary>
 		public bool DoubleTapDown => DoubleTapped[1] == 15;
-		/// <summary> The player has double tapped Down on this frame.</summary>
+		/// <summary>The player has double tapped Down on this frame.</summary>
 		public bool DoubleTapRight => DoubleTapped[2] == 15;
-		/// <summary> The player has double tapped Right on this frame.</summary>
+		/// <summary>The player has double tapped Right on this frame.</summary>
 		public bool DoubleTapLeft => DoubleTapped[3] == 15;
-		/// <summary> The player has double tapped their Set Bonus key on this frame.</summary>
+		/// <summary>The player has double tapped their Set Bonus key on this frame.</summary>
 		public bool DoubleTapSetBonus => (DoubleTapDown && !Main.ReversedUpDownArmorSetBonuses) || (DoubleTapUp && Main.ReversedUpDownArmorSetBonuses);
-		/// <summary> The player has double tapped a direction on this frame.</summary>
+		/// <summary>The player has double tapped a direction on this frame.</summary>
 		public bool DoubleTapAny => DoubleTapUp || DoubleTapDown || DoubleTapRight || DoubleTapLeft; 
-		/// <summary> Set to 15 after a double tap. Decremented every frame.</summary>
+		/// <summary>Set to 15 after a double tap. Decremented every frame.</summary>
 		public ref int DoubleTappedUp => ref DoubleTapped[0];
-		/// <summary> Set to 15 after a double tap. Decremented every frame.</summary>
+		/// <summary>Set to 15 after a double tap. Decremented every frame.</summary>
 		public ref int DoubleTappedDown => ref DoubleTapped[1];
-		/// <summary> Set to 15 after a double tap. Decremented every frame.</summary>
+		/// <summary>Set to 15 after a double tap. Decremented every frame.</summary>
 		public ref int DoubleTappedRight => ref DoubleTapped[2];
-		/// <summary> Set to 15 after a double tap. Decremented every frame.</summary>
+		/// <summary>Set to 15 after a double tap. Decremented every frame.</summary>
 		public ref int DoubleTappedLeft => ref DoubleTapped[3];
 		/// <summary>List of current Orchid Titanium Shards owned by this player.</summary>
 		public List<Projectile> TitaniumShards = new List<Projectile>();
@@ -218,23 +223,26 @@ namespace OrchidMod.Common.ModObjects
 
 			if (ForcedVelocityTimer > 0)
 			{
+				ForcedVelocityTimer--;
+
 				if (ForcedVelocityTimer <= 0)
-				{
+				{ // resets fields after the forcedvelocity ends
+					Player.velocity = ForcedVelocityVector * ForcedVelocityUpkeep;
 					ForcedVelocityVector = Vector2.Zero;
 					ForcedVelocityUpkeep = 0f;
+					ForcedVelocityIgnoresPlatforms = false;
 				}
 				else
 				{
 					Player.velocity = Vector2.Zero;
-					Player.velocity = ForcedVelocityVector * ForcedVelocityUpkeep;
 					Vector2 addedVelocity = Vector2.Zero;
 					for (int i = 0; i < 10; i++)
-						addedVelocity += Collision.TileCollision(Player.position + addedVelocity, ForcedVelocityVector * 0.1f, Player.width, Player.height, false, false, (int)Player.gravDir);
+					{
+						addedVelocity += Collision.TileCollision(Player.position + addedVelocity, ForcedVelocityVector * 0.1f, Player.width, Player.height, ForcedVelocityIgnoresPlatforms, ForcedVelocityIgnoresPlatforms, (int)Player.gravDir);
+					}
 
 					Player.position += addedVelocity;
 				}
-
-				ForcedVelocityTimer--;
 			}
 
 			OrchidDamageResistance = 1f;

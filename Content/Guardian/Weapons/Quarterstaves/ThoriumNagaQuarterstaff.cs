@@ -167,7 +167,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
             {
                 if (waterAttack == 1)
                 {
-                    orchidPlayer.ForcedVelocityVector *= 2;
+                    orchidPlayer.ForcedVelocityVector *= 4;
                     orchidPlayer.ForcedVelocityTimer = 1;
                     orchidPlayer.ForcedVelocityUpkeep = 1;
 

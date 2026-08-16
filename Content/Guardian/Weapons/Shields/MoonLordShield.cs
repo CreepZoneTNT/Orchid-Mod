@@ -48,7 +48,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 						OrchidPlayer orchidPlayer = player.GetModPlayer<OrchidPlayer>();
 						Vector2 playerDashVelocity = Vector2.UnitY.RotatedBy((player.Center - Main.MouseWorld).ToRotation() - MathHelper.PiOver2) * 20f;
 						orchidPlayer.ForcedVelocityVector = playerDashVelocity;
-						orchidPlayer.ForcedVelocityTimer = 5;
+						orchidPlayer.ForcedVelocityTimer = 10;
 						orchidPlayer.ForcedVelocityUpkeep = 1f;
 					}
 				}

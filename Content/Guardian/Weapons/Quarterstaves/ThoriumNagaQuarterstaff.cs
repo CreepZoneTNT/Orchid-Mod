@@ -178,16 +178,11 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
             }
             else
             {
-                waterAttack = 0;
-                waterAttackSuper = 0;
-                waterAttackCooldown = 0;
-            }
-            
-            if (wasUnderWater && !underWater && waterAttack == 1) // Dolphin leap
-            {
-                orchidPlayer.ForcedVelocityVector *= 2;
-                orchidPlayer.ForcedVelocityTimer = 1;
-                orchidPlayer.ForcedVelocityUpkeep = 1;
+                if (waterAttack == 1)
+                {
+                    orchidPlayer.ForcedVelocityVector *= 4;
+                    orchidPlayer.ForcedVelocityTimer = 1;
+                    orchidPlayer.ForcedVelocityUpkeep = 1;
 
                 for (int i = 0; i < 10; i++)
                 {

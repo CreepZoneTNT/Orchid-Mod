@@ -81,7 +81,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Gauntlets
 				guardian.modPlayer.ForcedVelocityVector = playerDashVelocity;
 				guardian.modPlayer.ForcedVelocityTimer = 26;
 				guardian.modPlayer.PlayerImmunity = 20;
-				guardian.modPlayer.ForcedVelocityUpkeep = 0.3f;
+				guardian.modPlayer.ForcedVelocityUpkeep = 0.23f;
+				guardian.modPlayer.ForcedVelocityIgnoresPlatforms = true;
 
 				int projectileType = ModContent.ProjectileType<MechanicalGauntletProjectile>();
 				Projectile newProjectile = Projectile.NewProjectileDirect(Item.GetSource_FromAI(), projectile.Center, guardian.modPlayer.ForcedVelocityVector, projectileType, guardian.GetGuardianDamage(Item.damage) * 2, Item.knockBack, player.whoAmI);

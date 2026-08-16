@@ -605,11 +605,10 @@ namespace OrchidMod
 					{
 						if (Main.projectile[katar.GetAnchors(Player)[1]].ModProjectile is GuardianKatarAnchor anchor && anchor.KatarDashTimer > 1)
 						{
-							Vector2 intendedVelocity = Vector2.UnitY.RotatedBy(anchor.KatarDashAngle) * -katar.ParryDashSpeed;
-							Player.velocity = intendedVelocity;
-							Player.direction = intendedVelocity.X > 0 ? 1 : -1;
-							Player.fallStart = (int)(Player.position.Y / 16);
-							Player.maxFallSpeed = katar.ParryDashSpeed;
+							modPlayer.ForcedVelocityIgnoresPlatforms = true;
+							modPlayer.ForcedVelocityTimer = 2;
+							modPlayer.ForcedVelocityUpkeep = katar.ParryDashMomentum;
+							modPlayer.ForcedVelocityVector = Vector2.UnitY.RotatedBy(anchor.KatarDashAngle) * -katar.ParryDashSpeed;
 						}
 					}
 				}

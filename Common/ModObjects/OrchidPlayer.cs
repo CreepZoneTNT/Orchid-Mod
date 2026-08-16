@@ -223,6 +223,8 @@ namespace OrchidMod.Common.ModObjects
 
 			if (ForcedVelocityTimer > 0)
 			{
+				Player.fallStart = (int)(Player.position.Y / 16);
+				Player.maxFallSpeed = ForcedVelocityVector.Length();
 				ForcedVelocityTimer--;
 
 				if (ForcedVelocityTimer <= 0)
@@ -231,17 +233,19 @@ namespace OrchidMod.Common.ModObjects
 					ForcedVelocityVector = Vector2.Zero;
 					ForcedVelocityUpkeep = 0f;
 					ForcedVelocityIgnoresPlatforms = false;
+					Player.direction = Player.velocity.X > 0 ? 1 : -1;
 				}
 				else
 				{
-					Player.velocity = Vector2.Zero;
 					Vector2 addedVelocity = Vector2.Zero;
 					for (int i = 0; i < 10; i++)
 					{
-						addedVelocity += Collision.TileCollision(Player.position + addedVelocity, ForcedVelocityVector * 0.1f, Player.width, Player.height, ForcedVelocityIgnoresPlatforms, ForcedVelocityIgnoresPlatforms, (int)Player.gravDir);
+						addedVelocity += Collision.TileCollision(Player.position + addedVelocity, ForcedVelocityVector * 0.1f, Player.width, Player.height, ForcedVelocityIgnoresPlatforms, false, (int)Player.gravDir);
 					}
 
+					Player.velocity = addedVelocity * 0.001f; // if set to 0, this causes weird issues with slopes & solid top tiles
 					Player.position += addedVelocity;
+					Player.direction = addedVelocity.X > 0 ? 1 : -1;
 				}
 			}
 

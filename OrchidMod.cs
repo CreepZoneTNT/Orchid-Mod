@@ -17,6 +17,7 @@ using Terraria.Graphics.Shaders;
 using OrchidMod.Content.Shapeshifter;
 using Terraria.ModLoader.IO;
 using OrchidMod.Content.Guardian;
+using OrchidMod.Content.Guardian.Projectiles.Misc;
 using Terraria.Audio;
 
 namespace OrchidMod
@@ -249,6 +250,71 @@ namespace OrchidMod
 					Logger.WarnFormat("OrchidMod: Unknown Message type: {0}", msgType);
 					break;
 			}
+		}
+
+		public override object Call(params object[] args)
+		{
+			if (args is null)
+				throw new ArgumentNullException(nameof(args), "OrchidMod: Call failed, arguments cannot be empty!");
+			if (args.Length == 0)
+				throw new ArgumentException("OrchidMod: Call failed, must have at least 1 argument!");
+			
+			if (args[0] is string function)
+			{
+				switch (function)
+				{
+					case "GetGuardianSlam" or "GetGuardianSlamMax" or "GetGuardianGuard" or "GetGuardianGuardMax":
+						if (args.Length != 2)
+							return new ArgumentException($"OrchidMod: {nameof(function)} call failed, must have exactly 2 arguments ([string] call name, [Player] player instance / [int] player index)");
+						if (args[1] is not int or Player)
+							return new ArgumentException($"OrchidMod: {nameof(function)} call failed, second argument {args[1].GetType().Name} is not an int or a Player!");
+						Player guardianPlayer = GetPlayerFromArg(args[1]);
+						if (guardianPlayer is null)
+							return new NullReferenceException($"OrchidMod: {nameof(function)} call failed, {nameof(guardianPlayer)} is not a valid player instance!");
+						OrchidGuardian guardian = guardianPlayer.Guardian();
+						return function switch
+						{
+							"GetGuardianSlam" => guardian.GuardianSlam,
+							"GetGuardianSlamMax" => guardian.GuardianSlamMax,
+							"GetGuardianGuard" => guardian.GuardianGuard,
+							"GetGuardianGuardMax" => guardian.GuardianGuardMax,
+							_ => 0
+						};
+					case "AddProjectileToGuardianBlacklist":
+						if (args.Length != 2)
+							throw new ArgumentException("OrchidMod: AddProjectileToGuardianBlacklist failed, must have exactly 2 arguments ([string] call name, [int] projectile ID)");
+						if (args[1] is not int projectileID)
+							throw new Exception($"OrchidMod: AddProjectileToGuardianBlacklist call failed, first argument {args[1].GetType().Name} is not an int!");
+						if (projectileID > ProjectileLoader.ProjectileCount || projectileID < 0)
+							throw new Exception($"OrchidMod: AddProjectileToGuardianBlacklist call failed, first argument {projectileID} is not a valid projectile ID!");
+						
+						if (OrchidGuardian.ProjectilesBlockBlacklist.Contains(projectileID))
+							Logger.WarnFormat("OrchidMod: OrchidGuardian.ProjectilesBlockBlacklist already contains an entry for {0}", ContentSamples.ProjectilesByType[projectileID].Name);
+						OrchidGuardian.ProjectilesBlockBlacklist.Add(projectileID);
+						break;
+					case "AddHorizonDevName":
+						if (args[1] is not string devName)
+							throw new Exception($"OrchidMod: AddHorizonDevName call failed, first argument {args[1].GetType().Name} is not a string!");
+						if (args[2] is not GuardianHorizonLanceProj.HorizonColor horizonColor)
+							throw new Exception($"OrchidMod: AddHorizonDevName call failed, second argument {args[2].GetType().Name} is not a valid HorizonColor entry!");
+
+						if (!GuardianHorizonLanceProj.HorizonColorLoader.TryAdd(devName, horizonColor))
+							throw new Exception($"OrchidMod: AddHorizonDevName call failed, there already exists a color entry for the name \"{devName}\"!");
+						break;
+					
+				}
+			}
+			return false;
+		}
+
+		public static Player GetPlayerFromArg(object player)
+		{
+			return player switch
+			{
+				int index => Main.player[index],
+				Player instance => instance,
+				_ => null
+			};
 		}
 	}
 }

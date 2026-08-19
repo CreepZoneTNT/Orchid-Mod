@@ -309,12 +309,13 @@ namespace OrchidMod.Content.Guardian
 			}
 
 			int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Knockback"));
+			
+			string click = OrchidUtils.GetClickInfoTooltip();
 
 			if (!CannotBlock)
 			{
-				tooltips.Insert(index + 1, new TooltipLine(Mod, "BlockDuration", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.BlockDuration", OrchidUtils.FramesToSeconds((int)(BlockDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianBlockDuration)))));
+				tooltips.Insert(index + 1, new TooltipLine(Mod, "BlockDuration", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.BlockDuration", OrchidUtils.FramesToSeconds((int)guardian.GetBlockDuration(Item, BlockDuration)))));
 
-				string click = Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
 				string block = "Mods.OrchidMod.UI.GuardianItem.Block";
 				if (!(GuardBlockCost == 1 && SlamBlockCost == 0))
 				{
@@ -322,14 +323,14 @@ namespace OrchidMod.Content.Guardian
 					if (SlamBlockCost > 0) block += "Slam";
 					if (GuardBlockCost == SlamBlockCost) block += "Same";
 				}
-				tooltips.Insert(index + 2, new TooltipLine(Mod, "ClickInfo", Language.GetText(block).Format(click, GuardBlockCost, SlamBlockCost))
+				tooltips.Insert(index + 2, new TooltipLine(Mod, "ClickInfo", Language.GetTextValue(block, click, GuardBlockCost, SlamBlockCost))
 				{
 					OverrideColor = new Color(175, 255, 175)
 				});
 			}
 
 			string ChargeToThrow = Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ChargeToThrow");
-			if (!CannotSwing) ChargeToThrow = Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.SwingWhileCharging");
+			if (!CannotSwing) ChargeToThrow = Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.SwingWhileCharging", click);
 			tooltips.Insert(index + (!CannotBlock ? 3 : 1), new TooltipLine(Mod, "Swing", ChargeToThrow)
 			{
 				OverrideColor = new Color(175, 255, 175)

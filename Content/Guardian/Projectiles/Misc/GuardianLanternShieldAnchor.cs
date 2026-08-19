@@ -16,7 +16,6 @@ using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using ThoriumMod.Tiles;
 using static Terraria.Player;
 
 namespace OrchidMod.Content.Guardian.Projectiles.Misc;
@@ -286,7 +285,7 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 						}
 					}
 						
-					if (guardian.GuardianShowDebugVisuals)
+					if (guardian.GuardianDebugVisuals == 1)
 					{
 
 						Vector2 vector = Hitbox;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using OrchidMod.Common.ModObjects;
+using OrchidMod.Content.General.Prefixes;
 using OrchidMod.Content.Guardian.Buffs;
 using OrchidMod.Content.Guardian.Projectiles.Misc;
 using OrchidMod.Content.Guardian.Projectiles.Standards;
@@ -723,11 +724,20 @@ namespace OrchidMod.Content.Guardian
 					{
 						if (Main.projectile[katar.GetAnchors(Player)[1]].ModProjectile is GuardianKatarAnchor anchor && anchor.KatarDashTimer > 1)
 						{
-							Vector2 intendedVelocity = Vector2.UnitY.RotatedBy(anchor.KatarDashAngle) * -katar.ParryDashSpeed;
-							Player.velocity = intendedVelocity;
-							Player.direction = intendedVelocity.X > 0 ? 1 : -1;
-							Player.fallStart = (int)(Player.position.Y / 16);
-							Player.maxFallSpeed = katar.ParryDashSpeed;
+							modPlayer.ForcedVelocityIgnoresPlatforms = true;
+							modPlayer.ForcedVelocityTimer = 2;
+							modPlayer.ForcedVelocityUpkeep = katar.ParryDashMomentum;
+							modPlayer.ForcedVelocityVector = Vector2.UnitY.RotatedBy(anchor.KatarDashAngle) * -katar.ParryDashSpeed;
+						}
+					}
+					else if (Player.HeldItem.ModItem is OrchidModGuardianFencingBlade fencingBlade && fencingBlade.GetAnchor(Player) != -1)
+					{
+						if (Main.projectile[fencingBlade.GetAnchor(Player)].ModProjectile is GuardianFencingBladeAnchor anchor && anchor.FencingBladeDashTimer > 1)
+						{
+							modPlayer.ForcedVelocityIgnoresPlatforms = true;
+							modPlayer.ForcedVelocityTimer = 2;
+							modPlayer.ForcedVelocityUpkeep = fencingBlade.DashMomentum;
+							modPlayer.ForcedVelocityVector = Vector2.UnitY.RotatedBy(anchor.FencingBladeDashAngle) * -fencingBlade.DashSpeed;
 						}
 					}
 				}
@@ -1402,6 +1412,7 @@ namespace OrchidMod.Content.Guardian
 			return 4;
 		}
 		
-		public void ThoriumForceShieldHealth() {}
+		public float GetParryDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianParryDuration;
+		public float GetBlockDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianBlockDuration;
 	}
 }

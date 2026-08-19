@@ -194,5 +194,11 @@
 		public static GuardianAttackInfo KatarCharge => Charged;
 		/// <inheritdoc cref="GuardAttack"/>
 		public static GuardianAttackInfo KatarDash => GuardAttack;
+		
+		public static GuardianAttackInfo FencingBladeGuard => Guard;
+		public static GuardianAttackInfo FencingBladeSlash => Slam;
+		public static GuardianAttackInfo FencingBladeCounter => CounterDefend;
+		public static GuardianAttackInfo FencingBladeReinforcedSlash => Charged;
+		public static GuardianAttackInfo FencingBladeDash => GuardAttack;
 	}
 }

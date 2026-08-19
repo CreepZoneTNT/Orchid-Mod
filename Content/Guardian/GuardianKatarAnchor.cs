@@ -230,8 +230,6 @@ namespace OrchidMod.Content.Guardian
 						}
 						else
 						{
-							owner.velocity *= guardianItem.ParryDashMomentum;
-
 							for (int i = 0; i < 5; i++)
 							{
 								Dust dust = Dust.NewDustDirect(owner.Center, 0, 0, DustID.Smoke);

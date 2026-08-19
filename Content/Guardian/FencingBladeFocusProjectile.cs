@@ -10,7 +10,7 @@ using Terraria.ModLoader;
 
 namespace OrchidMod.Content.Guardian
 {
-	public class FencingBladeSlashProjectile : OrchidModGuardianAnchor
+	public class FencingBladeFocusProjectile : OrchidModGuardianAnchor
 	{
 		private static Texture2D TextureMain;
 		public OrchidModGuardianFencingBlade FencingBladeItem;

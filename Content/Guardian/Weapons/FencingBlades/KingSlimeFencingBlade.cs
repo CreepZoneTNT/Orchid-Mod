@@ -10,17 +10,18 @@ public class KingSlimeFencingBlade : OrchidModGuardianFencingBlade
 	public override void SafeSetDefaults()
 	{
 		Item.useTime = 45;
-		Item.damage = 150;
+		Item.damage = 86;
 		Item.rare = ItemRarityID.Blue;
 		Item.width = 54;
 		Item.height = 54;
-		Item.knockBack = 3f;
+		Item.knockBack = 5f;
+		Item.shootSpeed = 10f;
 		Item.value = Item.sellPrice(0, 0, 30);
 
 		SheathOffset = new Vector2(3f, 1f);
 	}
 
-	public override Color GetColor() => new (40, 160, 215);
+	public override Color GetColor(Player player, OrchidGuardian guardian, Projectile anchor) => new (40, 160, 215);
 
 	public override void OnHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, NPC.HitInfo hit)
 	{

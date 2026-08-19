@@ -4202,7 +4202,7 @@ UI: {
 			Зарядите, чтобы взмахнуть
 			Нажмите {0}, чтобы нанести колющий удар во время зарядки
 			'''
-		// ChargeToJab: Charge to swing, {0} click to slam while charging
+		// ChargeToJab: Charge to swing, {0} to slam while charging
 		ChargeToDash:
 			'''
 			Зарядите, чтобы совершить рывок
@@ -4219,6 +4219,7 @@ UI: {
 		Parry: Нажмите {0}, чтобы совершить парирование
 		ParryDash: Нажмите {0}, чтобы совершить парирование рывком вниз
 		ChargeToThrow: Зарядите, чтобы бросить
+		// ChargeToParry: Charge to parry
 		SwingWhileCharging:
 			'''
 			Зарядите, чтобы бросить
@@ -4226,6 +4227,7 @@ UI: {
 			'''
 		UsesUpTo: Использует до {0} оч. нападения
 		RuneDuration: Время действия руны: {0} сек.
+		// DashDuringSwing: "{0} during reinforced attack to dash"
 		Block: Нажмите {0}, чтобы сделать блок
 		BlockGuard: Нажмите {0}, чтобы сделать блок за {1} оч. обороны
 		BlockSlam: Нажмите {0}, чтобы сделать блок за {1} оч. нападения

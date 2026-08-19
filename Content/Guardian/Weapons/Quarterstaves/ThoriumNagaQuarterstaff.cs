@@ -195,9 +195,10 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
                 }
             
                 waterAttack = 0;
-            }
+                }
 
-            wasUnderWater = underWater;
+                wasUnderWater = underWater;
+            }
         }
 
         public override bool PreSwingAI(Player player, OrchidGuardian guardian, Projectile projectile)

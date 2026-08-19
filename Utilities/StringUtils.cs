@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using Terraria.GameInput;
+using Terraria.Localization;
 
 namespace OrchidMod.Utilities
 {
@@ -24,6 +26,23 @@ namespace OrchidMod.Utilities
 			if (centiseconds % 10 == 0) centiseconds /= 10;
 			string separator = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 			return seconds + separator + centiseconds;
+		}
+		
+		public static string GetClickInfoTooltip(bool configSwap = false, bool rightClick = true)
+		{
+			string button = "";
+			if (PlayerInput.UsingGamepad)
+			{
+				KeyConfiguration keyConfig = PlayerInput.CurrentProfile.InputModes[InputMode.XBoxGamepad]; 
+				button = PlayerInput.BuildCommand("", true, keyConfig.KeyStatus[configSwap ^ rightClick ? "MouseRight" : "MouseLeft"]).Replace(": ", "");
+			}
+			else
+			{
+				if (configSwap ^ rightClick) button = Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
+				else button = Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
+			}
+			
+			return button;
 		}
 	}
 }

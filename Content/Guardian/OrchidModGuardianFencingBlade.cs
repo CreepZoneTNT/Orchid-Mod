@@ -32,16 +32,19 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 	/// <summary>The multiplier for the reinforced swing attack performed after a successful deflect or at full charge.</summary>
 	public float ReinforcedSwingSpeed = 1f;
 	public int ParryDuration = 20;
+	/// <summary>The amount of slash projectiles created during the basic attack. Unused if</summary>
+	/// <remarks>Also affects the attack animation: higher values make the blade swing faster. Use alongside <see cref="SwingSpeed"/> to balance the rate of fire with the attack duration.</remarks>
+	/// <seealso cref="GuardianFencingBladeAnchor.DoSlashStyle"/>
+	public int SwingsPerAttack = 1;
 	/// <summary>The amount of slash projectiles created during the reinforced attack.</summary>
 	/// <remarks>Also affects the attack animation: higher values make the blade swing faster. Use alongside <see cref="ReinforcedSwingSpeed"/> to balance the rate of fire with the attack duration.</remarks>
-	public int SwingsPerAttack = 6;
+	public int ReinforcedSwingsPerAttack = 6;
 	public float SwingDamage = 1f;
 	public float ReinforcedSwingDamage = 0.4f;
 	/// <summary>The percentage of the blade texture's height to offset its position when held.</summary>
 	public float HoldOffset = 0.25f;
 	/// <summary>The offset for the sheath texture when drawn, if <see cref="DrawSheath"/> is enabled.</summary>
 	public Vector2 SheathOffset = Vector2.Zero;
-	public float DashVelocity = 20f;
 	public float SwingVelocity = 0.5f;
 	public float ReinforcedSwingVelocity = 1.5f;
 	/// <summary>Controls the random variation (in radians) that the basic swing attack's slash projectile bends.</summary>
@@ -50,7 +53,9 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 	/// <summary>Controls the random variation (in radians) that the reinforced attack's slash projectiles bend.</summary>
 	/// <remarks>This value is passed into the slash projectile as <c>ai[0]</c>, as the lower and upper bounds of <c>NextFloat</c> when reinforced.</remarks>
 	public float ReinforcedSwingBend = 0.025f;
-	
+	public int DashDuration = 20;
+	public float DashSpeed = 20f;
+	public float DashMomentum = 0.6f;
 	public int SwingStyle = 0;
 	public int ReinforcedSwingStyle = 1;
 	
@@ -62,8 +67,7 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 	public virtual void OnHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, NPC.HitInfo hit) { } // Called when hitting a target during an attack
 	public virtual void OnHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, NPC.HitInfo hit) { } // Called when hitting the first target for the first time during an attack
 	public virtual void FencingBladeModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref NPC.HitModifiers modifiers, bool firstHit) { } // anchor's modifyhitNPC
-	public virtual bool OnSwing(Player player, OrchidGuardian guardian, Projectile projectile, bool reinforced, ref int damage) => true; // Called on the first frame of an attack
-	public virtual void OnStartAttack(Player player, OrchidGuardian guardian, Projectile projectile, bool charged, bool first) { } // Called on the first frame of an attack
+	public virtual bool OnSlash(Player player, OrchidGuardian guardian, Projectile projectile, bool reinforced, ref int damage) => true; // Called on the first frame of an attack
 	public virtual void OnParryFencingBlade(Player player, OrchidGuardian guardian, Entity aggressor, Projectile anchor) { } // Called on parrying anything
 	public virtual bool PreDash(Player player, OrchidGuardian guardian, Projectile anchor) => guardian.UseSlam();
 	public virtual void ExtraAIFencingBlade(Player player, OrchidGuardian guardian, Projectile anchor) {}
@@ -109,6 +113,8 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 		Item.useAnimation = Item.useTime;
 	}
 
+	public override bool AltFunctionUse(Player player) => true;
+
 	public override bool WeaponPrefix() => true;
 
 	public override bool CanUseItem(Player player)
@@ -122,14 +128,7 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 				var proj = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == AnchorType);
 				if (proj != null && proj.ModProjectile is GuardianFencingBladeAnchor anchor)
 				{
-					bool shouldBlock = Main.mouseRight && Main.mouseRightRelease;
-					bool shouldCharge = Main.mouseLeft;
-						
-					if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
-					{
-						shouldBlock = Main.mouseLeft && Main.mouseLeftRelease;
-						shouldCharge = Main.mouseRight;
-					}
+					bool shouldCharge = OrchidMod.OrchidClientConfig.GuardianSwapGauntletInputs ? Main.mouseRight : Main.mouseLeft;
 
 					if (shouldCharge && guardian.GuardianItemCharge == 0f && proj.ai[0] == 0f)
 					{
@@ -193,8 +192,12 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 		tooltips.Insert(index + 1, new TooltipLine(Mod, "ParryDuration", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ParryDuration", OrchidUtils.FramesToSeconds((int)(ParryDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianParryDuration)))));
 
 
-		string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
-		tooltips.Insert(index + 2, new TooltipLine(Mod, "ClickInfo", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.Parry", click))
+		string click = OrchidUtils.GetClickInfoTooltip(OrchidMod.OrchidClientConfig.GuardianSwapGauntletInputs);
+		tooltips.Insert(index + 2, new TooltipLine(Mod, "ClickInfo", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ChargeToParry"))
+		{
+			OverrideColor = new Color(175, 255, 175)
+		});
+		tooltips.Insert(index + 3, new TooltipLine(Mod, "Dash", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.DashDuringSwing", click))
 		{
 			OverrideColor = new Color(175, 255, 175)
 		});
@@ -215,5 +218,13 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 			return texture;
 		}
 		return null;
+	}
+	
+	public int GetAnchor(Player player)
+	{
+		foreach (Projectile proj in Main.ActiveProjectiles)
+			if (proj.owner == player.whoAmI && proj.type == AnchorType)
+				return proj.whoAmI;
+		return -1;
 	}
 }

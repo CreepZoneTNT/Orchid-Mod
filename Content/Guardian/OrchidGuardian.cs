@@ -730,6 +730,16 @@ namespace OrchidMod.Content.Guardian
 							modPlayer.ForcedVelocityVector = Vector2.UnitY.RotatedBy(anchor.KatarDashAngle) * -katar.ParryDashSpeed;
 						}
 					}
+					else if (Player.HeldItem.ModItem is OrchidModGuardianFencingBlade fencingBlade && fencingBlade.GetAnchor(Player) != -1)
+					{
+						if (Main.projectile[fencingBlade.GetAnchor(Player)].ModProjectile is GuardianFencingBladeAnchor anchor && anchor.FencingBladeDashTimer > 1)
+						{
+							modPlayer.ForcedVelocityIgnoresPlatforms = true;
+							modPlayer.ForcedVelocityTimer = 2;
+							modPlayer.ForcedVelocityUpkeep = fencingBlade.DashMomentum;
+							modPlayer.ForcedVelocityVector = Vector2.UnitY.RotatedBy(anchor.FencingBladeDashAngle) * -fencingBlade.DashSpeed;
+						}
+					}
 				}
 			}
 		}
@@ -1403,5 +1413,6 @@ namespace OrchidMod.Content.Guardian
 		}
 		
 		public float GetParryDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianParryDuration;
+		public float GetBlockDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianBlockDuration;
 	}
 }

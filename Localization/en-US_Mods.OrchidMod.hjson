@@ -4186,11 +4186,11 @@ UI: {
 	}
 
 	GuardianItem: {
-		LeftClick: Left
-		RightClick: Right
-		ChargeToSwing: Charge to swing, {0} click to jab while charging
-		ChargeToJab: Charge to swing, {0} click to slam while charging
-		ChargeToDash: Charge to dash, {0} click to jab while charging
+		LeftClick: Left click
+		RightClick: Right click
+		ChargeToSwing: Charge to swing, {0} to jab while charging
+		ChargeToJab: Charge to swing, {0} to slam while charging
+		ChargeToDash: Charge to dash, {0} to jab while charging
 		ParryDuration: "{0} second parry duration"
 		BlockDuration: "{0} second block duration"
 		Interrupted: Interrupted
@@ -4199,17 +4199,19 @@ UI: {
 		Failed: Failed
 		Guard: "{0} {^0:guard;guards}"
 		Slam: "{0} {^0:slam;slams}"
-		Parry: "{0} click to parry"
-		ParryDash: "{0} click to parry, dashing downwards"
+		Parry: "{0} to parry"
+		ParryDash: "{0} to parry, dashing downwards"
 		ChargeToThrow: Charge to throw
-		SwingWhileCharging: Charge to throw, right click to swing while charging
+		ChargeToParry: Charge to parry
+		SwingWhileCharging: Charge to throw, {0} to swing while charging
 		UsesUpTo: Uses up to {0} slams
 		RuneDuration: "{0} second rune duration"
-		Block: "{0} click to block"
-		BlockGuard: "{0} click to block, costing {1} {^1:guard;guards}"
-		BlockSlam: "{0} click to block, costing {2} {^2:slam;slams}"
-		BlockGuardSlamSame: "{0} click to block, costing {1} {^1:guard;guards} and {^1:slam;slams}"
-		BlockGuardSlam: "{0} click to block, costing {1} {^1:guard;guards} and {2} {^2:slam;slams}"
+		DashDuringSwing: "{0} during reinforced attack to dash"
+		Block: "{0} to block"
+		BlockGuard: "{0} to block, costing {1} {^1:guard;guards}"
+		BlockSlam: "{0} to block, costing {2} {^2:slam;slams}"
+		BlockGuardSlamSame: "{0} to block, costing {1} {^1:guard;guards} and {^1:slam;slams}"
+		BlockGuardSlam: "{0} to block, costing {1} {^1:guard;guards} and {2} {^2:slam;slams}"
 		BuffDuration: "{0} second buff duration"
 		HorizonLaceShieldStacks: Grants 3 guards when fully charged
 		DamageOfDefense: Deals {0}% of defense as opposing damage

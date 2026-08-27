@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using OrchidMod.Content.General.Prefixes;
 using Terraria;
 using Terraria.ID;
 using Terraria.Audio;
@@ -41,17 +42,6 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 			VolumeModifier = 1;
         }
 
-        public override int ChoosePrefix(UnifiedRandom rand) => rand.NextBool(100) ? PrefixID.Annoying : -1;
-
-        public override void ApplyPrefix(int pre)
-        {
-	        if (pre == PrefixID.Annoying)
-	        {
-		        Item.knockBack *= 1.15f;
-		        VolumeModifier *= 1.5f;
-	        }
-        }
-
         public override void OnMeleeHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged, bool OffHand) => SoundEngine.PlaySound(SqueakSound with {Volume = 0.1f * VolumeModifier}, projectile.Center);
 
         public override void OnThrowHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak, bool OffHand) => SoundEngine.PlaySound(SqueakSound with {Volume = 0.1f * VolumeModifier, Pitch = Weak ? -0.4f : 0}, projectile.Center);
@@ -66,14 +56,14 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
         {
 	        base.ModifyTooltips(tooltips);
 
-	        if (Item.prefix == PrefixID.Annoying)
+	        if (VolumeModifier != 1f)
 	        {
-		        int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Tooltip1"));
+		        int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("PrefixKnockback"));
 		        tooltips.Insert(index, new TooltipLine(Mod, "AnnoyingnessPrefix", Language.GetTextValue(Mod.GetLocalizationKey("Items.ToyWarhammers.AnnoyingPrefix"), (VolumeModifier - 1) * 100f))
-			        {
-				        IsModifier = true,
-				        IsModifierBad = VolumeModifier > 1
-			        }
+		        {
+			        IsModifier = true,
+			        IsModifierBad = VolumeModifier > 1
+		        }
 		        );
 	        }
         }

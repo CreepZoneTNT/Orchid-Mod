@@ -3958,6 +3958,8 @@ Projectiles: {
 	GuardianLanternShieldPunchProj.DisplayName: Heavy Punch
 	ThoriumTemplarFencingBladeProjectile.DisplayName: Yoinked Pickup
 	ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Riptide Reamer
+	ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Thorium Concentrated Thorium Quarterstaff Projectile
+	ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
 }
 
 Configs: {
@@ -4084,6 +4086,16 @@ Configs: {
 		GuardianFencingBladeUIType: {
 			Label: Fencing Blade icon variant
 			Tooltip: The UI icon variant to use for Fencing Blades
+		}
+
+		GuardianSwapPaviseImputs: {
+			Label: Guardian Swap Pavise Imputs
+			Tooltip: ""
+		}
+
+		GuardianSwapGauntletImputs: {
+			Label: Guardian Swap Gauntlet Imputs
+			Tooltip: ""
 		}
 	}
 

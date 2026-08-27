@@ -114,6 +114,18 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 				Projectile.netUpdate = true;
 			}
 
+			Player owner = Owner;
+			Color color = GetColor(owner, true);
+			for (int i = 0; i < Positions.Count; i++)
+			{
+				if (i > 5 && i < 55)
+				{
+					DoColorGradient(owner, ref color, 50);;
+				}
+
+				Lighting.AddLight(Positions[i], color.ToVector3() * 0.25f);
+			}
+
 			if (IsLocalOwner)
 			{
 				foreach (NPC npc in Main.npc)

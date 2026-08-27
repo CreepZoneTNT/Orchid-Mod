@@ -87,7 +87,7 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 		
 		if (GuardianItem.ModItem is GuardianLanternShield guardianItem)
 		{
-			ItemTexture = ModContent.Request<Texture2D>(Texture, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+			ItemTexture = ModContent.Request<Texture2D>(Texture, AssetRequestMode.ImmediateLoad).Value;
 			ResetSize();
 		}
 		else if (IsLocalOwner)
@@ -348,17 +348,11 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 				{ // Slam just started, make projectile
 					int damage = guardian.GetGuardianDamage(guardianItem.Item.damage);
 					
-					if (owner.boneGloveItem != null && !owner.boneGloveItem.IsAir && owner.boneGloveTimer == 0)
-					{ // Bone glove compatibility, from vanilla code
-						owner.boneGloveTimer = 60;
-						Vector2 center = owner.Center;
-						Vector2 vector = owner.DirectionTo(owner.ApplyRangeCompensation(0.2f, center, Main.MouseWorld)) * 10f;
-						Projectile.NewProjectile(owner.GetSource_ItemUse(owner.boneGloveItem), center.X, center.Y, vector.X, vector.Y, ProjectileID.BoneGloveProj, 25, 5f, owner.whoAmI);
-					}
+					Guardian.OnAttack(AttackID.GauntletSlam);
 
-					int projectileType = ModContent.ProjectileType<NightShieldProjAlt>();
-					float strikeVelocity = guardianItem.StrikeVelocity * guardianItem.Item.GetGlobalItem<GuardianPrefixItem>().GetSlamDistance() * owner.GetTotalAttackSpeed(DamageClass.Melee);
-					Vector2 velocity = Vector2.UnitY.RotatedBy((Main.MouseWorld - owner.MountedCenter).ToRotation() - MathHelper.PiOver2) * strikeVelocity * 0.25f;
+					int projectileType = ModContent.ProjectileType<GuardianLanternShieldPunchProj>();
+					float strikeVelocity = GuardianItem.shootSpeed * guardianItem.StrikeVelocity * guardianItem.Item.GetGlobalItem<GuardianPrefixItem>().GetSlamDistance() * owner.GetTotalAttackSpeed(DamageClass.Melee);
+					Vector2 velocity = Vector2.UnitY.RotatedBy((Main.MouseWorld - owner.MountedCenter).ToRotation() - MathHelper.PiOver2) * strikeVelocity;
 					Projectile punchProj = Projectile.NewProjectileDirect(Projectile.GetSource_FromAI(), Projectile.Center, velocity, projectileType, guardian.GetGuardianDamage(GuardianItem.damage), 1f, owner.whoAmI);
 					
 					Ding = false;
@@ -468,7 +462,8 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 					{
 						Projectile.rotation = MathHelper.Pi - MathHelper.PiOver4 * owner.direction;
 					}
-
+					
+					Ding = false;
 				}
 			}
 		}

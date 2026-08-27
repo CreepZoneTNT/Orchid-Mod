@@ -7,6 +7,16 @@ namespace OrchidMod.Content.Guardian.Weapons.FencingBlades;
 
 public class DeerclopsFencingBlade : OrchidModGuardianFencingBlade
 {
+	public override FencingBladeAttackProfile ChargedProfile(Projectile anchor) => FencingBladeAttackID.MultiSwing with
+	{
+		AnimationSpeed = 0.8f, BendAmount = 0.005f, Damage = 0.4f, Quantity = 5, Scale = 1.1f
+	};
+
+	public override FencingBladeAttackProfile ReinforcedProfile(Projectile anchor) => FencingBladeAttackID.MultiSwing with
+	{
+		AnimationSpeed = 0.6f, Velocity = 1.5f, BendAmount = 0.01f, Damage = 0.25f, Quantity = 10, Scale = 1.5f
+	};
+
 	public override void SafeSetDefaults()
 	{
 		Item.useTime = 24;
@@ -20,8 +30,7 @@ public class DeerclopsFencingBlade : OrchidModGuardianFencingBlade
 
 		DrawSheath = false;
 		SwingSound = SoundID.DD2_MonkStaffSwing;
-		SwingsPerAttack = 10;
-		ReinforcedSwingSpeed = 0.6f;
+		
 	}
 
 	public override Color GetColor(Player player, OrchidGuardian guardian, Projectile anchor) => new (54, 58, 39);

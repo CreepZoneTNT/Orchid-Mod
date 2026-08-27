@@ -299,6 +299,7 @@
             Executes the given attack style. <c>ai</c> should begin at 40 and decrement to 0 for the animation to play in correct order.<br/>
             For style IDs 0 and 2, <c>useFocusProj</c> will create an invisible projectile that spawns slashes onto it, instead of the default singular wave.
             </summary>
+            <seealso cref="!:OrchidModGua">dd</seealso>
             <remarks>Attack style IDs<br/>
             0: Single swing (default basic)<br/>
             1: Rapid multi-swing (default reinforced)<br/>
@@ -387,20 +388,8 @@
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.ChargeRate">
             <summary>Multiplies charge speed while holding left click.</summary>
         </member>
-        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.SwingSpeed">
-            <summary>The multiplier for the basic swing attack performed after a failed deflect.</summary>
-        </member>
-        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.ReinforcedSwingSpeed">
-            <summary>The multiplier for the reinforced swing attack performed after a successful deflect or at full charge.</summary>
-        </member>
-        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.SwingsPerAttack">
-            <summary>The amount of slash projectiles created during the basic attack. Unused if</summary>
-            <remarks>Also affects the attack animation: higher values make the blade swing faster. Use alongside <see cref="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.SwingSpeed"/> to balance the rate of fire with the attack duration.</remarks>
-            <seealso cref="M:OrchidMod.Content.Guardian.GuardianFencingBladeAnchor.DoSlashStyle(System.Int32,System.Single,Terraria.Audio.SoundStyle,System.Boolean,System.Boolean)"/>
-        </member>
-        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.ReinforcedSwingsPerAttack">
-            <summary>The amount of slash projectiles created during the reinforced attack.</summary>
-            <remarks>Also affects the attack animation: higher values make the blade swing faster. Use alongside <see cref="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.ReinforcedSwingSpeed"/> to balance the rate of fire with the attack duration.</remarks>
+        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.SemiReinforcedDamage">
+            <summary>Multiplier for the damage dealt by a Reinforced attack that consumed a Guard. Defaults to 0.8 (80%).</summary>
         </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.HoldOffset">
             <summary>The percentage of the blade texture's height to offset its position when held.</summary>
@@ -408,19 +397,41 @@
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.SheathOffset">
             <summary>The offset for the sheath texture when drawn, if <see cref="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.DrawSheath"/> is enabled.</summary>
         </member>
-        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.SwingBend">
-            <summary>Controls the random variation (in radians) that the basic swing attack's slash projectile bends.</summary>
-            <remarks>This value is passed into the slash projectile as <c>ai[0]</c>, as the lower and upper bounds of <c>NextFloat</c> when not reinforced.</remarks>
+        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.DashDuration">
+            <summary> Duration (in frames) of the reinforced dash. Defaults to 10. </summary>
         </member>
-        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.ReinforcedSwingBend">
-            <summary>Controls the random variation (in radians) that the reinforced attack's slash projectiles bend.</summary>
-            <remarks>This value is passed into the slash projectile as <c>ai[0]</c>, as the lower and upper bounds of <c>NextFloat</c> when reinforced.</remarks>
+        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.DashSpeed">
+            <summary> Velocity of the reinforced dash. Defaults to 20f. </summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.DashMomentum">
+            <summary> Multiplies the velocity of the player after the reinforced dash (retains more momentum with higher values). Defaults to 0.33f (for early game weapons). </summary>
         </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.FencingBladeFrames">
             <summary>The amount of animation frames this weapon has.</summary>
         </member>
         <member name="F:OrchidMod.Content.Guardian.OrchidModGuardianFencingBlade.DrawSheath">
             <summary>Whether the sheath should be drawn. If false, the sword will always be drawn.</summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.AttackStyle">
+            <inheritdoc cref="M:OrchidMod.Content.Guardian.GuardianFencingBladeAnchor.DoSlashStyle(System.Int32,System.Single,Terraria.Audio.SoundStyle,System.Boolean,System.Boolean)"/>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.Quantity">
+            <summary>The amount of slash projectiles created during the attack, or the amount of stab projectiles created by the focus. Unused if <c>SwingStyle</c> is 0 or 2, when <c>UseSwingFocusProj</c> is disabled.</summary>
+            <remarks>Also affects the attack animation: higher values make the blade swing faster. Use alongside <see cref="!:SwingSpeed"/> to balance the rate of fire with the attack duration.</remarks>
+            <seealso cref="M:OrchidMod.Content.Guardian.GuardianFencingBladeAnchor.DoSlashStyle(System.Int32,System.Single,Terraria.Audio.SoundStyle,System.Boolean,System.Boolean)"/>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.Damage">
+            <summary>Multiplies the amount of damage inflicted per projectile.</summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.AnimationSpeed">
+            <summary>Multiplies the animation speed of the attack.</summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.Velocity">
+            <summary>Multiplies the velocity of the attack's projectile(s).</summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.BendAmount">
+            <summary>something something random angle offset</summary>
+            <remarks>If <c>UsesFocusProjectile</c> is true, this controls the random offset from the ordinals that the focus spawns each stab projectile at; otherwise this controls the random rate each slash curves in flight.</remarks>
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.OnPunch(Terraria.Player,OrchidMod.Content.Guardian.OrchidGuardian,Terraria.Projectile,System.Boolean,System.Boolean,System.Boolean@,System.Int32@)">
             <summary> Called right before a punch projectile is spawned. Return false to prevent normal punch projectiles from spawning. </summary>

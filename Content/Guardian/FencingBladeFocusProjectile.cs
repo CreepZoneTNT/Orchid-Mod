@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OrchidMod.Common;
 using OrchidMod.Utilities;
+using ReLogic.Content;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -12,17 +13,24 @@ namespace OrchidMod.Content.Guardian
 {
 	public class FencingBladeFocusProjectile : OrchidModGuardianAnchor
 	{
-		private static Texture2D TextureMain;
+		private static Asset<Texture2D> TextureMain;
 		public OrchidModGuardianFencingBlade FencingBladeItem;
 
 		public List<Vector2> OldPosition;
 		public List<float> OldRotation;
+		public List<int> OldFrame;
 		
-		public int HitCount = 0;
+		public int Frame = 0;
+		public int TimeSpent = 0;
+		public float StabTimer = 0;
+		public int DamageReset = 0;
+		
+		public static float[] OrdinalAngles = [MathHelper.PiOver4, 3 * MathHelper.PiOver4, 5 * MathHelper.PiOver4, 7 * MathHelper.PiOver4];
+		public List<float> NextDirection;
 
 		public override void Load()
 		{
-			TextureMain ??= ModContent.Request<Texture2D>(Texture, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+			TextureMain ??= ModContent.Request<Texture2D>(Texture, AssetRequestMode.ImmediateLoad);
 		}
 
 		public override void SafeSetDefaults()
@@ -31,7 +39,7 @@ namespace OrchidMod.Content.Guardian
 			Projectile.height = 30;
 			Projectile.friendly = true;
 			Projectile.aiStyle = -1;
-			Projectile.timeLeft = 81;
+			Projectile.timeLeft = 151;
 			Projectile.tileCollide = false;
 			Projectile.scale = 1f;
 			Projectile.alpha = 96;
@@ -43,6 +51,8 @@ namespace OrchidMod.Content.Guardian
 
 			OldPosition = [];
 			OldRotation = [];
+			OldFrame = [];
+			NextDirection = [];
 		}
 
 		public override void AI()
@@ -59,54 +69,84 @@ namespace OrchidMod.Content.Guardian
 					}
 				}
 
-				float scale = Owner.GetModPlayer<OrchidGuardian>().GuardianWeaponScale;
-				if (scale != 1f)
-				{ // re-centers and adjusts projectiles scale + hitbox to match the players
-					Vector2 oldCenter = Projectile.Center;
-					Projectile.scale = scale;
-					Projectile.width = (int)(Projectile.width * scale);
-					Projectile.height = (int)(Projectile.height * scale);
-					Projectile.Center = oldCenter;
-				}
+				for (int i = 0; i < 4; i++)
+					for (int t = 0; t < 20; t++)
+					{
+						int index = Main.rand.Next(4);
+						if (!NextDirection.Contains(OrdinalAngles[index])) 
+							NextDirection.Add(OrdinalAngles[index]); 
+					}
 			}
 			else if (FencingBladeItem.ProjectileAI(Owner, Projectile, Strong))
 			{
-				Projectile.velocity *= 0.94574f;
+				Projectile.velocity *= 0.98f;
 				if (Strong)
 				{
-					OldPosition.Add(Projectile.Center);
-					OldRotation.Add(Projectile.rotation);
-					
+					if (TimeSpent % 4 == 0)
+					{
+						OldPosition.Add(Projectile.Center);
+						OldRotation.Add(Projectile.rotation);
+						OldFrame.Add(Frame);
+					}
+				
 					if (OldPosition.Count > 10)
 					{
 						OldPosition.RemoveAt(0);
 						OldRotation.RemoveAt(0);
+						OldFrame.RemoveAt(0);
 					}
-					
-					Projectile.velocity = Projectile.velocity.RotatedBy(Projectile.ai[0]);
-					Projectile.rotation += Projectile.ai[0];
 				}
+				
+				if ((int)StabTimer + 1 > DamageReset && DamageReset <= (int)Projectile.ai[0])
+				{
+					float nextAngle = NextDirection[0];
+					Vector2 velocity = Vector2.UnitX.RotatedBy(nextAngle + Main.rand.NextFloat(-Projectile.ai[1], Projectile.ai[1])) * 10f;
+				
+					Projectile newProj = Projectile.NewProjectileDirect(Projectile.GetSource_FromAI(), Projectile.Center + velocity, Vector2.Zero, ModContent.ProjectileType<FencingBladeSlashProjectile>(), 1, 1f, Owner.whoAmI);
+					if (newProj.ModProjectile is FencingBladeSlashProjectile slashProj)
+					{
+						slashProj.FencingBladeItem = FencingBladeItem;
+						slashProj.Strong = Strong;
+						slashProj.Scale = Projectile.ai[2];
+						slashProj.Stab = true;
+						newProj.velocity = -velocity;
+						newProj.rotation = newProj.velocity.ToRotation();
+						newProj.damage = Projectile.damage;
+						newProj.CritChance = (int)(Owner.GetCritChance<GuardianDamageClass>() + Owner.GetCritChance<GenericDamageClass>() + Projectile.CritChance);
+						newProj.knockBack = Projectile.knockBack;
+
+						newProj.netUpdate = true;
+					}
+					else
+						newProj.Kill();
+					
+					NextDirection.RemoveAt(0);
+					
+					for (int t = 0; t < 20; t++)
+					{
+						int index = Main.rand.Next(4);
+						if (!NextDirection.Contains(OrdinalAngles[index])) 
+							NextDirection.Add(OrdinalAngles[index]); 
+					}
+							
+					Projectile.netUpdate = true;
+					DamageReset++;
+				}
+				
+				if (TimeSpent % 2 == 0)
+				{
+					Frame++;
+					if (Frame > 3) Frame = 0;
+				}
+				
+				TimeSpent++;
+				StabTimer += Projectile.ai[0]/120;
 			}
 		}
 
 		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
 		{
-			modifiers.FinalDamage *= 1 - 0.05f * HitCount;
-			FencingBladeItem.FencingBladeModifyHitNPC(Owner, Owner.GetModPlayer<OrchidGuardian>(), target, Projectile, ref modifiers, FirstHit);
-		}
-
-		public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone, Player player, OrchidGuardian guardian)
-		{
-			{
-				if (FirstHit)
-				{
-					FencingBladeItem.OnHitFirst(Owner, guardian, target, Projectile, hit);
-					
-				}
-				FencingBladeItem.OnHit(Owner, guardian, target, Projectile, hit);
-				
-				HitCount++;
-			}
+			modifiers.FinalDamage *= 0.5f;
 		}
 
 		public override bool OrchidPreDraw(SpriteBatch spriteBatch, ref Color lightColor)
@@ -118,18 +158,20 @@ namespace OrchidMod.Content.Guardian
 
 				// Draw code here
 				float colorMult = 0.8f;
-				if (Projectile.timeLeft < 10) colorMult *= Projectile.timeLeft / 10f;
-				SpriteEffects effect = SpriteEffects.None;
-				if (Projectile.velocity.X < 0f) effect = SpriteEffects.FlipVertically;
+				if (Projectile.timeLeft < 20) colorMult *= Projectile.timeLeft / 20f;
 				
 				Color itemColor = FencingBladeItem.GetColor(Owner, Guardian, Projectile);
 
+				Texture2D texture = TextureMain.Value;
+				Rectangle frame = texture.Frame(1, 4, 0, Frame);
+
 				for (int i = 0; i < OldPosition.Count; i++)
 				{
-					spriteBatch.Draw(TextureMain, OldPosition[i] - Main.screenPosition, null, itemColor * colorMult * ((i + 1) / 10f), OldRotation[i], TextureMain.Size() * 0.5f, Projectile.scale, effect, 0f);
+					Rectangle oldFrame = texture.Frame(1, 4, 0, OldFrame[i]);
+					spriteBatch.Draw(texture, OldPosition[i] - Main.screenPosition, oldFrame, itemColor * colorMult * ((i + 1) / 10f), OldRotation[i], oldFrame.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0f);
 				}
-				spriteBatch.Draw(TextureMain, Projectile.Center - Main.screenPosition, null, itemColor * colorMult * 1.5f, Projectile.rotation, TextureMain.Size() * 0.5f, Projectile.scale * 1.1f, effect, 0f);
-				spriteBatch.Draw(TextureMain, Projectile.Center - Main.screenPosition, null, itemColor * colorMult, Projectile.rotation, TextureMain.Size() * 0.5f, Projectile.scale, effect, 0f);
+				spriteBatch.Draw(texture, Projectile.Center - Main.screenPosition, frame, itemColor * colorMult * 1.5f, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale * 1.1f, SpriteEffects.None, 0f);
+				spriteBatch.Draw(texture, Projectile.Center - Main.screenPosition, frame, itemColor * colorMult, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, SpriteEffects.None, 0f);
 
 				// Draw code ends here
 

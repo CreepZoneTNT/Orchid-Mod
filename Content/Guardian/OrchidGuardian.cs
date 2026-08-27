@@ -382,17 +382,19 @@ namespace OrchidMod.Content.Guardian
 
 				// Condition for parrying an Aggro Dummy or Boss Dummy from Thorium 
 				// (only if the player is either in godmode, or if there aren't any enemies/bosses within 45 tiles)
+				NPC dummy = null;
 				if (OrchidMod.ThoriumMod != null && Main.npc.Any(npc => {
 					int aggroDummy = OrchidMod.ThoriumMod.Find<ModNPC>("AggroDummy").Type;
 					int bossDummy = OrchidMod.ThoriumMod.Find<ModNPC>("BossDummy").Type;
 					if ((npc.type == aggroDummy || npc.type == bossDummy) && Collision.CheckAABBvAABBCollision(Player.Center, Player.Hitbox.Size(), npc.Center, npc.Hitbox.Size())) 
 					{
+						dummy = npc;
 						if (Player.creativeGodMode || CrossModGodMode) return true;
-						else return !Main.npc.Any(n => n.active && (!n.friendly || n.boss) && !(npc.type == aggroDummy || npc.type == bossDummy) && n.Center.DistanceSQ(Player.Center) <= 1638400f);
+						return !Main.npc.Any(n => n.active && (!n.friendly || n.boss) && !(npc.type == aggroDummy || npc.type == bossDummy) && n.Center.DistanceSQ(Player.Center) <= 1638400f);
 					}
 					return false;
 				})
-				) DoParryItemParry(null);
+				) DoParryItemParry(dummy);
 			}
 
 			if (GauntletPunchCooldown > -10) GauntletPunchCooldown--;
@@ -737,7 +739,7 @@ namespace OrchidMod.Content.Guardian
 							modPlayer.ForcedVelocityIgnoresPlatforms = true;
 							modPlayer.ForcedVelocityTimer = 2;
 							modPlayer.ForcedVelocityUpkeep = fencingBlade.DashMomentum;
-							modPlayer.ForcedVelocityVector = Vector2.UnitY.RotatedBy(anchor.FencingBladeDashAngle) * -fencingBlade.DashSpeed;
+							modPlayer.ForcedVelocityVector = Vector2.UnitY.RotatedBy(anchor.FencingBladeDashAngle) * fencingBlade.DashSpeed;
 						}
 					}
 				}

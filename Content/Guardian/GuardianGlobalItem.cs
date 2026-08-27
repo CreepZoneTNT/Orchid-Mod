@@ -1,8 +1,11 @@
-﻿using OrchidMod.Content.General.Prefixes;
+﻿using Microsoft.Xna.Framework;
+using OrchidMod.Content.General.Prefixes;
+using OrchidMod.Content.Guardian.Armors.OreHelms;
 using OrchidMod.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
@@ -58,6 +61,17 @@ namespace OrchidMod.Content.Guardian
 					int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Defense"));
 					tooltips.Insert(index + 2, new TooltipLine(Mod, "Tooltip", Language.GetTextValue(ModContent.GetInstance<OrchidMod>().GetLocalizationKey("Items.DepthDiverGreaves.Tooltip"))));
 				}
+			}
+		}
+	
+		public override void DrawArmorColor(EquipType type, int slot, Player drawPlayer, float shadow, ref Color color, ref int glowMask, ref Color glowMaskColor)
+		{
+			if ((drawPlayer.armor[10].type == ModContent.ItemType<GuardianChlorophyteHead>() || (drawPlayer.armor[10].type == ItemID.None && drawPlayer.armor[0].type == ModContent.ItemType<GuardianChlorophyteHead>())) && drawPlayer.body == 51 && drawPlayer.legs == 47)
+			{
+				float magicnumber = (float)(((float)Main.mouseTextColor) / 200.0 - 0.30000001192092896);
+				color.R = (byte)(color.R * magicnumber);
+				color.G = (byte)(color.G * magicnumber);
+				color.B = (byte)(color.B * magicnumber);
 			}
 		}
 	}

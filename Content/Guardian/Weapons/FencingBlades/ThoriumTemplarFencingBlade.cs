@@ -13,6 +13,12 @@ public class ThoriumTemplarFencingBlade : OrchidModGuardianFencingBlade
 	public NPC HitTarget;
 	public int HitCount = 0;
 	 
+	public override FencingBladeAttackProfile ChargedProfile(Projectile anchor) => FencingBladeAttackID.MultiSwing with
+	{ Quantity = 3, BendAmount = 0.02f, Damage = 0.8f, ControlAngle = MathHelper.Pi / 6f };
+	
+	public override FencingBladeAttackProfile ReinforcedProfile(Projectile anchor) => FencingBladeAttackID.SingleSwing with
+		{ Quantity = 7, UsesFocusProjectile = true };
+		
 	public override void SafeSetDefaults()
 	{
 		Item.useTime = 35;
@@ -23,10 +29,6 @@ public class ThoriumTemplarFencingBlade : OrchidModGuardianFencingBlade
 		Item.knockBack = 3f;
 		Item.shootSpeed = 15f;
 		Item.value = Item.sellPrice(0, 3);
-
-		SwingsPerAttack = 7;
-		ReinforcedSwingBend = 0.06f;
-		ReinforcedSwingSpeed = 0.75f;
 	}
 
 	public override void UpdateInventory(Player player)
@@ -47,7 +49,7 @@ public class ThoriumTemplarFencingBlade : OrchidModGuardianFencingBlade
 			if (HitTarget == null) HitTarget = target;
 			if (target == HitTarget)
 			{
-				if (++HitCount == SwingsPerAttack)
+				if (++HitCount == 7)
 				{
 					HitTarget = null;
 					HitCount = 0;

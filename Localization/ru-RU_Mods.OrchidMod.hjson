@@ -3246,6 +3246,7 @@ Items: {
 			'Honk honk'
 			Lets you dual wield a pair of very squeaky hammers
 			''' */
+		// AnnoyingPrefix: "{0:+0;-0}% obnoxiousness"
 	}
 
 	ThoriumValadiumWarhammer: {
@@ -3491,8 +3492,8 @@ Items: {
 	}
 
 	ThoriumTemplarFencingBlade: {
-		// Tooltip: ""
 		// DisplayName: Thorium Templar Fencing Blade
+		// Tooltip: ""
 	}
 }
 
@@ -3649,6 +3650,7 @@ Prefixes: {
 	BlockingPrefix.DisplayName: Блокирующий
 	# Guardian
 	HaidexPrefix.DisplayName: Непонятный
+	// AnnoyingPrefixGuardian.DisplayName: Annoying
 	FlimsyPrefix.DisplayName: Хлипкий
 	FeeblePrefix.DisplayName: Хилый
 	FragilePrefix.DisplayName: Ветхий
@@ -3964,6 +3966,7 @@ Projectiles: {
 	// FencingBladeSlashProjectile.DisplayName: Fencing Blade Slash
 	// ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
 	// FencingBladeFocusProjectile.DisplayName: Fencing Blade Focus Projectile
+	// GuardianLanternShieldPunchProj.DisplayName: Guardian Lantern Shield Punch Proj
 }
 
 Configs: {

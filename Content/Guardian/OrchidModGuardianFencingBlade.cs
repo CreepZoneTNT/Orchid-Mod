@@ -59,6 +59,7 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 	public virtual bool OnSlash(Player player, OrchidGuardian guardian, Projectile projectile, bool reinforced, ref int damage) => true; // Called on the first frame of an attack
 	public virtual void OnParryFencingBlade(Player player, OrchidGuardian guardian, Entity aggressor, Projectile anchor) { } // Called on parrying anything
 	public virtual bool PreDash(Player player, OrchidGuardian guardian, Projectile anchor) => guardian.UseSlam();
+	public virtual bool PreDeflect(Player player, OrchidGuardian guardian, Entity aggressor, Projectile anchor) => guardian.UseGuard();
 	public virtual void ExtraAIFencingBlade(Player player, OrchidGuardian guardian, Projectile anchor) {}
 	public virtual void PostDrawFencingBlade(SpriteBatch spriteBatch, Projectile projectile, Player player, Color lightColor) { }
 	public virtual bool PreDrawFencingBlade(SpriteBatch spriteBatch, Projectile projectile, Player player, ref Color lightColor) => true;
@@ -72,79 +73,84 @@ public abstract class OrchidModGuardianFencingBlade : OrchidModGuardianParryItem
 
 	public sealed override void OnParry(Player player, OrchidGuardian guardian, Entity aggressor, Projectile anchor)
 	{
-		anchor.ai[0] = 41f;
-		anchor.ai[2] = MathHelper.WrapAngle(Vector2.Normalize(Main.MouseWorld - player.MountedCenter).ToRotation() - MathHelper.PiOver2);
-		guardian.OnAttack(AttackID.FencingBladeCounter, this);
-		((GuardianFencingBladeAnchor)anchor.ModProjectile).NeedNetUpdate = true;
+		if (anchor.ModProjectile is GuardianFencingBladeAnchor modAnchor)
+		{
+			anchor.ai[0] = 41f;
+			anchor.ai[2] = MathHelper.WrapAngle(Vector2.Normalize(Main.MouseWorld - player.MountedCenter).ToRotation() - MathHelper.PiOver2);
+			guardian.OnAttack(AttackID.FencingBladeCounter, this);
+			modAnchor.Ding = true;
+			modAnchor.NeedNetUpdate = true;
+			
+		}
 		OnParryFencingBlade(player, guardian, aggressor, anchor);
 		
-		// Code borrowed from ThoriumGraniteGauntlet.cs
-		if (anchor.ModProjectile is GuardianFencingBladeAnchor blade && blade.Ding is true && aggressor is not null)
-		{
-			bool deflect = false;
-			bool instantExplode = true;
-			Vector2 strikeVelocity = Vector2.UnitY.RotatedBy((Main.MouseWorld - player.MountedCenter).ToRotation() - MathHelper.PiOver2) * 8;
-			Vector2 strikeEndPosition = anchor.Center + strikeVelocity * 10;
-			int punchDamage = guardian.GetGuardianDamage(Item.damage);
-			int highestDeflectedDamage = 0;
-			foreach (Projectile deflectProj in Main.ActiveProjectiles)
-			{
-				if (deflectProj.hostile && deflectProj.damage > 0 && Collision.CheckAABBvLineCollision(deflectProj.position + deflectProj.velocity - new Vector2(16), new Vector2(deflectProj.width + 32, deflectProj.height + 32), anchor.Center, strikeEndPosition))
-				{
-					if (!deflect)
-					{
-						deflect = true;
-						guardian.OnBlockProjectileFirst(anchor, deflectProj, 0, true);
-					}
-					else
-					{
-						instantExplode = false;
-						guardian.OnBlockProjectile(anchor, deflectProj, true);
-						if (deflectProj.damage > highestDeflectedDamage) highestDeflectedDamage = deflectProj.damage;
-						deflectProj.Kill();
-					}
-				}
-			}
-			foreach (NPC deflectEnemy in Main.ActiveNPCs)
-			{
-				if (!deflectEnemy.friendly && Collision.CheckAABBvLineCollision(deflectEnemy.position + deflectEnemy.velocity - new Vector2(16), new Vector2(deflectEnemy.width + 32, deflectEnemy.height + 32), anchor.Center, strikeEndPosition))
-				{
-					if (!deflect)
-					{
-						deflect = true;
-						guardian.OnBlockNPCFirst(anchor, deflectEnemy, 0, true);
-					}
-					else
-					{
-						guardian.OnBlockNPC(anchor, deflectEnemy, true);
-						if (deflectEnemy.damage > highestDeflectedDamage) highestDeflectedDamage = deflectEnemy.damage;
-						if (!deflectEnemy.dontTakeDamage)
-						{
-							NPC.HitInfo info = deflectEnemy.CalculateHitInfo(punchDamage, strikeVelocity.X > 1 ? 1 : -1, false, 1f, ModContent.GetInstance<GuardianDamageClass>());
-							if (info.Damage >= deflectEnemy.life) instantExplode = false; 
-							deflectEnemy.StrikeNPC(info);
-						}
-					}
-				}
-			}
-			if (deflect)
-			{
-				Projectile counterProj = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.MountedCenter + strikeVelocity * 6f, Vector2.Zero, ModContent.ProjectileType<ThoriumGraniteGauntletProjectile>(), Math.Clamp(highestDeflectedDamage, punchDamage, 1000), Item.knockBack, player.whoAmI);
-				counterProj.CritChance = (int)(player.GetCritChance<GuardianDamageClass>() + player.GetCritChance<GenericDamageClass>() + Item.crit);
-				counterProj.rotation = Main.rand.NextFloat(MathHelper.TwoPi);
-				if (!instantExplode)
-				{
-					counterProj.damage = (int)(counterProj.damage * 1.5f);
-					SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(0.4f), player.Center);
-				}
-				else
-				{
-					counterProj.ai[0] = 1;
-					counterProj.timeLeft -= 4;
-					SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(0.6f), player.Center);
-				}
-			}
-		}
+		// // Code borrowed from ThoriumGraniteGauntlet.cs
+		// if (PreDeflect(player, guardian, aggressor, anchor) && anchor.ModProjectile is GuardianFencingBladeAnchor blade && blade.Ding is true && aggressor is not null)
+		// {
+		// 	bool deflect = false;
+		// 	bool instantExplode = true;
+		// 	Vector2 strikeVelocity = Vector2.UnitY.RotatedBy((Main.MouseWorld - player.MountedCenter).ToRotation() - MathHelper.PiOver2) * 8;
+		// 	Vector2 strikeEndPosition = anchor.Center + strikeVelocity * 10;
+		// 	int slashDamage = guardian.GetGuardianDamage(Item.damage * ReinforcedProfile(anchor).Damage * ReinforcedProfile(anchor).Quantity);
+		// 	int highestDeflectedDamage = 0;
+		// 	foreach (Projectile deflectProj in Main.ActiveProjectiles)
+		// 	{
+		// 		if (deflectProj.hostile && deflectProj.damage > 0 && Collision.CheckAABBvLineCollision(deflectProj.position + deflectProj.velocity - new Vector2(16), new Vector2(deflectProj.width + 32, deflectProj.height + 32), anchor.Center, strikeEndPosition))
+		// 		{
+		// 			if (!deflect)
+		// 			{
+		// 				deflect = true;
+		// 				guardian.OnBlockProjectileFirst(anchor, deflectProj, 0, true);
+		// 			}
+		// 			else
+		// 			{
+		// 				instantExplode = false;
+		// 				guardian.OnBlockProjectile(anchor, deflectProj, true);
+		// 				if (deflectProj.damage > highestDeflectedDamage) highestDeflectedDamage = deflectProj.damage;
+		// 				deflectProj.Kill();
+		// 			}
+		// 		}
+		// 	}
+		// 	foreach (NPC deflectEnemy in Main.ActiveNPCs)
+		// 	{
+		// 		if (!deflectEnemy.friendly && Collision.CheckAABBvLineCollision(deflectEnemy.position + deflectEnemy.velocity - new Vector2(16), new Vector2(deflectEnemy.width + 32, deflectEnemy.height + 32), anchor.Center, strikeEndPosition))
+		// 		{
+		// 			if (!deflect)
+		// 			{
+		// 				deflect = true;
+		// 				guardian.OnBlockNPCFirst(anchor, deflectEnemy, 0, true);
+		// 			}
+		// 			else
+		// 			{
+		// 				guardian.OnBlockNPC(anchor, deflectEnemy, true);
+		// 				if (deflectEnemy.damage > highestDeflectedDamage) highestDeflectedDamage = deflectEnemy.damage;
+		// 				if (!deflectEnemy.dontTakeDamage)
+		// 				{
+		// 					NPC.HitInfo info = deflectEnemy.CalculateHitInfo(slashDamage, strikeVelocity.X > 1 ? 1 : -1, false, 1f, ModContent.GetInstance<GuardianDamageClass>());
+		// 					if (info.Damage >= deflectEnemy.life) instantExplode = false; 
+		// 					deflectEnemy.StrikeNPC(info);
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// 	if (deflect)
+		// 	{
+		// 		Projectile counterProj = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.MountedCenter + strikeVelocity * 6f, Vector2.Zero, ModContent.ProjectileType<ThoriumGraniteGauntletProjectile>(), Math.Clamp(highestDeflectedDamage, slashDamage, 1000), Item.knockBack, player.whoAmI);
+		// 		counterProj.CritChance = (int)(player.GetCritChance<GuardianDamageClass>() + player.GetCritChance<GenericDamageClass>() + Item.crit);
+		// 		counterProj.rotation = Main.rand.NextFloat(MathHelper.TwoPi);
+		// 		if (!instantExplode)
+		// 		{
+		// 			counterProj.damage = (int)(counterProj.damage * 1.5f);
+		// 			SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(0.4f), player.Center);
+		// 		}
+		// 		else
+		// 		{
+		// 			counterProj.ai[0] = 1;
+		// 			counterProj.timeLeft -= 4;
+		// 			SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(0.6f), player.Center);
+		// 		}
+		// 	}
+		// }
 		
 	}
 
@@ -292,23 +298,47 @@ public struct FencingBladeAttackProfile()
 {
 	/// <inheritdoc cref="GuardianFencingBladeAnchor.DoSlashStyle"/>
 	public int AttackStyle = 0;
+
 	/// <summary>The amount of slash projectiles created during the attack, or the amount of stab projectiles created by the focus. Unused if <c>SwingStyle</c> is 0 or 2, when <c>UseSwingFocusProj</c> is disabled.</summary>
 	/// <remarks>Also affects the attack animation: higher values make the blade swing faster. Use alongside <see cref="SwingSpeed"/> to balance the rate of fire with the attack duration.</remarks>
 	/// <seealso cref="GuardianFencingBladeAnchor.DoSlashStyle"/>
 	public int Quantity = 1;
+
 	/// <summary>Multiplies the amount of damage inflicted per projectile.</summary>
 	public float Damage = 1f;
+	/// <summary>Multiplies the amount of damage inflicted per projectile.</summary>
+	public float DamageDecay = 0.05f;
+
 	/// <summary>Multiplies the animation speed of the attack.</summary>
 	public float AnimationSpeed = 1f;
+
 	/// <summary>Multiplies the velocity of the attack's projectile(s).</summary>
 	public float Velocity = 1f;
+
 	/// <summary>something something random angle offset</summary>
 	/// <remarks>If <c>UsesFocusProjectile</c> is true, this controls the random offset from the ordinals that the focus spawns each stab projectile at; otherwise this controls the random rate each slash curves in flight.</remarks>
 	public float BendAmount = 0f;
+
+	/// <summary>The generic "control angle" for the attack's animation. Function depends on <c>AttackStyle</c>, but generally determines how wide a swing is when performed.</summary>
 	public float ControlAngle = MathHelper.PiOver2;
+	/// <summary>Multiplies the base scale of the attack's projectile(s).</summary>
 	public float Scale = 1f;
+	/// <summary>Multiplier for the change of scale of the attack's projectile(s).</summary>
 	public float ScaleChange = 1f;
+	/// <summary>
+	/// If true, the attack will spawn a "<see cref="FencingBladeFocusProjectile">Focus</see>" projectile that conjures diagonal stab projectiles on an interval, instead of individual slashes/stabs.
+	/// Only works when <c>AttackStyle</c> is set to 0 or 2, as <see cref="Quantity"/> is used to determine the amount of stabs conjured.<br/>
+	/// Focus stabs cannot bend, so be sure to read <see cref="BendAmount"/> and <see cref="FocusRotates"/>. 
+	/// </summary>
+	/// <remarks>Works similarly to the fully-powered Blade from <i>Cave Story</i>.</remarks>
+	/// <seealso cref="Stab"/>
 	public bool UsesFocusProjectile = false;
+
+	/// <summary>If true, the slash projectiles will have their <c>Stab</c> property set, changing their appearance from an arc shape to a linear slice. Mostly visual.</summary>
+	public bool Stab = false;
+
+	/// <summary>If true while <c>UsesFocusProjectile</c> is also true, the stab projectiles spawned by the focus will respect the focus projectile's direction instead of being locked to the ordinal directions.</summary>
+	public bool FocusRotates = false;
 }
 
 public static class FencingBladeAttackID
@@ -324,6 +354,14 @@ public static class FencingBladeAttackID
 		BendAmount = 0.01f,
 		ControlAngle = MathHelper.Pi / 5f,
 		ScaleChange = 1.001f
+	};
+
+	public static readonly FencingBladeAttackProfile SingleThrust = new()
+	{
+		AttackStyle = 2,
+		Stab = true,
+		DamageDecay = 0.02f,
+		AnimationSpeed = 0.8f
 	};
 
 	/*public static FencingBladeAttackProfile CustomSwing(float damage = 1f, float speed = 1f, float velocity = 1f, float bend = 0f, float angle = MathHelper.PiOver2, float scale = 1f, float scaleMult = 1f) => SingleSwing with

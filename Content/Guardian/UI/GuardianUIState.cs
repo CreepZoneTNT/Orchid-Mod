@@ -59,6 +59,9 @@ namespace OrchidMod.Content.Guardian.UI
 		public static Texture2D textureFencingBladeOn;
 		public static Texture2D textureFencingBladeOff;
 		public static Texture2D textureFencingBladeReady;
+		public static Texture2D textureFencingBladeSheathlessOn;
+		public static Texture2D textureFencingBladeSheathlessOff;
+		public static Texture2D textureFencingBladeSheathlessReady;
 
 		public static Texture2D textureHorizonLanceOn;
 		public static Texture2D textureHorizonLanceOff;
@@ -134,6 +137,9 @@ namespace OrchidMod.Content.Guardian.UI
 			textureFencingBladeOn = ModContent.Request<Texture2D>(path + "FencingBladeOn", AssetRequestMode.ImmediateLoad).Value;
 			textureFencingBladeOff = ModContent.Request<Texture2D>(path + "FencingBladeOff", AssetRequestMode.ImmediateLoad).Value;
 			textureFencingBladeReady = ModContent.Request<Texture2D>(path + "FencingBladeReady", AssetRequestMode.ImmediateLoad).Value;
+			textureFencingBladeSheathlessOn = ModContent.Request<Texture2D>(path + "FencingBladeSheathlessOn", AssetRequestMode.ImmediateLoad).Value;
+			textureFencingBladeSheathlessOff = ModContent.Request<Texture2D>(path + "FencingBladeSheathlessOff", AssetRequestMode.ImmediateLoad).Value;
+			textureFencingBladeSheathlessReady = ModContent.Request<Texture2D>(path + "FencingBladeSheathlessReady", AssetRequestMode.ImmediateLoad).Value;
 
 			textureHammerOn = ModContent.Request<Texture2D>(path + "HammerOn", AssetRequestMode.ImmediateLoad).Value;
 			textureHammerOff = ModContent.Request<Texture2D>(path + "HammerOff", AssetRequestMode.ImmediateLoad).Value;
@@ -418,13 +424,22 @@ namespace OrchidMod.Content.Guardian.UI
 						chargeTextureReady = textureBlockReady;
 					}
 					
-					if (guardianItem is OrchidModGuardianFencingBlade)
+					if (guardianItem is OrchidModGuardianFencingBlade blade)
 					{
 						if (maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f))
 						{
-							chargeTextureOn = textureFencingBladeOn;
-							chargeTextureOff = textureFencingBladeOff;
-							chargeTextureReady = textureFencingBladeReady;
+							if (((OrchidMod.OrchidClientConfig.GuardianFencingBladeUIType == OrchidClientConfig.FencingBladeUIType.Depends && !blade.DrawSheath) || OrchidMod.OrchidClientConfig.GuardianFencingBladeUIType == OrchidClientConfig.FencingBladeUIType.Sheathless))
+							{
+								chargeTextureOn = textureFencingBladeSheathlessOn;
+								chargeTextureOff = textureFencingBladeSheathlessOff;
+								chargeTextureReady = textureFencingBladeSheathlessReady;
+							}
+							else
+							{
+								chargeTextureOn = textureFencingBladeOn;
+								chargeTextureOff = textureFencingBladeOff;
+								chargeTextureReady = textureFencingBladeReady;
+							}
 						}
 					}
 					

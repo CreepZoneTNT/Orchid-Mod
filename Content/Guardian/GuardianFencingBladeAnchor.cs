@@ -206,9 +206,9 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 					Projectile.extraUpdates = 1;
 					Visible = true;
 
-					SoundEngine.PlaySound(GuardianItem.SwingSound, Projectile.Center);
+					SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing, Projectile.Center);
 						
-					CombatText.NewText(Owner.getRect(), Color.White, MathHelper.ToDegrees(Projectile.ai[2]).ToString());
+					// CombatText.NewText(Owner.getRect(), Color.White, MathHelper.ToDegrees(Projectile.ai[2]).ToString());
 				}
 				
 				if (Projectile.ai[2] is > -3.14f and < 0f)
@@ -330,7 +330,6 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 						DamageReset = 0;
 						Visible = true;
 						
-						// SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing, Projectile.Center);
 						Projectile.netUpdate = true;
 						// NeedNetUpdate = true;
 					}
@@ -417,7 +416,7 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 						Projectile.ai[0] = 41f;
 						Projectile.ai[2] = MathHelper.WrapAngle(Vector2.Normalize(Main.MouseWorld - Owner.MountedCenter).ToRotation() - MathHelper.PiOver2);
 						Guardian.OnAttack(AttackID.FencingBladeReinforcedSlash, GuardianItem);
-						Guardian.GuardianItemCharge = 60f;
+						Guardian.GuardianItemCharge = 61f;
 						Ding = false;
 						Owner.TryInterruptingItemUsage();
 						NeedNetUpdate = true;
@@ -445,7 +444,10 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 								Guardian.GuardianParryBuffer = true;
 							}
 							else
+							{
+								Ding = null;
 								Projectile.ai[0] = -41f;
+							}
 						}
 						else
 						{
@@ -482,6 +484,8 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 		
 		GuardianItem.ExtraAIFencingBlade(Owner, Guardian, Projectile);
 	}
+
+	public override bool? CanCutTiles() => Projectile.ai[0] is > 1 and < 42 or < 0;
 
 	public override bool OrchidPreDraw(SpriteBatch spriteBatch, ref Color lightColor)
 	{
@@ -548,10 +552,13 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 		return false;
 	}
 	
-	public void UpdateCache(int limit = 10, bool purgeOld = true)
+	public void UpdateCache(int limit = 10, bool recordNew = true, bool purgeOld = true)
 	{
-		OldPosition.Add(Projectile.Center);
-		OldRotation.Add(Projectile.rotation);
+		if (recordNew)
+		{
+			OldPosition.Add(Projectile.Center);
+			OldRotation.Add(Projectile.rotation);
+		}
 				
 		if (purgeOld && OldPosition.Count > limit)
 		{
@@ -594,6 +601,8 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 		AttackTimer++;
 		SwingTimer++;
 		
+		int damage = Guardian.GetGuardianDamage(FencingBladeItem.damage * settings.Damage * (reinforced && Ding is not true ? GuardianItem.SemiReinforcedDamage : Ding is null ? 0.8f : 1f));
+		
 		switch (style)
 		{
 			case 0: // Normal attack: big upward slash
@@ -603,7 +612,6 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 					UpdateCache();
 					if (rotation >= 0 && DamageReset == 0)
 					{
-						int damage = Guardian.GetGuardianDamage(FencingBladeItem.damage * settings.Damage * (Ding is not true ? GuardianItem.SemiReinforcedDamage : 1f));
 						if (GuardianItem.OnSlash(Owner, Guardian, Projectile, reinforced, ref damage))
 						{
 							Vector2 velocity = Vector2.UnitY.RotatedBy(Projectile.ai[2]) * FencingBladeItem.shootSpeed * settings.Velocity;
@@ -625,7 +633,7 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 				else
 				{
 					rotation = ((toSheath - Projectile.ai[2]) + (Owner.direction == -1 ? MathHelper.Pi : 0)) * MathF.Sin(MathHelper.Pi/40 * (ai + 20f));
-					UpdateCache(0);
+					UpdateCache(0, false);
 				}
 				
 				rotation = Projectile.ai[2] + Owner.direction * rotation;
@@ -634,7 +642,7 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 				Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, rotation) + Vector2.UnitY.RotatedBy(Projectile.rotation - MathHelper.Pi) * BladeTexture.Height * GuardianItem.HoldOffset;
 				
 				Projectile.rotation = rotation + MathHelper.Pi;
-				if (ai < 20) Projectile.rotation = Projectile.DirectionTo(sheathPos).ToRotation();
+				if (ai < 20) Projectile.rotation = (toSheath - Projectile.ai[2]);
 				
 				break;
 			case 1: // Reinforced attack:
@@ -667,7 +675,6 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 				
 				if ((int)((40 - ai) / interval) > DamageReset)
 				{
-					int damage = Guardian.GetGuardianDamage(FencingBladeItem.damage * settings.Damage);
 					if (GuardianItem.OnSlash(Owner, Guardian, Projectile, reinforced, ref damage))
 						CreateSlashProj(Vector2.UnitY.RotatedBy(Projectile.ai[2]) * FencingBladeItem.shootSpeed * settings.Velocity, damage, reinforced);
 							
@@ -678,12 +685,37 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 				}
 				break;
 			case 2:
+				if (ai < 20f)
+				{
+					rotation = ((toSheath - Projectile.ai[2]) + (Owner.direction == -1 ? MathHelper.Pi : 0)) * MathF.Sin(MathHelper.Pi/40 * (ai + 20f));
+					UpdateCache(0, false);
+				}
+				else
+				{
+					rotation = 0;
+					if (ai <= 30 && DamageReset == 0)
+					{
+						if (GuardianItem.OnSlash(Owner, Guardian, Projectile, reinforced, ref damage))
+						{
+							Vector2 velocity = Vector2.UnitY.RotatedBy(Projectile.ai[2]) * FencingBladeItem.shootSpeed * settings.Velocity;
+							if (useFocusProj) CreateFocusProj(velocity * 0.5f, damage, reinforced);
+							else CreateSlashProj(velocity, damage, reinforced);
+						}
+							
+						SoundEngine.PlaySound(sound, Projectile.Center);
+						DamageReset++;
+						Projectile.netUpdate = true;
+						SwingTimer = 0;
+					}
+				}
+
+				rotation = Projectile.ai[2] + Owner.direction * rotation;
 				
-				rotation = ((toSheath - Projectile.ai[2]) + (Owner.direction == -1 ? MathHelper.Pi : 0)) * MathF.Sin(MathHelper.Pi/40 * (ai + 20f));
-				UpdateCache(0);
-				
+				Projectile.rotation = rotation + MathHelper.Pi;
 				Owner.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, rotation);
-				Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, rotation) + Vector2.UnitY.RotatedBy(rotation) * BladeTexture.Height * GuardianItem.HoldOffset;
+				float distance = BladeTexture.Height * GuardianItem.HoldOffset;
+					distance *= ai >= 20f ? -(0.5f + 1.5f * MathF.Sin(MathHelper.Pi * ai / 20)) : 0.5f;
+				Projectile.Center = Owner.GetFrontHandPosition(Player.CompositeArmStretchAmount.Full, rotation) + Vector2.UnitY.RotatedBy(rotation) * distance;
 				break;
 			
 		}
@@ -699,9 +731,11 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 		if (newProj.ModProjectile is FencingBladeSlashProjectile slashProj) // Code modified from GuardianKatarAnchor.cs 
 		{
 			slashProj.FencingBladeItem = GuardianItem;
-			slashProj.Strong = reinforced;
+			slashProj.Strong = Ding is true;
 			slashProj.Scale = settings.Scale;
 			slashProj.ScaleMult = settings.ScaleChange;
+			slashProj.Stab = settings.Stab;
+			slashProj.DamageDecay = settings.DamageDecay;
 			newProj.ai[0] = Main.rand.NextFloat(-settings.BendAmount, settings.BendAmount);
 			newProj.rotation = newProj.velocity.ToRotation();
 			newProj.damage = damage;
@@ -724,7 +758,8 @@ public class GuardianFencingBladeAnchor : OrchidModGuardianParryAnchor
 		if (newProj.ModProjectile is FencingBladeFocusProjectile focusProj) // Code modified from GuardianKatarAnchor.cs 
 		{
 			focusProj.FencingBladeItem = GuardianItem;
-			focusProj.Strong = reinforced;
+			focusProj.Strong = Ding is true;
+			focusProj.FencingBladeProfile = settings;
 			newProj.ai[0] = settings.Quantity;
 			newProj.ai[1] = settings.BendAmount;
 			newProj.ai[2] = settings.Scale;

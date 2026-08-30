@@ -68,10 +68,17 @@ namespace OrchidMod.Common
 		[BackgroundColor(151, 120, 79)]
 		public bool GuardianThoriumThorsHammerConversion { get; set; }
 
+		public enum FencingBladeUIType
+		{
+			Sheath,
+			Sheathless,
+			Depends
+		}
 		
-		[DefaultValue(false)]
+		[DefaultValue(FencingBladeUIType.Sheath)]
+		[Dropdown]
 		[BackgroundColor(151, 120, 79)]
-		public bool GuardianFencingBlade { get; set; }
+		public FencingBladeUIType GuardianFencingBladeUIType { get; set; }
 
 		[Header("Shapeshifter")]
 		[DefaultValue(false)]

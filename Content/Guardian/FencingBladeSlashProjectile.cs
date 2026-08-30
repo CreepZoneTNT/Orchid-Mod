@@ -28,6 +28,7 @@ namespace OrchidMod.Content.Guardian
 		public List<float> OldRotation;
 		
 		public int HitCount = 0;
+		public float DamageDecay = 0f;
 
 		public override void Load()
 		{
@@ -55,6 +56,8 @@ namespace OrchidMod.Content.Guardian
 			OldRotation = [];
 		}
 
+		public override bool? CanHitNPC(NPC target) => true;
+
 		public override void AI()
 		{
 			if (!Initialized)
@@ -81,24 +84,24 @@ namespace OrchidMod.Content.Guardian
 			{
 				Projectile.velocity *= 0.94574f;
 				
-				if (TimeSpent % 4 == 0)
-				{
-					OldPosition.Add(Projectile.Center);
-					OldRotation.Add(Projectile.rotation);
-				}
-				
-				if (OldPosition.Count > 10)
-				{
-					OldPosition.RemoveAt(0);
-					OldRotation.RemoveAt(0);
-				}
-				
 				if (!Stab)
 				{
 					Projectile.velocity = Projectile.velocity.RotatedBy(Projectile.ai[0]);
 					Projectile.rotation += Projectile.ai[0];
 				}
 				
+			}
+			
+			if (TimeSpent % 4 == 0)
+			{
+				OldPosition.Add(Projectile.Center);
+				OldRotation.Add(Projectile.rotation);
+			}
+				
+			if (OldPosition.Count > 10)
+			{
+				OldPosition.RemoveAt(0);
+				OldRotation.RemoveAt(0);
 			}
 			
 			float weaponScale = Owner.GetModPlayer<OrchidGuardian>().GuardianWeaponScale * Scale;
@@ -139,6 +142,7 @@ namespace OrchidMod.Content.Guardian
 						Guardian.AddSlam();
 					}
 					FencingBladeItem.OnHitFirst(Owner, guardian, target, Projectile, hit);
+					FirstHit = false;
 				}
 				FencingBladeItem.OnHit(Owner, guardian, target, Projectile, hit);
 				

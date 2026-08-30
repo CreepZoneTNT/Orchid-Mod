@@ -423,6 +423,9 @@
         <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.Damage">
             <summary>Multiplies the amount of damage inflicted per projectile.</summary>
         </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.DamageDecay">
+            <summary>Multiplies the amount of damage inflicted per projectile.</summary>
+        </member>
         <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.AnimationSpeed">
             <summary>Multiplies the animation speed of the attack.</summary>
         </member>
@@ -432,6 +435,30 @@
         <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.BendAmount">
             <summary>something something random angle offset</summary>
             <remarks>If <c>UsesFocusProjectile</c> is true, this controls the random offset from the ordinals that the focus spawns each stab projectile at; otherwise this controls the random rate each slash curves in flight.</remarks>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.ControlAngle">
+            <summary>The generic "control angle" for the attack's animation. Function depends on <c>AttackStyle</c>, but generally determines how wide a swing is when performed.</summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.Scale">
+            <summary>Multiplies the base scale of the attack's projectile(s).</summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.ScaleChange">
+            <summary>Multiplier for the change of scale of the attack's projectile(s).</summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.UsesFocusProjectile">
+            <summary>
+            If true, the attack will spawn a "<see cref="T:OrchidMod.Content.Guardian.FencingBladeFocusProjectile">Focus</see>" projectile that conjures diagonal stab projectiles on an interval, instead of individual slashes/stabs.
+            Only works when <c>AttackStyle</c> is set to 0 or 2, as <see cref="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.Quantity"/> is used to determine the amount of stabs conjured.<br/>
+            Focus stabs cannot bend, so be sure to read <see cref="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.BendAmount"/> and <see cref="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.FocusRotates"/>. 
+            </summary>
+            <remarks>Works similarly to the fully-powered Blade from <i>Cave Story</i>.</remarks>
+            <seealso cref="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.Stab"/>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.Stab">
+            <summary>If true, the slash projectiles will have their <c>Stab</c> property set, changing their appearance from an arc shape to a linear slice. Mostly visual.</summary>
+        </member>
+        <member name="F:OrchidMod.Content.Guardian.FencingBladeAttackProfile.FocusRotates">
+            <summary>If true while <c>UsesFocusProjectile</c> is also true, the stab projectiles spawned by the focus will respect the focus projectile's direction instead of being locked to the ordinal directions.</summary>
         </member>
         <member name="M:OrchidMod.Content.Guardian.OrchidModGuardianGauntlet.OnPunch(Terraria.Player,OrchidMod.Content.Guardian.OrchidGuardian,Terraria.Projectile,System.Boolean,System.Boolean,System.Boolean@,System.Int32@)">
             <summary> Called right before a punch projectile is spawned. Return false to prevent normal punch projectiles from spawning. </summary>

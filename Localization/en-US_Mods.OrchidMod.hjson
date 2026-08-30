@@ -3491,8 +3491,17 @@ Items: {
 	}
 
 	ThoriumTemplarFencingBlade: {
-		Tooltip: ""
-		DisplayName: Thorium Templar Fencing Blade
+		DisplayName: Templar's Vigilance
+		Tooltip:
+			'''
+			Charged slashes yank pickups toward you at the cost of 25% decreased efficacy
+			Reinforced stab hits will heal allies below 50% health 
+			'''
+	}
+
+	ThoriumSteelFencingBlade: {
+		DisplayName: Steel Saber
+		Tooltip: "'Expertly forged by the Blacksmith'"
 	}
 }
 
@@ -3964,6 +3973,8 @@ Projectiles: {
 	FencingBladeSlashProjectile.DisplayName: Slash
 	FencingBladeFocusProjectile.DisplayName: Focus
 	GuardianLanternShieldPunchProj.DisplayName: Heavy Punch
+	ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
+	ThoriumTemplarFencingBladeProjectile.DisplayName: Thorium Templar Fencing Blade Projectile
 }
 
 Configs: {
@@ -4087,9 +4098,9 @@ Configs: {
 				'''
 		}
 
-		GuardianFencingBlade: {
-			Label: Guardian Fencing Blade
-			Tooltip: ""
+		GuardianFencingBladeUIType: {
+			Label: Fencing Blade icon variant
+			Tooltip: The UI icon variant to use for Fencing Blades
 		}
 	}
 
@@ -4115,6 +4126,25 @@ Configs: {
 		EnableContentShapeshifter: {
 			Label: Enable Shapeshifter Content
 			Tooltip: Allows shapeshifter items to be obtainable
+		}
+	}
+
+	FencingBladeUIType: {
+		Tooltip: ""
+
+		Sheath: {
+			Label: Sheath
+			Tooltip: The UI will always use Amber's icon, depicting a fencing blade in its sheath
+		}
+
+		Sheathless: {
+			Label: Sheathless
+			Tooltip: The UI will always use CreepZoneTNT's icon, depicting a fencing blade without a sheath
+		}
+
+		Depends: {
+			Label: Depends
+			Tooltip: The icon variant will change depending on whether the fencing blade has its sheath enabled or not
 		}
 	}
 }

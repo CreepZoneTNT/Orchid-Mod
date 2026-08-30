@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,6 +16,7 @@ namespace OrchidMod.Content.Guardian
 	{
 		private static Asset<Texture2D> TextureMain;
 		public OrchidModGuardianFencingBlade FencingBladeItem;
+		public FencingBladeAttackProfile FencingBladeProfile;
 
 		public List<Vector2> OldPosition;
 		public List<float> OldRotation;
@@ -77,38 +79,41 @@ namespace OrchidMod.Content.Guardian
 							NextDirection.Add(OrdinalAngles[index]); 
 					}
 			}
-			else if (FencingBladeItem.ProjectileAI(Owner, Projectile, Strong))
+			else
 			{
-				Projectile.velocity *= 0.98f;
-				if (Strong)
-				{
-					if (TimeSpent % 4 == 0)
-					{
-						OldPosition.Add(Projectile.Center);
-						OldRotation.Add(Projectile.rotation);
-						OldFrame.Add(Frame);
-					}
+				Projectile.velocity *= Strong ? 0.98f : 0.95f;
+
+				Projectile.rotation = Projectile.velocity.ToRotation();
 				
-					if (OldPosition.Count > 10)
-					{
-						OldPosition.RemoveAt(0);
-						OldRotation.RemoveAt(0);
-						OldFrame.RemoveAt(0);
-					}
+				if (TimeSpent % 4 == 0)
+				{
+					OldPosition.Add(Projectile.Center);
+					OldRotation.Add(Projectile.rotation);
+					OldFrame.Add(Frame);
+				}
+			
+				if (OldPosition.Count > (Strong ? 10 : 5))
+				{
+					OldPosition.RemoveAt(0);
+					OldRotation.RemoveAt(0);
+					OldFrame.RemoveAt(0);
 				}
 				
-				if ((int)StabTimer + 1 > DamageReset && DamageReset <= (int)Projectile.ai[0])
+				if ((int)StabTimer + 1 > DamageReset && DamageReset <= FencingBladeProfile.Quantity)
 				{
-					float nextAngle = NextDirection[0];
-					Vector2 velocity = Vector2.UnitX.RotatedBy(nextAngle + Main.rand.NextFloat(-Projectile.ai[1], Projectile.ai[1])) * 10f;
+					float nextAngle = NextDirection[0] + Main.rand.NextFloat(-FencingBladeProfile.BendAmount, FencingBladeProfile.BendAmount);
+					if (FencingBladeProfile.FocusRotates) nextAngle = MathHelper.WrapAngle(nextAngle + Projectile.rotation);
+					Vector2 velocity = Vector2.UnitX.RotatedBy(nextAngle) * 10f;
 				
-					Projectile newProj = Projectile.NewProjectileDirect(Projectile.GetSource_FromAI(), Projectile.Center + velocity, Vector2.Zero, ModContent.ProjectileType<FencingBladeSlashProjectile>(), 1, 1f, Owner.whoAmI);
+					Projectile newProj = Projectile.NewProjectileDirect(Projectile.GetSource_FromAI(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<FencingBladeSlashProjectile>(), 1, 1f, Owner.whoAmI);
 					if (newProj.ModProjectile is FencingBladeSlashProjectile slashProj)
 					{
 						slashProj.FencingBladeItem = FencingBladeItem;
 						slashProj.Strong = Strong;
-						slashProj.Scale = Projectile.ai[2];
+						slashProj.Scale = FencingBladeProfile.Scale;
+						slashProj.ScaleMult = FencingBladeProfile.ScaleChange;
 						slashProj.Stab = true;
+						newProj.Center += velocity;
 						newProj.velocity = -velocity;
 						newProj.rotation = newProj.velocity.ToRotation();
 						newProj.damage = Projectile.damage;
@@ -140,13 +145,13 @@ namespace OrchidMod.Content.Guardian
 				}
 				
 				TimeSpent++;
-				StabTimer += Projectile.ai[0]/120;
+				StabTimer += FencingBladeProfile.Quantity/120f;
 			}
 		}
 
 		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
 		{
-			modifiers.FinalDamage *= 0.5f;
+			modifiers.FinalDamage *= 0.2f;
 		}
 
 		public override bool OrchidPreDraw(SpriteBatch spriteBatch, ref Color lightColor)

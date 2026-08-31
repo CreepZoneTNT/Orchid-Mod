@@ -3294,8 +3294,8 @@ Items: {
 		/* Tooltip:
 			'''
 			[c/FF0000:Test Item]
-			Shoots lingering bubbles on jab 
-			Pop bubbles with charged attacks or fully charge while underwater to propel yourself to your cursor
+			Blows lingering bubbles on jab 
+			Charged attacks pop bubbles 
 			''' */
 	}
 
@@ -3976,6 +3976,7 @@ Projectiles: {
 	// GuardianLanternShieldPunchProj.DisplayName: Heavy Punch
 	// ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
 	// ThoriumTemplarFencingBladeProjectile.DisplayName: Thorium Templar Fencing Blade Projectile
+	// ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Thorium Naga Quarterstaff Projectile Alt
 }
 
 Configs: {

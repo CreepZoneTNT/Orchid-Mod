@@ -2,8 +2,8 @@
   "profiles": {
     "Terraria": {
       "commandName": "Executable",
-      "executablePath": "dotnet/dotnet",
-      "commandLineArgs": "$(tMLPath) -tmlsavedirectory /var/home/creepzonetnt/Documents/Coding/tModLoader/",
+      "executablePath": "dotnet",
+      "commandLineArgs": "$(tMLPath)",
       "workingDirectory": "$(tMLSteamPath)"
     },
     "TerrariaServer": {

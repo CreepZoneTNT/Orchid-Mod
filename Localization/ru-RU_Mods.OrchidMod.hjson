@@ -257,8 +257,13 @@ Buffs: {
 	}
 
 	GuardianVoidQuarterstaffBuff: {
-		// Description: Void Rush
-		// DisplayName: 150% increased Flux Ripper attack speed
+		// DisplayName: Void Rush
+		// Description: 150% increased Flux Ripper attack speed
+	}
+
+	GuardianDreadGauntletBuff: {
+		// DisplayName: Dread Reaper's Fury
+		// Description: 60% increased melee speed and 20% increased movement speed, at a cost...
 	}
 }
 
@@ -3236,7 +3241,12 @@ Items: {
 
 	ToyWarhammers: {
 		// DisplayName: The Big Honkers
-		// Tooltip: Lets you dual wield a pair of very squeaky hammers
+		/* Tooltip:
+			'''
+			'Honk honk'
+			Lets you dual wield a pair of very squeaky hammers
+			''' */
+		// AnnoyingPrefix: "{0:+0;-0}% obnoxiousness"
 	}
 
 	ThoriumValadiumWarhammer: {
@@ -3284,8 +3294,8 @@ Items: {
 		/* Tooltip:
 			'''
 			[c/FF0000:Test Item]
-			Jab is replaced by a powerful sweep
-			Fully charge while underwater to propel yourself to your cursor, ending in a massive full sweep attack
+			Blows lingering bubbles on jab 
+			Charged attacks pop bubbles 
 			''' */
 	}
 
@@ -3295,6 +3305,7 @@ Items: {
 			'''
 			[c/FF0000:Test Item]
 			Fully charging creates a damage-sharing link between enemies
+			'The wonders of the world shall be connected'
 			''' */
 	}
 
@@ -3304,13 +3315,18 @@ Items: {
 			'''
 			[c/FF0000:Test Item]
 			Attacks grant Cold Energy charge
-			At full Cold Energy charge, your next slam will release a giant snowflake
+			At full Cold Energy charge, your next charged attack will release a giant snowflake
 			''' */
 	}
 
 	ThoriumDreadGauntlet: {
 		// DisplayName: Dread Reaper's Claw
-		// Tooltip: ""
+		/* Tooltip:
+			'''
+			Hooking an enemy refunds a guard, deals damage, and triggers your active parry
+			Parrying increases speed for a short time, and launches kunai on punch
+			''' */
+		// Parry: "{0} click fires a grappling claw, costing 2 guards"
 	}
 
 	ThoriumGuardianTitanHead: {
@@ -3339,7 +3355,7 @@ Items: {
 	}
 
 	ThoriumGuardianVoidHead: {
-		// DisplayName: Thorium Guardian Void Head
+		// DisplayName: Void Sentinel Helmet
 		/* Tooltip:
 			'''
 			[c/FF0000:Test Item]
@@ -3350,9 +3366,10 @@ Items: {
 			''' */
 		/* SetBonus:
 			'''
-			Decreases max life by 250
-			Guardian attacks briefly grant massively increased health and resource regeration
-			While blocking or parrying you will attract nearby blockable projectiles
+			Decreases max life by 100
+			Summons a stinger tail above you
+			Pressing the 'Armor Ability' key consumes life to stab toward your cursor
+			On hit you gain massively increased life and guardian resource regeneration 
 			''' */
 	}
 
@@ -3417,6 +3434,31 @@ Items: {
 		// Tooltip: Spending a slam shields the lowest health nearby ally life by 5, up to 10
 	}
 
+	HorizonChandelier: {
+		// Tooltip: ""
+		// DisplayName: Horizon Chandelier
+	}
+
+	HorizonBrick: {
+		// Tooltip: ""
+		// DisplayName: Horizon Brick
+	}
+
+	ThoriumTerrariumQuarterstaff: {
+		// DisplayName: Thorium Terrarium Quarterstaff
+		// Tooltip: ""
+	}
+
+	ThoriumBlackKatar: {
+		// DisplayName: The Black Katar
+		/* Tooltip:
+			'''
+			[c/FF0000:Test Item]
+			Parries summon a shadow clone that imitates your movement after a delay
+			Dealing damage grants you stacking damage and withers enemies at 50 stacks
+			''' */
+	}
+
 	ConsolariaLepusEggNest: {
 		// DisplayName: Consolaria Lepus Egg Nest
 		// Tooltip: ""
@@ -3430,21 +3472,37 @@ Items: {
 		''' */
 	// DepthDiverGreaves.Tooltip: Increases maximum guards by 2
 
-	GuardianDelegateTest: {
-		// DisplayName: Guardian Delegate Test
+	GuardianLanternShield: {
+		// DisplayName: Guardian Lantern Shield
+		// Tooltip: Can emit light with a torch
+	}
+
+	KingSlimeFencingBlade: {
+		// DisplayName: Slimy Shinken
+		// Tooltip: Reinforced attacks coat enemies in slime
+	}
+
+	DeerclopsFencingBlade: {
+		// DisplayName: Fencing Sword
 		/* Tooltip:
 			'''
-			Consuming slams launches a nail in a random direction
-			Inflicts Daybroken on the first enemy blocked or parried
-			Slams and guards have a chance not to be consumed as the player approaches critical health
-			Grants a 0.25-second 'Perfect Parry' window
-			Parrying during this time does nothing of utility
-			Gaining more than 1 guard at once says some words of inspiration
-			Reduces resources granted by warhammers and quarterstaves by 50%, but all attacks can grant resources
-			Modifies the tooltips and CombatText to reflect this
-			'Just a bunch of wacky effects to test my Delegates system'
-			[c/FF0000:Test Item]
+			Reinforced attacks ignore 15 points of enemy defense
+			'Enguard! Re-post!'
 			''' */
+	}
+
+	ThoriumTemplarFencingBlade: {
+		// DisplayName: Templar's Vigilance
+		/* Tooltip:
+			'''
+			Charged slashes yank pickups toward you at the cost of 25% decreased efficacy
+			Reinforced stab hits will heal allies below 50% health 
+			''' */
+	}
+
+	ThoriumSteelFencingBlade: {
+		// DisplayName: Steel Saber
+		// Tooltip: "'Expertly forged by the Blacksmith'"
 	}
 }
 
@@ -3601,6 +3659,7 @@ Prefixes: {
 	BlockingPrefix.DisplayName: Блокирующий
 	# Guardian
 	HaidexPrefix.DisplayName: Непонятный
+	// AnnoyingPrefixGuardian.DisplayName: Annoying
 	FlimsyPrefix.DisplayName: Хлипкий
 	FeeblePrefix.DisplayName: Хилый
 	FragilePrefix.DisplayName: Ветхий
@@ -3899,16 +3958,25 @@ Projectiles: {
 	// GuardianKatarAnchor.DisplayName: Katar
 	// HellstoneKatarProjectile.DisplayName: Trailblaze
 	// ThoriumGraniteKatarProjectile.DisplayName: Ion Deluge
-	// ToyWarhammerProjectile.DisplayName: The Big Honker
 	// ThoriumVoidQuarterstaffProjectile.DisplayName: Void
-	// ThoriumDemonBloodGauntletProjectile.DisplayName: Thorium Demon Blood Gauntlet Projectile
-	// ThoriumNagaQuarterstaffProjectile.DisplayName: Thorium Naga Quarterstaff Projectile
-	// ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Thorium Concentrated Thorium Quarterstaff Projectile
-	// ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
-	// GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
+	// ThoriumNagaQuarterstaffProjectile.DisplayName: Acrid Bubble
 	// ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
-	// ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
-	// ThoriumTerrariumQuarterstaffProjectile.DisplayName: Thorium Terrarium Quarterstaff Projectile
+	// ThoriumBoreanStriderQuarterstaffProjectile.DisplayName: Giga Snowflake
+	// ThoriumDreadGauntletProjectileAlt.DisplayName: Dread Kunai
+	// ThoriumDreadGauntletProjectile.DisplayName: Dread Grappleclaw
+	// VoidArmorTail.DisplayName: Void Armor Tail
+	// ThoriumBlackKatarProjectile.DisplayName: Shadow Clone
+	// ConsolariaLepusEggNestProjectile.DisplayName: Egg
+	// GuardianLanternShieldAnchor.DisplayName: Lantern Shield
+	// ThoriumNagaQuarterstaffProjectileDash.DisplayName: Riptide Dive
+	// ThoriumTerrariumQuarterstaffProjectile.DisplayName: Bifrost
+	// GuardianFencingBladeAnchor.DisplayName: Fencing Blade
+	// FencingBladeSlashProjectile.DisplayName: Slash
+	// FencingBladeFocusProjectile.DisplayName: Focus
+	// GuardianLanternShieldPunchProj.DisplayName: Heavy Punch
+	// ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
+	// ThoriumTemplarFencingBladeProjectile.DisplayName: Thorium Templar Fencing Blade Projectile
+	// ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Thorium Naga Quarterstaff Projectile Alt
 }
 
 Configs: {
@@ -3940,12 +4008,12 @@ Configs: {
 			Tooltip: Использовать старый интерфейс молотов хранителя (в стиле Paper Mario)
 		}
 
-		GuardianSwapPaviseImputs: {
+		GuardianSwapPaviseInputs: {
 			Label: Поменять клавиши функционала павез
 			Tooltip: Меняет местами ЛКМ и ПКМ для функционала павез хранителя
 		}
 
-		GuardianSwapGauntletImputs: {
+		GuardianSwapGauntletInputs: {
 			Label: Поменять клавишу предметов парирования
 			Tooltip: Меняет местами ЛКМ и ПКМ для предметов хранителя, использующих парирование (перчатки, боевые шесты и т.д.)
 		}
@@ -4039,6 +4107,11 @@ Configs: {
 				No effect if Smart Cursor isn't set to 'Toggle'
 				''' */
 		}
+
+		GuardianFencingBladeUIType: {
+			// Label: Fencing Blade icon variant
+			// Tooltip: The UI icon variant to use for Fencing Blades
+		}
 	}
 
 	OrchidServerConfig: {
@@ -4063,6 +4136,25 @@ Configs: {
 		EnableContentShapeshifter: {
 			Label: Доступность контента оборотня
 			Tooltip: Делает предметы, относящиеся к классу оборотня, доступными для получения
+		}
+	}
+
+	FencingBladeUIType: {
+		// Tooltip: ""
+
+		Sheath: {
+			// Label: Sheath
+			// Tooltip: The UI will always use Amber's icon, depicting a fencing blade in its sheath
+		}
+
+		Sheathless: {
+			// Label: Sheathless
+			// Tooltip: The UI will always use CreepZoneTNT's icon, depicting a fencing blade without a sheath
+		}
+
+		Depends: {
+			// Label: Depends
+			// Tooltip: The icon variant will change depending on whether the fencing blade has its sheath enabled or not
 		}
 	}
 }
@@ -4142,7 +4234,7 @@ UI: {
 			Зарядите, чтобы взмахнуть
 			Нажмите {0}, чтобы нанести колющий удар во время зарядки
 			'''
-		// ChargeToJab: Charge to swing, {0} click to slam while charging
+		// ChargeToJab: Charge to swing, {0} to slam while charging
 		ChargeToDash:
 			'''
 			Зарядите, чтобы совершить рывок
@@ -4159,6 +4251,7 @@ UI: {
 		Parry: Нажмите {0}, чтобы совершить парирование
 		ParryDash: Нажмите {0}, чтобы совершить парирование рывком вниз
 		ChargeToThrow: Зарядите, чтобы бросить
+		// ChargeToParry: Charge to parry
 		SwingWhileCharging:
 			'''
 			Зарядите, чтобы бросить
@@ -4166,6 +4259,7 @@ UI: {
 			'''
 		UsesUpTo: Использует до {0} оч. нападения
 		RuneDuration: Время действия руны: {0} сек.
+		// DashDuringSwing: "{0} during reinforced attack to dash"
 		Block: Нажмите {0}, чтобы сделать блок
 		BlockGuard: Нажмите {0}, чтобы сделать блок за {1} оч. обороны
 		BlockSlam: Нажмите {0}, чтобы сделать блок за {1} оч. нападения
@@ -4174,7 +4268,6 @@ UI: {
 		BuffDuration: Длительность эффекта: {0} сек.
 		HorizonLaceShieldStacks: Даёт 3 оч. обороны при полном заряде
 		DamageOfDefense: Наносит противостоящий урон, равный {0}% от вашей защиты
-		// PerfectParry: Perfect parry!
 	}
 
 	DanserItem: {

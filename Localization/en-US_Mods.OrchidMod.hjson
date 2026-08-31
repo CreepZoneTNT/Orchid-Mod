@@ -3235,7 +3235,12 @@ Items: {
 
 	ToyWarhammers: {
 		DisplayName: The Big Honkers
-		Tooltip: Lets you dual wield a pair of very squeaky hammers
+		Tooltip:
+			'''
+			'Honk honk'
+			Lets you dual wield a pair of very squeaky hammers
+			'''
+		AnnoyingPrefix: "{0:+0;-0}% obnoxiousness"
 	}
 
 	ThoriumValadiumWarhammer: {
@@ -3283,8 +3288,8 @@ Items: {
 		Tooltip:
 			'''
 			[c/FF0000:Test Item]
-			Jab is replaced by a powerful sweep
-			Fully charge while underwater to propel yourself to your cursor, ending in a massive full sweep attack
+			Blows lingering bubbles on jab, up to 10
+			Charged attacks pop bubbles, potentially triggering a chain reaction
 			'''
 	}
 
@@ -3303,7 +3308,7 @@ Items: {
 			'''
 			[c/FF0000:Test Item]
 			Attacks grant Cold Energy charge
-			At full Cold Energy charge, your next slam will release a giant snowflake
+			At full Cold Energy charge, your next charged attack will release a giant snowflake
 			'''
 	}
 
@@ -3338,7 +3343,7 @@ Items: {
 	}
 
 	ThoriumGuardianVoidHead: {
-		DisplayName: Thorium Guardian Void Head
+		DisplayName: Void Sentinel Helmet
 		Tooltip:
 			'''
 			[c/FF0000:Test Item]
@@ -3349,9 +3354,10 @@ Items: {
 			'''
 		SetBonus:
 			'''
-			Decreases max life by 250
-			Guardian attacks briefly grant massively increased health and resource regeration
-			While blocking or parrying you will attract nearby blockable projectiles
+			Decreases max life by 100
+			Summons a stinger tail above you
+			Pressing the 'Armor Ability' key consumes life to stab toward your cursor
+			On hit you gain massively increased life and guardian resource regeneration 
 			'''
 	}
 
@@ -3898,16 +3904,29 @@ Projectiles: {
 	GuardianKatarAnchor.DisplayName: Katar
 	HellstoneKatarProjectile.DisplayName: Trailblaze
 	ThoriumGraniteKatarProjectile.DisplayName: Ion Deluge
-	ToyWarhammerProjectile.DisplayName: The Big Honker
 	ThoriumVoidQuarterstaffProjectile.DisplayName: Void
-	ThoriumDemonBloodGauntletProjectile.DisplayName: Thorium Demon Blood Gauntlet Projectile
-	ThoriumNagaQuarterstaffProjectile.DisplayName: Thorium Naga Quarterstaff Projectile
-	ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Thorium Concentrated Thorium Quarterstaff Projectile
+	ThoriumNagaQuarterstaffProjectile.DisplayName: Acrid Bubble
+	ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
+	ThoriumBoreanStriderQuarterstaffProjectile.DisplayName: Giga Snowflake
+	ThoriumDreadGauntletProjectileAlt.DisplayName: Dread Kunai
+	ThoriumDreadGauntletProjectile.DisplayName: Dread Grappleclaw
+	VoidArmorTail.DisplayName: Void Armor Tail
+	ThoriumBlackKatarProjectile.DisplayName: Shadow Clone
+	ConsolariaLepusEggNestProjectile.DisplayName: Egg
+	GuardianLanternShieldAnchor.DisplayName: Lantern Shield
+	ThoriumNagaQuarterstaffProjectileDash.DisplayName: Riptide Dive
+	ThoriumTerrariumQuarterstaffProjectile.DisplayName: Bifrost
+	GuardianFencingBladeAnchor.DisplayName: Fencing Blade
+	FencingBladeSlashProjectile.DisplayName: Slash
+	FencingBladeFocusProjectile.DisplayName: Focus
+	GuardianLanternShieldPunchProj.DisplayName: Heavy Punch
 	ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
 	GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
 	ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
 	ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
 	ThoriumTerrariumQuarterstaffProjectile.DisplayName: Thorium Terrarium Quarterstaff Projectile
+	ThoriumTemplarFencingBladeProjectile.DisplayName: Thorium Templar Fencing Blade Projectile
+	ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Thorium Naga Quarterstaff Projectile Alt
 }
 
 Configs: {

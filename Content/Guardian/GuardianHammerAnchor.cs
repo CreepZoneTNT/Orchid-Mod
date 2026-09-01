@@ -11,7 +11,9 @@ using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.Enums;
 using Terraria.GameContent;
+using Terraria.GameContent.Achievements;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -438,7 +440,21 @@ namespace OrchidMod.Content.Guardian
 								if (Projectile.ai[1] < -52) chainOffset = (chainOffset / 8f) * (Projectile.ai[1] + 60);
 								if (Projectile.ai[1] > -35) chainOffset += (chainOffset / 15f) * (-Projectile.ai[1] - 35);
 
+								Vector2 preOffsetCenter = Projectile.Center;
 								Projectile.Center += chainDirection * chainOffset;
+
+								if (CanCutTiles() is not false)
+								{
+									AchievementsHelper.CurrentlyMining = true;
+									
+									bool[] tileCutIgnore = Owner.GetTileCutIgnorance(false, false);
+									DelegateMethods.tilecut_0 = TileCuttingContext.AttackMelee;
+									DelegateMethods.tileCutIgnore = tileCutIgnore;
+
+									Utils.PlotTileLine(preOffsetCenter, Projectile.Center, 8f, DelegateMethods.CutTiles);
+									
+									AchievementsHelper.CurrentlyMining = false;
+								}
 							}
 
 							float toAdd = 30f / HammerItem.Item.useTime * HammerItem.SwingSpeed * owner.GetTotalAttackSpeed(DamageClass.Melee);
@@ -465,7 +481,7 @@ namespace OrchidMod.Content.Guardian
 					if (HammerItem.ThrowAI(owner, guardian, Projectile, WeakThrow, OffHand))
 					{
 						if (Projectile.timeLeft < 598 && range > 0) // Delay helps preventing the hammer from instantly despawning if launched from inside a tile
-						Projectile.tileCollide = HammerItem.TileCollide;
+							Projectile.tileCollide = HammerItem.TileCollide;
 						else Projectile.tileCollide = false;
 
 						if (range == HammerItem.Range)
@@ -862,7 +878,7 @@ namespace OrchidMod.Content.Guardian
 				}
 				else if (guardian.GuardianChain > 0f && guardian.GuardianChainTexture != null)
 				{ // I want to consume a shoebox
-					Texture2D chainTexture = ModContent.Request<Texture2D>(guardian.GuardianChainTexture, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+					Texture2D chainTexture = ModContent.Request<Texture2D>(guardian.GuardianChainTexture, AssetRequestMode.ImmediateLoad).Value;
 					Vector2 chainDirection = Vector2.Normalize(Projectile.Center - player.Center);
 					float chainOffset = guardian.GuardianChain;
 					if (Projectile.ai[1] < -52) chainOffset = (chainOffset / 8f) * (Projectile.ai[1] + 60);

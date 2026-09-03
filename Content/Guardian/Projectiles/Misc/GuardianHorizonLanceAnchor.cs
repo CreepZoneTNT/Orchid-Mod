@@ -97,6 +97,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 					{
 						if (Main.MouseWorld.X > owner.Center.X && owner.direction != 1) owner.ChangeDir(1);
 						else if (Main.MouseWorld.X < owner.Center.X && owner.direction != -1) owner.ChangeDir(-1);
+						owner.heldProj = Projectile.whoAmI;
 					}
 					else if (!Worn)
 					{
@@ -295,6 +296,8 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 								Projectile.ai[0] = -50f;
 								owner.itemTime = 51;
 								owner.itemAnimation = 51;
+
+								guardian.OnAttack(AttackID.QuarterstaffCharge, guardianItem);
 							}
 							else
 							{ // Not enough charge = Reset to idle

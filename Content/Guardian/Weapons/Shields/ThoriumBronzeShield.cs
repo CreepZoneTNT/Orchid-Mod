@@ -63,9 +63,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			guardian.GuardianBronzeShieldDamage = guardian.GuardianGuardRecharge / 100f;
 		}
 
-		public override void ExtraAIShield(Projectile projectile)
+		public override void ExtraAIShield(Player player, Projectile projectile)
 		{
-			Player player = Main.player[projectile.owner];
 			OrchidGuardian guardian = player.GetModPlayer<OrchidGuardian>();
 			if (projectile.ai[0] > 0)
 			{

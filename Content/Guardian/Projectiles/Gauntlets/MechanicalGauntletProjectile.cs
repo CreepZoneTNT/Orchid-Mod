@@ -45,9 +45,10 @@ namespace OrchidMod.Content.Guardian.Projectiles.Gauntlets
 			{ // Lazy way of syncing the dash without making my own packet
 				OrchidPlayer orchidPlayer = owner.GetModPlayer<OrchidPlayer>();
 				orchidPlayer.ForcedVelocityVector = Projectile.velocity;
-				orchidPlayer.ForcedVelocityTimer = 20;
+				orchidPlayer.ForcedVelocityTimer = 26;
 				orchidPlayer.PlayerImmunity = 20;
-				orchidPlayer.ForcedVelocityUpkeep = 0.3f;
+				orchidPlayer.ForcedVelocityUpkeep = 0.23f;
+				orchidPlayer.ForcedVelocityIgnoresPlatforms = true;
 			}
 		}
 	}

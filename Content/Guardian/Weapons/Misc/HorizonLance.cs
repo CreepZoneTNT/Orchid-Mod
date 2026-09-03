@@ -129,6 +129,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 							proj.ai[0] = ParryDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianParryDuration + 1f;
 							anchor.NeedNetUpdate = true;
 							SoundEngine.PlaySound(SoundID.Item37, player.Center);
+							
+							guardian.OnAttack(AttackID.QuarterstaffGuard, this);
 						}
 
 						if (shouldCharge && guardian.GuardianItemCharge == 0f)
@@ -142,6 +144,12 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 				}
 			}
 			return false;
+		}
+
+		public override bool ModifyAttackInfo(ref GuardianAttackInfo info)
+		{
+			if (info.Defense) info.SetOffense();
+			return true;
 		}
 
 		public sealed override void HoldItem(Player player)
@@ -191,8 +199,13 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 			//Projectile proj = Main.player[Main.myPlayer].GetModPlayer<OrchidGuardian>().GuardianCurrentStandardAnchor;
 			//if (proj != null && proj.ModProjectile is GuardianHorizonLanceAnchor standard)
 			//{
-				spriteBatch.Draw(ModContent.Request<Texture2D>(LanceTextureGlow).Value, position, frame, Color.White, 0, origin, scale, SpriteEffects.None, 0);
+				spriteBatch.Draw(ModContent.Request<Texture2D>(LanceTextureGlow).Value, position, frame, drawColor, 0, origin, scale, SpriteEffects.None, 0);
 			//}
+		}
+
+		public override void PostDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, float rotation, float scale, int whoAmI)
+		{
+			spriteBatch.Draw(ModContent.Request<Texture2D>(LanceTextureGlow).Value, Item.position - Main.screenPosition, null, Color.White, rotation, new Vector2(Item.width, Item.height) * 0.5f, scale, SpriteEffects.None, 0);
 		}
 
 		public override void ModifyTooltips(List<TooltipLine> tooltips)

@@ -252,6 +252,8 @@ namespace OrchidMod.Content.Guardian
 								{ // Accessory increases charge speed after a katar dash
 									guardian.GuardianBadgeHopliteLevel++;
 								}
+
+								guardian.OnAttack(AttackID.KatarDash, this);
 							}
 						}
 					}

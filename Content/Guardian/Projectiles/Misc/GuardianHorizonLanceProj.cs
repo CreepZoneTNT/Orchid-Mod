@@ -120,8 +120,6 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 				case "Slime":
 					return firstColor ? new Color(0, 255, 255) : new Color(255, 252, 85);
 				case "Amber":
-					return firstColor ? new Color(200, 130, 100) : new Color(180, 50, 200);
-				case "Freya":
 					return firstColor ? new Color(255, 0, 0) : new Color(155, 150, 255);
 				case "Sonzie":
 					return firstColor ? new Color(170, 22, 50) : new Color(20, 122, 0);
@@ -139,7 +137,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 					return firstColor ? new Color(150, 0, 17) : new Color(0, 150, 17);
 				case "GitGudWO":
 					return firstColor ? new Color(150, 150, 150) : new Color(200, 0, 0);
-				case "Kibl":
+				case "Krux":
 					return firstColor ? new Color(0, 50, 200) : new Color(0, 150, 50);
 				case "mcgen":
 					return firstColor ? new Color(135, 80, 135) : new Color(135, 135, 80);

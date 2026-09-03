@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Terraria;
 using Terraria.GameContent.Generation;
 using Terraria.ID;
@@ -28,6 +29,8 @@ using OrchidMod.Content.Guardian.Weapons.Gauntlets;
 using OrchidMod.Content.Guardian.Weapons.Standards;
 using OrchidMineshaft.Tiles.Chests;
 using OrchidMod.Content.General.Misc;
+using OrchidMod.Content.General.Prefixes;
+using OrchidMod.Content.Guardian;
 using OrchidMod.Content.Shapeshifter.Weapons.Warden;
 using OrchidMod.Content.Shapeshifter.Weapons.Predator;
 using OrchidMod.Content.Guardian.Misc;
@@ -36,6 +39,7 @@ using OrchidMod.Content.Shapeshifter.Weapons.Symbiote;
 using OrchidMod.Content.Shapeshifter.Accessories;
 using OrchidMod.Content.Shapeshifter.Misc;
 using OrchidMod.Content.Guardian.Weapons.Katars;
+using OrchidMod.Content.Shapeshifter;
 
 namespace OrchidMod.Common.ModSystems
 {
@@ -108,7 +112,7 @@ namespace OrchidMod.Common.ModSystems
 				if (!Framing.GetTileSafely(x, y).HasTile && !Framing.GetTileSafely(x + 1, y).HasTile &&
 				!Framing.GetTileSafely(x, y - 1).HasTile && !Framing.GetTileSafely(x + 1, y - 1).HasTile)
 				{
-					if (Framing.GetTileSafely(x, y + 1).TileType == 60 && Framing.GetTileSafely(x + 1, y + 1).TileType == 60)
+					if (Framing.GetTileSafely(x, y + 1).TileType == TileID.JungleGrass && Framing.GetTileSafely(x + 1, y + 1).TileType == TileID.JungleGrass)
 					{
 
 						for (int w = 0; w < 2; w++)
@@ -138,7 +142,7 @@ namespace OrchidMod.Common.ModSystems
 				if (!Framing.GetTileSafely(x, y).HasTile && !Framing.GetTileSafely(x + 1, y).HasTile &&
 				!Framing.GetTileSafely(x, y - 1).HasTile && !Framing.GetTileSafely(x + 1, y - 1).HasTile)
 				{
-					if (Framing.GetTileSafely(x, y + 1).TileType == 60 && Framing.GetTileSafely(x + 1, y + 1).TileType == 60)
+					if (Framing.GetTileSafely(x, y + 1).TileType == TileID.JungleGrass && Framing.GetTileSafely(x + 1, y + 1).TileType == TileID.JungleGrass)
 					{
 
 						for (int w = 0; w < 2; w++)
@@ -242,24 +246,69 @@ namespace OrchidMod.Common.ModSystems
 		{
 			if (chest != null)
 			{
-				for (int inventoryIndex = 39; inventoryIndex > 1; inventoryIndex--)
+				for (int inventoryIndex = 39; inventoryIndex > 1; inventoryIndex--) // Moving items over by 1
 				{
 					if (chest.item[inventoryIndex - 1].type != ItemID.None)
 					{
-						chest.item[inventoryIndex].SetDefaults(chest.item[inventoryIndex - 1].type);
-						chest.item[inventoryIndex].stack = chest.item[inventoryIndex - 1].stack;
+						// chest.item[inventoryIndex].SetDefaults(chest.item[inventoryIndex - 1].type);
+						// chest.item[inventoryIndex].stack = chest.item[inventoryIndex - 1].stack;
+						chest.item[inventoryIndex] = chest.item[inventoryIndex - 1].Clone();
 					}
 				}
-				chest.item[1].SetDefaults(itemToPlace);
+				Item item = chest.item[1];
+				item.SetDefaults(itemToPlace);
 				if (quantity > 1)
+					item.stack = quantity;
+					
+				if (item.Prefix(-1) && Main.tenthAnniversaryWorld) // item.Prefix(-1) runs whenever the item can accept prefixes; the Main.tenthAnniversaryWorld condition checks if CelMk10 is active to amplify prefix
 				{
-					chest.item[1].stack = quantity;
+					int[] goodPrefixIdsForGuardianWeapon =
+					[
+						PrefixID.Godly,
+						PrefixID.Ruthless,
+						PrefixType<AngelicPrefix>(),
+						PrefixType<EmpyreanPrefix>(),
+						WorldGen.genRand.NextBool(10) ? PrefixType<HaidexPrefix>() : PrefixType<SpartanPrefix>()
+					];
+					if (WorldGen.genRand.NextBool(10)) goodPrefixIdsForGuardianWeapon[4] = PrefixType<HaidexPrefix>();
+				
+					int[] goodPrefixIdsForShapeshifterWeapon =
+					[
+						PrefixID.Godly,
+						PrefixID.Ruthless,
+						PrefixType<PrimalPrefix>(),
+						PrefixType<DivinePrefix>()
+					];
+					
+					// Code borrowed from Terraria.WorldGen
+					int prefix = item.prefix;
+
+					int[] options = [];
+					
+					if (item.CountsAsClass<GuardianDamageClass>()) options = goodPrefixIdsForGuardianWeapon;
+					if (item.CountsAsClass<ShapeshifterDamageClass>()) options = goodPrefixIdsForShapeshifterWeapon;
+					if (item.accessory) options = WorldGen.TenthAnniversaryWorldInfo.GoodPrefixIdsForAccessory;
+					if (item.CountsAsClass(DamageClass.Melee)) options = WorldGen.TenthAnniversaryWorldInfo.GoodPrefixIdsForMeleeWeapon;
+					if (item.CountsAsClass(DamageClass.Ranged)) options = WorldGen.TenthAnniversaryWorldInfo.GoodPrefixIdsForRangedWeapon;
+					if (item.CountsAsClass(DamageClass.Magic)) options = WorldGen.TenthAnniversaryWorldInfo.GoodPrefixIdsForMagicWeapon;
+					if (item.CountsAsClass(DamageClass.Summon)) options = WorldGen.TenthAnniversaryWorldInfo.GoodPrefixIdsForSummonerWeapon;
+					
+					List<int> list = new (options);
+					while (list.Count > 0) {
+						int index = WorldGen.genRand.Next(list.Count);
+						int pre = list[index];
+						item.Prefix(pre);
+						if (item.prefix == pre)
+							return true;
+			
+						list.RemoveAt(index);
+					}
+			
+					item.Prefix(prefix);
 				}
 			}
 			else
-			{
 				return false;
-			}
 			return true;
 		}
 
@@ -310,7 +359,7 @@ namespace OrchidMod.Common.ModSystems
 			// Mushroom Chests
 			chestLoots.Add(new ChestLoot(ItemType<GlowingMushroomGauntlet>(), ChestType.Mushroom, 50));
 
-			if (ModContent.GetInstance<OrchidServerConfig>().EnableContentAlchemist)
+			if (GetInstance<OrchidServerConfig>().EnableContentAlchemist)
 			{
 				chestLoots.Add(new ChestLoot(ItemType<EmberVial>(), ChestType.SurfaceWooden, 20));
 				chestLoots.Add(new ChestLoot(ItemType<SeafoamVial>(), ChestType.Water, 20));
@@ -327,7 +376,7 @@ namespace OrchidMod.Common.ModSystems
 				chestLoots.Add(new ChestLoot(ItemType<SunplateFlask>(), ChestType.SkyIsland, 30));
 			}
 
-			if (ModContent.GetInstance<OrchidServerConfig>().EnableContentGambler)
+			if (GetInstance<OrchidServerConfig>().EnableContentGambler)
 			{
 				chestLoots.Add(new ChestLoot(ItemType<TiamatRelic>(), ChestType.DungeonLocked, 50, 1, 3, true));
 				chestLoots.Add(new ChestLoot(ItemType<EmbersCard>(), ChestType.SurfaceWooden, 20));
@@ -344,7 +393,7 @@ namespace OrchidMod.Common.ModSystems
 				chestLoots.Add(new ChestLoot(ItemType<BundleOfClovers>(), ChestType.Ivy, 20));
 			}
 
-			if (ModContent.GetInstance<OrchidServerConfig>().EnableContentShapeshifter)
+			if (GetInstance<OrchidServerConfig>().EnableContentShapeshifter)
 			{
 				chestLoots.Add(new ChestLoot(ItemType<WardenSnail>(), ChestType.SurfaceWooden, 20));
 				chestLoots.Add(new ChestLoot(ItemType<SymbioteToad>(), ChestType.LivingTree, 50));
@@ -361,7 +410,7 @@ namespace OrchidMod.Common.ModSystems
 				Chest chest = Main.chest[chestIndex];
 				HandleSpecialChests(chest);
 
-				List<ChestLoot> possibleLoot = new List<ChestLoot>();
+				List<ChestLoot> possibleLoot = [];
 				foreach (ChestLoot loot in chestLoots)
 				{
 					if (loot.ValidChest(chest) && loot.RollPlace())
@@ -414,7 +463,7 @@ namespace OrchidMod.Common.ModSystems
 		{
 			if (chest != null && Main.tile[chest.x, chest.y].TileType == (ushort)TileType<MinersLockboxTile>())
 			{
-				int[] specialItemPoll = { ItemType<EnchantedRune>(), ItemType<EnchantedPavise>() };
+				int[] specialItemPoll = [ItemType<EnchantedRune>(), ItemType<EnchantedPavise>()];
 				int rand = Main.rand.Next(specialItemPoll);
 				if (ModContent.GetInstance<OrchidServerConfig>().EnableContentGambler) placeInChest(chest, ItemType<DetonatorCard>(), 1);
 				placeInChest(chest, rand, 1);
@@ -423,13 +472,13 @@ namespace OrchidMod.Common.ModSystems
 			if (chest != null && Main.tile[chest.x, chest.y].TileType == (ushort)TileType<ShamanBiomeChestTile>())
 			{
 				//chest.item[0].SetDefaults(ItemType<ShroomiteScepter>());
-				chest.item[1].SetDefaults(183); // Glowing Mushroom
+				chest.item[1].SetDefaults(ItemID.GlowingMushroom); // Glowing Mushroom
 				chest.item[1].stack = Main.rand.Next(10) + 20;
-				chest.item[2].SetDefaults(188); // Healing Potion
+				chest.item[2].SetDefaults(ItemID.HealingPotion); // Healing Potion
 				chest.item[2].stack = Main.rand.Next(5) + 3;
-				chest.item[3].SetDefaults(298); // Shine Potion
+				chest.item[3].SetDefaults(ItemID.ShinePotion); // Shine Potion
 				chest.item[3].stack = Main.rand.Next(3) + 1;
-				chest.item[4].SetDefaults(289); // Regeneration Potion
+				chest.item[4].SetDefaults(ItemID.RegenerationPotion); // Regeneration Potion
 				chest.item[4].stack = Main.rand.Next(3) + 1;
 			}
 

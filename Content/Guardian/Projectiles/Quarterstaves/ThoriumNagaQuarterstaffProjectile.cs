@@ -5,6 +5,7 @@ using Terraria.Audio;
 using Microsoft.Xna.Framework;
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using Humanizer;
 using Microsoft.Xna.Framework.Graphics;
@@ -84,13 +85,17 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 
 			foreach (Projectile beble in Main.ActiveProjectiles)
 			{
-				if (beble.type == Type && beble.owner == Projectile.owner && beble.whoAmI != Projectile.whoAmI && (beble.Center - Projectile.Center).Length() <= 18f * (Projectile.scale + beble.scale))
+				if (beble.type == Type && (beble.owner == Projectile.owner || Main.player[beble.owner].team == Owner.team) && beble.identity != Projectile.identity && (beble.Center - Projectile.Center).Length() <= 18f * (Projectile.scale + beble.scale))
 				{
 					beble.velocity -= beble.DirectionTo(Projectile.Center) * beble.Distance(Projectile.Center) * 0.25f;
 					Projectile.velocity -= Projectile.DirectionTo(beble.Center) * Projectile.Distance(beble.Center) * 0.25f;
 					SoundEngine.PlaySound(SoundID.Item154, Projectile.Center);
+					Projectile.netUpdate = true;
+					beble.netUpdate = true;
 				}
 			}
+			
+			Lighting.AddLight(Projectile.Center, GetOwnerColor(Projectile.owner).ToVector3() * 0.1f);
 
 			if (Projectile.timeLeft == 10 && Projectile.ai[2] == 1)
 			{
@@ -98,21 +103,23 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 				Projectile.damage = Projectile.originalDamage;
 				SoundEngine.PlaySound(SoundID.Item21, Projectile.Center);
 				SoundEngine.PlaySound(SoundID.Item14, Projectile.Center);
+				bool ccw = Main.rand.NextBool();
+				float dustRot = Main.rand.NextFloat(MathHelper.TwoPi);
 				for (int i = 0; i < 3; i++)
 				{
-					float dustRot = Main.rand.NextFloat(MathHelper.TwoPi);
-					bool ccw = Main.rand.NextBool();
 					for (int j = 40; j > 0; j--)
 					{
-						Dust dust = Dust.NewDustPerfect(Projectile.Center, DustID.GreenFairy);
-						dust.velocity = Vector2.UnitX.RotatedBy(dustRot + MathHelper.TwoPi * j / 3f) * (j * 0.30f);
-						dust.scale *= 2f - j * 0.012f;
+						Dust dust = Dust.NewDustPerfect(Projectile.Center, DustID.FireworksRGB, newColor: GetOwnerColor(Projectile.owner));
+						dust.velocity = Vector2.UnitX.RotatedBy(dustRot + MathHelper.TwoPi * i / 3f) * (j * 0.12f + 0.5f) * Projectile.scale;
+						dust.scale *= 2f - j * 0.015f;
 						dust.noGravity = true;
-						if (ccw) dustRot -= 0.1f - j * 0.0005f;
-						else dustRot += 0.1f - j * 0.00005f;
+						if (ccw) dustRot -= 0.2f - j * 0.0015f;
+						else dustRot += 0.2f - j * 0.0015f;
 						dust.alpha = 127;
 					}
 				}
+
+				Projectile.netUpdate = true;
 				// for (int i = 15; i > 0; i--)
 				// {
 				// 	Dust dust = Dust.NewDustDirect(Projectile.Center, 0, 0, DustID.GreenTorch);
@@ -123,10 +130,11 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 				
 				foreach (Projectile boble in Main.ActiveProjectiles)
 				{
-					if (boble.type == Type && boble.ai[2] == 0 && boble.owner == Projectile.owner && boble.identity != Projectile.identity && (boble.Center - Projectile.Center).Length() <= 108f * Projectile.scale + 18f * boble.scale)
+					if (boble.type == Type && boble.ai[2] == 0 && (boble.owner == Projectile.owner || Main.player[boble.owner].team == Owner.team) && boble.identity != Projectile.identity && (boble.Center - Projectile.Center).Length() <= 108f * Projectile.scale + 18f * boble.scale)
 					{
 						boble.ai[2] = 1;
 						boble.timeLeft = 10;
+						boble.netUpdate = true;
 					}
 				}
 			}
@@ -135,6 +143,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 		public override bool OnTileCollide(Vector2 oldVelocity)
 		{
 			Bounce(oldVelocity, 0.95f);
+			Projectile.netUpdate = true;
 			return false;
 		}
 
@@ -142,16 +151,11 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 		{
 			float radius = 18f * Projectile.scale;
 			if (Projectile.ai[2] == 1) radius *= 6f;
-			return target.Distance(Projectile.Center) <= radius;
+			return IsValidTarget(target) && target.Distance(Projectile.Center) <= radius;
 		}
 
 		public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone, Player player, OrchidGuardian guardian)
 		{
-			if (Projectile.ai[2] != 1f)
-			{
-				hit.HideCombatText = true;
-				CombatText.NewText(target.getRect(), hit.Crit ? CombatText.DamagedHostileCrit : CombatText.DamagedHostile, hit.Damage, hit.Crit, true);
-			}
 		}
 
 		public override void ModifyDamageHitbox(ref Rectangle hitbox)
@@ -168,7 +172,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 		public override void OnKill(int timeLeft)
 		{
 			for (int i = 0; i < (Projectile.ai[2] == 1 ? 40 : 10); i++)
-				Dust.NewDustPerfect(Projectile.Center, DustID.BubbleBlock, Main.rand.NextVector2Unit() * Main.rand.NextFloat(Projectile.ai[2] == 1 ? 32f : 8f), newColor: Color.MediumAquamarine, Scale: Main.rand.NextFloat(0.5f, 1f))
+				Dust.NewDustPerfect(Projectile.Center, DustID.TintableDustLighted, Main.rand.NextVector2Unit() * Main.rand.NextFloat(Projectile.ai[2] == 1 ? 32f : 8f), newColor: GetOwnerColor(Projectile.owner), Scale: Main.rand.NextFloat(0.5f, 1f))
 					.noGravity = true;
 
 			SoundEngine.PlaySound(SoundID.Item54, Projectile.Center);
@@ -177,10 +181,15 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 		public override bool OrchidPreDraw(SpriteBatch spriteBatch, ref Color lightColor)
 		{
 			spriteBatch.End(out SpriteBatchSnapshot snapshot);
-			spriteBatch.Begin(snapshot with {SortMode = SpriteSortMode.Immediate, BlendState = BlendState.Additive});
+			spriteBatch.Begin(snapshot with {BlendState = BlendState.Additive});
 			
 			Texture2D texture = TextureAssets.Projectile[Type].Value;
-			Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, GetOwnerColor(Projectile.owner, ref lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale * new Vector2(Projectile.ai[0] / 15f, Projectile.ai[1] / 15f), SpriteEffects.None, 0f);
+			if (Main.netMode != NetmodeID.SinglePlayer && Owner.team != 0)
+			{
+				Texture2D outline = ModContent.Request<Texture2D>(Texture + "_Outline").Value;
+				Main.EntitySpriteDraw(outline, Projectile.Center - Main.screenPosition, null, Main.teamColor[Owner.team], Projectile.rotation, outline.Size() * 0.5f, Projectile.scale * new Vector2(Projectile.ai[0] / 15f, Projectile.ai[1] / 15f), SpriteEffects.None, 0f);
+			}
+			Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, Lighting.GetColor(Projectile.Center.ToTileCoordinates(), GetOwnerColor(Projectile.owner)) * 2f, Projectile.rotation, texture.Size() * 0.5f, Projectile.scale * new Vector2(Projectile.ai[0] / 15f, Projectile.ai[1] / 15f), SpriteEffects.None, 0f);
 			
 			spriteBatch.End();
 			spriteBatch.Begin(snapshot);
@@ -188,18 +197,26 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 			return false;
 		}
 
-		public static Color GetOwnerColor(int whoAmI, ref Color lightColor)
+		public static Color GetOwnerColor(int whoAmI)
 		{
-			if (Main.netMode == NetmodeID.SinglePlayer) return Main.ColorOfTheSkies;
+			Color playerColor = new (83, 128, 128);
 			
-			Color playerColor = Color.White;
-			
-			Player player = Main.player[whoAmI]; 
-			Main.rand.SetSeed(player.name.GetHashCode());
-			playerColor = Color.Lerp(new Color(Main.rand.Next(256), Main.rand.Next(256), Main.rand.Next(256)), lightColor, 0.5f);
+			if (Main.netMode != NetmodeID.SinglePlayer)
+			{
+				Player player = Main.player[whoAmI];
+				byte[] bytes = Encoding.UTF8.GetBytes(player.name);
+				int total = 0;
+				for (int i = 0; i < bytes.Length; i++)
+					total += bytes[i] * (int)MathF.Pow(256, i);
+				total = (int)(total % MathF.Pow(256, bytes.Length));
+				
+				Main.rand.SetSeed(total);
+				playerColor = new Color(Main.rand.Next(256), Main.rand.Next(256), Main.rand.Next(256), 255);
 		
-			if (player.team != 0)
-				playerColor = Color.Lerp(playerColor, Main.teamColor[player.team], 0.6f);
+				if (player.team != 0)
+					playerColor = Color.Lerp(playerColor, Main.teamColor[player.team], 0.5f);
+			}
+			
 		
 			return playerColor;
 		}

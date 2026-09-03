@@ -2624,7 +2624,7 @@ Items: {
 
 	Quarterstaff: {
 		DisplayName: Quarterstaff
-		Tooltip: ""
+		Tooltip: Can be upgraded with torches
 	}
 
 	HellboneMaterial: {
@@ -3967,15 +3967,13 @@ Projectiles: {
 	ThoriumBlackKatarProjectile.DisplayName: Shadow Clone
 	ConsolariaLepusEggNestProjectile.DisplayName: Egg
 	GuardianLanternShieldAnchor.DisplayName: Lantern Shield
-	ThoriumNagaQuarterstaffProjectileDash.DisplayName: Riptide Dive
 	ThoriumTerrariumQuarterstaffProjectile.DisplayName: Bifrost
 	GuardianFencingBladeAnchor.DisplayName: Fencing Blade
 	FencingBladeSlashProjectile.DisplayName: Slash
 	FencingBladeFocusProjectile.DisplayName: Focus
 	GuardianLanternShieldPunchProj.DisplayName: Heavy Punch
-	ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
-	ThoriumTemplarFencingBladeProjectile.DisplayName: Thorium Templar Fencing Blade Projectile
-	ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Thorium Naga Quarterstaff Projectile Alt
+	ThoriumTemplarFencingBladeProjectile.DisplayName: Yoinked Pickup
+	ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Riptide Reamer
 }
 
 Configs: {

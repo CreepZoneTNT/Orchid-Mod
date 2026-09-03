@@ -3294,8 +3294,8 @@ Items: {
 		/* Tooltip:
 			'''
 			[c/FF0000:Test Item]
-			Blows lingering bubbles on jab 
-			Charged attacks pop bubbles 
+			Blows lingering bubbles on jab, up to 10
+			Charged attacks pop bubbles, potentially triggering a chain reaction
 			''' */
 	}
 

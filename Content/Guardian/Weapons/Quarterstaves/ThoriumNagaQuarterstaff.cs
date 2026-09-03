@@ -62,11 +62,32 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 	        }
         }
 
+        public override void OnParryQuarterstaff(Player player, OrchidGuardian guardian, Entity aggressor, Projectile anchor)
+        {
+	        Vector2 direction = Main.rand.NextVector2Unit();
+	        float targetVelocity = Item.shootSpeed;
+	        
+	        if (aggressor is NPC)
+	        {
+		        Vector2 projectedDir = player.velocity + aggressor.velocity;
+		        float distance = projectedDir.Length();
+		        if (distance >= 160f) distance = 160f;
+		        targetVelocity = MathHelper.Clamp(distance / 19.792f, 4f, Item.shootSpeed);
+		        direction = Vector2.Normalize(projectedDir);
+	        }
+	        
+	        
+	        int damage = player.GetWeaponDamage(Item);
+	        int projectileType = ModContent.ProjectileType<ThoriumNagaQuarterstaffProjectile>();
+	        Projectile booble = Projectile.NewProjectileDirect(Item.GetSource_FromAI(), player.Center, direction * targetVelocity, projectileType, damage, 0f, anchor.owner);
+	        booble.CritChance = guardian.GetGuardianCrit(Item.crit);
+        }
+
         public override void OnAttack(Player player, OrchidGuardian guardian, Projectile projectile, bool jabAttack, bool counterAttack)
 		{
-			if (projectile.ModProjectile is GuardianQuarterstaffAnchor)
+			if (projectile.ModProjectile is GuardianQuarterstaffAnchor && !counterAttack)
 			{
-				if (!jabAttack && !counterAttack)
+				if (!jabAttack)
 				{
 					Vector2 tipPosition = projectile.Center - Vector2.UnitY.RotatedBy(projectile.rotation + MathHelper.PiOver4) * projectile.width * 0.4f;
 					Vector2 velocity = Vector2.UnitY.RotatedBy(projectile.ai[1]);
@@ -77,28 +98,26 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 				}
 				else
 				{
+					Vector2 direction = Vector2.UnitY.RotatedBy(projectile.ai[1]);
+					
 					if (IsLocalPlayer(player))
 					{
 						altJab = !altJab;
 						altJabResetTimer = 120;
+						
+						float distance = (Main.MouseWorld - player.Center).Length();
+						if (distance >= 800f) distance = 800f;
+						float targetVelocity = MathHelper.Clamp(distance / 19.792f, 4f, Item.shootSpeed);
+
+						int damage = player.GetWeaponDamage(Item);
+						int projectileType = ModContent.ProjectileType<ThoriumNagaQuarterstaffProjectile>();
+						Projectile booble = Projectile.NewProjectileDirect(Item.GetSource_FromAI(), player.Center, direction * targetVelocity, projectileType, damage, 0f, projectile.owner);
+						booble.CritChance = guardian.GetGuardianCrit(Item.crit);
 					}
-
-
-
-					float distance = (Main.MouseWorld - player.Center).Length();
-					if (distance >= 800f) distance = 800f;
-					float targetVelocity = MathHelper.Clamp(distance / 19.802f, 4f, Item.shootSpeed);
 					
-					Vector2 direction = Vector2.UnitY.RotatedBy(projectile.ai[1]);
-
-					int damage = player.GetWeaponDamage(Item);
-					int projectileType = ModContent.ProjectileType<ThoriumNagaQuarterstaffProjectile>();
-					Projectile booble = Projectile.NewProjectileDirect(Item.GetSource_FromAI(), player.Center + direction, direction * targetVelocity, projectileType, damage, 0f, projectile.owner);
-					booble.CritChance = guardian.GetGuardianCrit(Item.crit);
-
 					for (int i = 0; i < 10; i++)
 					{
-						Dust dust = Dust.NewDustPerfect(player.Center + direction, DustID.GreenFairy, Main.rand.NextVector2CircularEdge(2.5f, 2.5f), Scale: 2f, newColor: Color.DarkCyan);
+						Dust dust = Dust.NewDustPerfect(player.Center + direction, DustID.TintableDustLighted, Main.rand.NextVector2CircularEdge(2.5f, 2.5f), Scale: 2f, newColor: ThoriumNagaQuarterstaffProjectile.GetOwnerColor(player.whoAmI));
 						dust.noGravity = true;
 					}
 
@@ -126,7 +145,6 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			{
 				CreateRecipe()
 				.AddTile(TileID.MythrilAnvil)
-                .AddIngredient<ThoriumAquaiteQuarterstaff>()
 				.AddIngredient(thoriumMod, "AbyssalChitin", 8)
 				.Register();
 			}

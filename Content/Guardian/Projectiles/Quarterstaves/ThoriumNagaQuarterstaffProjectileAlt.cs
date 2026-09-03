@@ -22,7 +22,6 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 		{
 			Projectile.width = 40;
 			Projectile.height = 40;
-			Projectile.friendly = true;
 			Projectile.aiStyle = -1;
 			Projectile.timeLeft = 81;
 			Projectile.scale = 1f;
@@ -51,8 +50,10 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 					{
 						buble.ai[2] = 1;
 						buble.timeLeft = 10;
+						buble.netUpdate = true;
 
 						Projectile.ai[0] = 1;
+						Projectile.netUpdate = true;
 						break;
 					}
 				}

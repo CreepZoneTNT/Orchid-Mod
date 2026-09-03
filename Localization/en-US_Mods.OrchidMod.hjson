@@ -253,8 +253,13 @@ Buffs: {
 	}
 
 	GuardianVoidQuarterstaffBuff: {
-		Description: Void Rush
-		DisplayName: 150% increased Flux Ripper attack speed
+		DisplayName: Void Rush
+		Description: 150% increased Flux Ripper attack speed
+	}
+
+	GuardianDreadGauntletBuff: {
+		DisplayName: Dread Reaper's Fury
+		Description: 60% increased melee speed and 20% increased movement speed, at a cost...
 	}
 }
 
@@ -2619,7 +2624,7 @@ Items: {
 
 	Quarterstaff: {
 		DisplayName: Quarterstaff
-		Tooltip: ""
+		Tooltip: Can be upgraded with torches
 	}
 
 	HellboneMaterial: {
@@ -3299,6 +3304,7 @@ Items: {
 			'''
 			[c/FF0000:Test Item]
 			Fully charging creates a damage-sharing link between enemies
+			'The wonders of the world shall be connected'
 			'''
 	}
 
@@ -3314,7 +3320,12 @@ Items: {
 
 	ThoriumDreadGauntlet: {
 		DisplayName: Dread Reaper's Claw
-		Tooltip: ""
+		Tooltip:
+			'''
+			Hooking an enemy refunds a guard, deals damage, and triggers your active parry
+			Parrying increases speed for a short time, and launches kunai on punch
+			'''
+		Parry: "{0} click fires a grappling claw, costing 2 guards"
 	}
 
 	ThoriumGuardianTitanHead: {
@@ -3420,6 +3431,31 @@ Items: {
 	ThoriumLifeQuartzCenser: {
 		DisplayName: Life Censer
 		Tooltip: Spending a slam shields the lowest health nearby ally life by 5, up to 10
+	}
+
+	HorizonChandelier: {
+		Tooltip: ""
+		DisplayName: Horizon Chandelier
+	}
+
+	HorizonBrick: {
+		Tooltip: ""
+		DisplayName: Horizon Brick
+	}
+
+	ThoriumTerrariumQuarterstaff: {
+		DisplayName: Thorium Terrarium Quarterstaff
+		Tooltip: ""
+	}
+
+	ThoriumBlackKatar: {
+		DisplayName: The Black Katar
+		Tooltip:
+			'''
+			[c/FF0000:Test Item]
+			Parries summon a shadow clone that imitates your movement after a delay
+			Dealing damage grants you stacking damage and withers enemies at 50 stacks
+			'''
 	}
 
 	ConsolariaLepusEggNest: {
@@ -3606,6 +3642,7 @@ Prefixes: {
 	BlockingPrefix.DisplayName: Blocking
 	# Guardian
 	HaidexPrefix.DisplayName: Haidex
+	AnnoyingPrefixGuardian.DisplayName: Annoying
 	FlimsyPrefix.DisplayName: Flimsy
 	FeeblePrefix.DisplayName: Feeble
 	FragilePrefix.DisplayName: Fragile
@@ -3912,19 +3949,15 @@ Projectiles: {
 	ThoriumDreadGauntletProjectile.DisplayName: Dread Grappleclaw
 	VoidArmorTail.DisplayName: Void Armor Tail
 	ThoriumBlackKatarProjectile.DisplayName: Shadow Clone
-	ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
+	ConsolariaLepusEggNestProjectile.DisplayName: Egg
 	GuardianLanternShieldAnchor.DisplayName: Lantern Shield
-	ThoriumNagaQuarterstaffProjectileDash.DisplayName: Riptide Dive
-	ThoriumTerrariumQuarterstaffProjectile.DisplayName: Thorium Terrarium Quarterstaff Projectile
+	ThoriumTerrariumQuarterstaffProjectile.DisplayName: Bifrost
 	GuardianFencingBladeAnchor.DisplayName: Fencing Blade
 	FencingBladeSlashProjectile.DisplayName: Slash
 	FencingBladeFocusProjectile.DisplayName: Focus
 	GuardianLanternShieldPunchProj.DisplayName: Heavy Punch
-	ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
-	GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
-	ThoriumTemplarFencingBladeProjectile.DisplayName: Thorium Templar Fencing Blade Projectile
-	ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Thorium Naga Quarterstaff Projectile Alt
-	ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Thorium Concentrated Thorium Quarterstaff Projectile
+	ThoriumTemplarFencingBladeProjectile.DisplayName: Yoinked Pickup
+	ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Riptide Reamer
 }
 
 Configs: {
@@ -3956,13 +3989,13 @@ Configs: {
 			Tooltip: Use the old Guardian Hammer UI (Paper Mario style)
 		}
 
-		GuardianSwapPaviseImputs: {
-			Label: Swap Pavise Imputs
+		GuardianSwapPaviseInputs: {
+			Label: Swap Pavise Inputs
 			Tooltip: Swap Left and Right click inputs for Guardian Pavises
 		}
 
-		GuardianSwapGauntletImputs: {
-			Label: Swap Parry Items Imputs
+		GuardianSwapGauntletInputs: {
+			Label: Swap Parry Items Inputs
 			Tooltip: Swap Left and Right click inputs for Guardian Parry Items (Gauntlets, Quarterstaves, ...)
 		}
 
@@ -4047,6 +4080,11 @@ Configs: {
 				No effect if Smart Cursor isn't set to 'Toggle'
 				'''
 		}
+
+		GuardianFencingBladeUIType: {
+			Label: Fencing Blade icon variant
+			Tooltip: The UI icon variant to use for Fencing Blades
+		}
 	}
 
 	OrchidServerConfig: {
@@ -4071,6 +4109,25 @@ Configs: {
 		EnableContentShapeshifter: {
 			Label: Enable Shapeshifter Content
 			Tooltip: Allows shapeshifter items to be obtainable
+		}
+	}
+
+	FencingBladeUIType: {
+		Tooltip: ""
+
+		Sheath: {
+			Label: Sheath
+			Tooltip: The UI will always use Amber's icon, depicting a fencing blade in its sheath
+		}
+
+		Sheathless: {
+			Label: Sheathless
+			Tooltip: The UI will always use CreepZoneTNT's icon, depicting a fencing blade without a sheath
+		}
+
+		Depends: {
+			Label: Depends
+			Tooltip: The icon variant will change depending on whether the fencing blade has its sheath enabled or not
 		}
 	}
 }
@@ -4143,11 +4200,11 @@ UI: {
 	}
 
 	GuardianItem: {
-		LeftClick: Left
-		RightClick: Right
-		ChargeToSwing: Charge to swing, {0} click to jab while charging
-		ChargeToJab: Charge to swing, {0} click to slam while charging
-		ChargeToDash: Charge to dash, {0} click to jab while charging
+		LeftClick: Left click
+		RightClick: Right click
+		ChargeToSwing: Charge to swing, {0} to jab while charging
+		ChargeToJab: Charge to swing, {0} to slam while charging
+		ChargeToDash: Charge to dash, {0} to jab while charging
 		ParryDuration: "{0} second parry duration"
 		BlockDuration: "{0} second block duration"
 		Interrupted: Interrupted
@@ -4156,21 +4213,22 @@ UI: {
 		Failed: Failed
 		Guard: "{0} {^0:guard;guards}"
 		Slam: "{0} {^0:slam;slams}"
-		Parry: "{0} click to parry"
-		ParryDash: "{0} click to parry, dashing downwards"
+		Parry: "{0} to parry"
+		ParryDash: "{0} to parry, dashing downwards"
 		ChargeToThrow: Charge to throw
-		SwingWhileCharging: Charge to throw, right click to swing while charging
+		ChargeToParry: Charge to parry
+		SwingWhileCharging: Charge to throw, {0} to swing while charging
 		UsesUpTo: Uses up to {0} slams
 		RuneDuration: "{0} second rune duration"
-		Block: "{0} click to block"
-		BlockGuard: "{0} click to block, costing {1} {^1:guard;guards}"
-		BlockSlam: "{0} click to block, costing {2} {^2:slam;slams}"
-		BlockGuardSlamSame: "{0} click to block, costing {1} {^1:guard;guards} and {^1:slam;slams}"
-		BlockGuardSlam: "{0} click to block, costing {1} {^1:guard;guards} and {2} {^2:slam;slams}"
+		DashDuringSwing: "{0} during reinforced attack to dash"
+		Block: "{0} to block"
+		BlockGuard: "{0} to block, costing {1} {^1:guard;guards}"
+		BlockSlam: "{0} to block, costing {2} {^2:slam;slams}"
+		BlockGuardSlamSame: "{0} to block, costing {1} {^1:guard;guards} and {^1:slam;slams}"
+		BlockGuardSlam: "{0} to block, costing {1} {^1:guard;guards} and {2} {^2:slam;slams}"
 		BuffDuration: "{0} second buff duration"
 		HorizonLaceShieldStacks: Grants 3 guards when fully charged
 		DamageOfDefense: Deals {0}% of defense as opposing damage
-		PerfectParry: Perfect parry!
 	}
 
 	DanserItem: {

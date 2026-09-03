@@ -3912,21 +3912,19 @@ Projectiles: {
 	ThoriumDreadGauntletProjectile.DisplayName: Dread Grappleclaw
 	VoidArmorTail.DisplayName: Void Armor Tail
 	ThoriumBlackKatarProjectile.DisplayName: Shadow Clone
-	ConsolariaLepusEggNestProjectile.DisplayName: Egg
+	ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
 	GuardianLanternShieldAnchor.DisplayName: Lantern Shield
 	ThoriumNagaQuarterstaffProjectileDash.DisplayName: Riptide Dive
-	ThoriumTerrariumQuarterstaffProjectile.DisplayName: Bifrost
+	ThoriumTerrariumQuarterstaffProjectile.DisplayName: Thorium Terrarium Quarterstaff Projectile
 	GuardianFencingBladeAnchor.DisplayName: Fencing Blade
 	FencingBladeSlashProjectile.DisplayName: Slash
 	FencingBladeFocusProjectile.DisplayName: Focus
 	GuardianLanternShieldPunchProj.DisplayName: Heavy Punch
 	ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
 	GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
-	ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
-	ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
-	ThoriumTerrariumQuarterstaffProjectile.DisplayName: Thorium Terrarium Quarterstaff Projectile
 	ThoriumTemplarFencingBladeProjectile.DisplayName: Thorium Templar Fencing Blade Projectile
 	ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Thorium Naga Quarterstaff Projectile Alt
+	ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Thorium Concentrated Thorium Quarterstaff Projectile
 }
 
 Configs: {

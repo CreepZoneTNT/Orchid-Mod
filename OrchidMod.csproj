@@ -15,6 +15,7 @@
 	  <Compile Remove="Common\Globals.Tiles\**" />
 	  <EmbeddedResource Remove="Common\Globals.Tiles\**" />
 	  <None Remove="Common\Globals.Tiles\**" />
+	  <None Remove="Assets\Sounds\GFB\BirdUp_Hit3.ogg" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Reference Include="OrchidMineshaft">
@@ -22,6 +23,7 @@
 	  </Reference>
 	</ItemGroup>
 	<ItemGroup>
+	  <Folder Include="Assets\Sounds\GFB\" />
 	  <Folder Include="Content\Guardian\Projectiles\Standards\" />
 	</ItemGroup>
 

@@ -17,6 +17,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using System.Linq;
+using OrchidMod.Content.General.Prefixes;
 using OrchidMod.Content.Guardian.Accessories;
 
 namespace OrchidMod.Content.Guardian
@@ -1710,7 +1711,11 @@ namespace OrchidMod.Content.Guardian
 			if (GuardianItemCharge < 180f) return 3;
 			return 4;
 		}
-		
+
 		public void ThoriumForceShieldHealth() {}
+
+		public float GetBlockDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianBlockDuration;
+		public float GetParryDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianParryDuration;
+
 	}
 }

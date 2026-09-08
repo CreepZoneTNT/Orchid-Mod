@@ -9,6 +9,8 @@ public struct Circle(Vector2 origin, float radius)
 	public Vector2 Origin = origin;
 	public float Radius = radius;
 
+	public static float X(Circle value) => value.Origin.X;
+	public static float Y(Circle value) => value.Origin.Y;
 	public static (Vector2, float) ToTuple(Circle value) => (value.Origin, value.Radius);
 
 	public static float Circumference(Circle value) => 2 * MathHelper.Pi * value.Radius;
@@ -30,12 +32,13 @@ public struct Circle(Vector2 origin, float radius)
 		return new Circle(entity.Center, radius * lenience);
 	}
 
-	public static Circle operator +(Circle circle, Vector2 point) => new Circle(circle.Origin + point, circle.Radius);
-	public static Circle operator +(Circle circle, float radius) => new Circle(circle.Origin, circle.Radius + radius);
+	public static Circle operator +(Circle circle, Vector2 point) => new (circle.Origin + point, circle.Radius);
+	public static Circle operator +(Circle circle, float radius) => new (circle.Origin, circle.Radius + radius);
+	public static Circle operator -(Circle circle, Vector2 point) => circle + -point;
+	public static Circle operator -(Circle circle, float radius) => circle + -radius;
 	
-	public static Circle operator *(Circle circle, float amount) => new Circle(circle.Origin, circle.Radius * amount);
-	public static Circle operator /(Circle circle, float amount) => new Circle(circle.Origin, circle.Radius / amount);
-
+	public static Circle operator *(Circle circle, float amount) => new (circle.Origin, circle.Radius * amount);
+	public static Circle operator /(Circle circle, float amount) => new (circle.Origin, circle.Radius / amount);
 }
 	
 
@@ -56,22 +59,27 @@ public static partial class OrchidUtils
 	public static bool CheckCircularvCircularCollision(Circle circle1, Circle circle2) => CheckCircularvCircularCollision(circle1.Origin, circle1.Radius, circle2.Origin, circle2.Radius);
 	public static bool CheckCircularvCircularCollision(Entity entity1, Entity entity2, bool useEntity1LargestDim = true, bool useEntity2LargestDim = true) => CheckCircularvCircularCollision(entity1.Center, entity1.GetDimension(useEntity1LargestDim) * 0.5f, entity2.Center, entity2.GetDimension(useEntity2LargestDim) * 0.5f);
 
-	/// <summary> A somewhat scuffed way to tell if a circular hitbox is overlapping a rectangle. </summary>
+	// https://stackoverflow.com/questions/401847/circle-rectangle-collision-detection-intersection
 	public static bool CheckAABBvCircularCollision(Rectangle rectangle, Circle circle)
 	{
-		Vector2 refPointX = rectangle.Center() + Vector2.UnitX * rectangle.Width / 4f * (circle.Origin.X > rectangle.Center().X).ToDirectionInt();
-		Vector2 refPointY = rectangle.Center() + Vector2.UnitY * rectangle.Height / 4f * (circle.Origin.Y > rectangle.Center().Y).ToDirectionInt();
-		return rectangle.Contains(Circle.ClosestPointInCircle(circle, rectangle.Center()).ToPoint()) || rectangle.Contains(Circle.ClosestPointInCircle(circle, refPointX).ToPoint()) || rectangle.Contains(Circle.ClosestPointInCircle(circle, refPointY).ToPoint());
+		float closestX = MathHelper.Clamp(circle.Origin.X, rectangle.Left, rectangle.Right);
+		float closestY = MathHelper.Clamp(circle.Origin.Y, rectangle.Top, rectangle.Bottom);
+
+		float distanceX = circle.Origin.X - closestX;
+		float distanceY = circle.Origin.Y - closestY;
+
+		float distanceSquared = distanceX * distanceX + distanceY * distanceY;
+		return distanceSquared < circle.Radius * circle.Radius;
 	}
 	
 	public static bool CheckAABBvCircularCollision(Vector2 rectPosition, Vector2 rectDimensions, Vector2 circOrigin, float circRadius)
 	{
-		Rectangle rectangle = new Rectangle((int)rectPosition.X, (int)rectPosition.Y, (int)rectDimensions.X, (int)rectDimensions.Y);
-		Circle circle = new Circle(circOrigin, circRadius);
+		Rectangle rectangle = new ((int)rectPosition.X, (int)rectPosition.Y, (int)rectDimensions.X, (int)rectDimensions.Y);
+		Circle circle = new (circOrigin, circRadius);
 		return CheckAABBvCircularCollision(rectangle, circle);
 	}
 
-	public static Vector2 Scale(this Vector2 value, float factorX = 1f, float factorY = 1f) => new Vector2(value.X * factorX, value.Y * factorY);
+	public static Vector2 Scale(this Vector2 value, float factorX = 1f, float factorY = 1f) => new (value.X * factorX, value.Y * factorY);
 	public static void Scale(ref Vector2 original, out Vector2 result, float factorX = 1f, float factorY = 1f) => result = new Vector2(original.X * factorX, original.Y * factorY);
 
 }

@@ -17,6 +17,8 @@ namespace OrchidMod.Content.Guardian
 	{
 		public int SelectedItem { get; set; } = -1;
 		public Item ShieldItem => Main.player[Projectile.owner].inventory[this.SelectedItem];
+		public Texture2D ShieldTexture;
+		public Texture2D ShieldTextureGlow;
 
 		//public int ShieldAnimFrame { get => Projectile.frame; set { Projectile.frame = value; }}
 
@@ -62,28 +64,29 @@ namespace OrchidMod.Content.Guardian
 			Projectile.ai[1] = 0f;
 			Projectile.netUpdate = true;
 			Projectile.spriteDirection = 1;
+			
 		}
 
 		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
 		{
 			var owner = Main.player[Projectile.owner];
-			if (ShieldItem.ModItem is OrchidModGuardianShield) (ShieldItem.ModItem as OrchidModGuardianShield).PaviseModifyHitNPC(owner, owner.GetModPlayer<OrchidGuardian>(), target, Projectile, ref modifiers, FirstHit);
+			if (ShieldItem.ModItem is OrchidModGuardianShield shield) shield.PaviseModifyHitNPC(owner, owner.GetModPlayer<OrchidGuardian>(), target, Projectile, ref modifiers, FirstHit);
 		}
 
 		public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone, Player player, OrchidGuardian guardian)
 		{
 			var owner = Main.player[Projectile.owner];
 			var item = ShieldItem;
-			if (item == null || !(item.ModItem is OrchidModGuardianShield guardianItem))
+			if (item == null || item.ModItem is not OrchidModGuardianShield guardianItem)
 			{
 				Projectile.Kill();
 				return;
 			}
 
-			guardianItem.SlamHit(owner, Projectile, target, WeakSlam);
+			guardianItem.SlamHit(owner, guardian, Projectile, target, WeakSlam);
 			if (FirstHit)
 			{
-				guardianItem.SlamHitFirst(owner, Projectile, target, WeakSlam);
+				guardianItem.SlamHitFirst(owner, guardian, Projectile, target, WeakSlam);
 			}
 		}
 
@@ -158,7 +161,7 @@ namespace OrchidMod.Content.Guardian
 
 					if (Projectile.ai[1] <= 0f)
 					{
-						guardianItem.SlamEnd(owner, Projectile, WeakSlam);
+						guardianItem.SlamEnd(owner, guardian, Projectile, WeakSlam);
 						Projectile.ai[1] = 0f;
 						isSlamming = 0;
 						Projectile.friendly = false;
@@ -170,10 +173,10 @@ namespace OrchidMod.Content.Guardian
 
 				if (Projectile.ai[0] != 0f)
 				{ // blocking & charging
-					if (Projectile.ai[0] >= (int)(guardianItem.blockDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianBlockDuration))
+					if (Projectile.ai[0] >= (int)guardian.GetBlockDuration(ShieldItem, guardianItem.blockDuration))
 					{ // first frame of blocking
 						Projectile.localAI[1] = 0f;
-						Vector2 oldDimensions = new Vector2(Projectile.width, Projectile.height);
+						Vector2 oldDimensions = new (Projectile.width, Projectile.height);
 						var texture = ModContent.Request<Texture2D>(guardianItem.ShieldTexture).Value;
 						Projectile.width = (int)(texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames);
 						Projectile.height = (int)(texture.Height * guardian.GuardianWeaponScale / guardianItem.ShieldFrames);
@@ -184,7 +187,7 @@ namespace OrchidMod.Content.Guardian
 
 					aimedLocation += owner.MountedCenter.Floor() - oldOwnerPos.Floor();
 
-					if (IsLocalOwner)
+					if (IsLocalOwner && guardianItem.ModifyBlockingAngle(owner, guardian, Projectile, ref Projectile.localAI[1]))
 					{ // pavise rotation while blocking
 						Vector2 toPavise = Vector2.Normalize(Projectile.Center - owner.MountedCenter.Floor());
 						Vector2 toPaviseClock = toPavise.RotatedBy(0.001f * guardianItem.blockRotation);
@@ -221,19 +224,18 @@ namespace OrchidMod.Content.Guardian
 
 						//guardian.GuardianSlamRechargeTime = (int)(OrchidGuardian.GuardianRechargeTime * guardian.GuardianSlamRecharge);
 
-						for (int l = 0; l < Main.projectile.Length; l++)
+						foreach (Projectile proj in Main.ActiveProjectiles)
 						{
-							Projectile proj = Main.projectile[l];
-							if (proj.active && proj.hostile && proj.damage > 0 && !OrchidGuardian.ProjectilesBlockBlacklist.Contains(proj.type))
+							if (proj.hostile && proj.damage > 0 && !OrchidGuardian.ProjectilesBlockBlacklist.Contains(proj.type))
 							{
 								if (LineIntersectsRect(p1, p2, proj.Hitbox) || proj.Hitbox.Intersects(Projectile.Hitbox))
 								{
-									bool killProj = guardianItem.Block(owner, Projectile, proj);
+									bool killProj = guardianItem.Block(owner, guardian, Projectile, proj);
 									guardian.OnBlockProjectile(Projectile, proj);
 									if (shieldEffectReady)
 									{
 										guardian.OnBlockProjectileFirst(Projectile, proj);
-										guardianItem.Protect(owner, Projectile);
+										guardianItem.Protect(owner, guardian, Projectile);
 										shieldEffectReady = false;
 										SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(Main.rand.NextFloat(0.4f, 0.6f)), owner.MountedCenter);
 									}
@@ -243,10 +245,9 @@ namespace OrchidMod.Content.Guardian
 							}
 						}
 
-						for (int k = 0; k < Main.maxNPCs; k++)
+						foreach (NPC target in Main.ActiveNPCs)
 						{
-							NPC target = Main.npc[k];
-							if (target.active && !target.dontTakeDamage && !target.friendly && LineIntersectsRect(p2, p1, target.Hitbox))
+							if (IsValidTarget(target) && LineIntersectsRect(p2, p1, target.Hitbox))
 							{
 								bool contained = false;
 								foreach (BlockedEnemy blockedEnemy in guardian.GuardianBlockedEnemies)
@@ -274,12 +275,12 @@ namespace OrchidMod.Content.Guardian
 									target.velocity = push;
 								}
 
-								guardianItem.Push(owner, Projectile, target);
+								guardianItem.Push(owner, guardian, Projectile, target);
 								guardian.OnBlockNPC(Projectile, target);
 								if (shieldEffectReady)
 								{ // First parry stuff
 									guardian.OnBlockNPCFirst(Projectile, target);
-									guardianItem.Protect(owner, Projectile);
+									guardianItem.Protect(owner, guardian, Projectile);
 									shieldEffectReady = false;
 									SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(Main.rand.NextFloat(0.4f, 0.6f)), owner.MountedCenter);
 								}
@@ -289,7 +290,7 @@ namespace OrchidMod.Content.Guardian
 						Projectile.ai[0]--;
 						if (Projectile.ai[0] <= 0f)
 						{
-							if (guardianItem.BlockEnd(owner, Projectile))
+							if (guardianItem.BlockEnd(owner, guardian, Projectile))
 							{
 								spawnDusts();
 							}
@@ -300,12 +301,12 @@ namespace OrchidMod.Content.Guardian
 				else
 				{
 					Projectile.localAI[1] = 0f;
-					if (Main.myPlayer == Projectile.owner)
+					if (IsLocalOwner)
 					{
 						aimedLocation = Main.MouseWorld - owner.MountedCenter.Floor();
 						aimedLocation.Normalize();
 
-						aimedLocation = Vector2.UnitX.RotatedBy(IsRotationLocked ? LockedRotation : OrchidModGuardianShield.GetSnappedAngle(guardianItem, owner, aimedLocation.ToRotation()));
+						aimedLocation = Vector2.UnitX.RotatedBy(IsRotationLocked ? LockedRotation : aimedLocation.ToRotation());
 						Projectile.velocity = aimedLocation * float.Epsilon;
 						aimedLocation *= (guardianItem.distance + addedDistance) * -1f;
 
@@ -393,7 +394,7 @@ namespace OrchidMod.Content.Guardian
 
 							shieldEffectReady = true;
 							Projectile.ai[0] = (int)(guardianItem.blockDuration * guardianItem.Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianBlockDuration);
-							guardianItem.BlockStart(owner, Projectile);
+							guardianItem.BlockStart(owner, guardian, Projectile, Ding);
 							guardianItem.PlayGuardSound(owner, guardian, Projectile);
 						}
 						else
@@ -422,7 +423,7 @@ namespace OrchidMod.Content.Guardian
 						LockedRotation = Projectile.rotation + MathHelper.Pi;
 						Projectile.netUpdate = true;
 					}
-					guardianItem.Slam(owner, Projectile, WeakSlam);
+					guardianItem.Slam(owner, guardian, Projectile, WeakSlam);
 				}
 
 				UpdateHitbox();
@@ -430,7 +431,7 @@ namespace OrchidMod.Content.Guardian
 			}
 
 			oldOwnerPos = owner.MountedCenter;
-			guardianItem.ExtraAIShield(owner, Projectile);
+			guardianItem.ExtraAIShield(owner, Guardian, Projectile);
 		}
 
 		// https://stackoverflow.com/questions/5514366/how-to-know-if-a-line-intersects-a-rectangle
@@ -544,16 +545,16 @@ namespace OrchidMod.Content.Guardian
 
 		public override void SendExtraAI(BinaryWriter writer)
 		{
-			writer.Write(this.SelectedItem);
-			writer.Write(this.blockRotation);
-			writer.Write(this.WeakSlam);
+			writer.Write(SelectedItem);
+			writer.Write(blockRotation);
+			writer.Write(WeakSlam);
 		}
 
 		public override void ReceiveExtraAI(BinaryReader reader)
 		{
-			this.SelectedItem = reader.ReadInt32();
-			this.blockRotation = reader.ReadByte();
-			this.WeakSlam = reader.ReadBoolean();
+			SelectedItem = reader.ReadInt32();
+			blockRotation = reader.ReadByte();
+			WeakSlam = reader.ReadBoolean();
 		}
 	}
 }

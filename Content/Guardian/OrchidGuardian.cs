@@ -1133,7 +1133,7 @@ namespace OrchidMod.Content.Guardian
 			{
 				if (shieldAnchor.ShieldItem.ModItem is OrchidModGuardianShield shield)
 				{
-					shield.Reflect(Player, anchor, blockedProjectile, ref GuardianShieldSpikeReflect);
+					shield.Reflect(Player, this, anchor, blockedProjectile, ref GuardianShieldSpikeReflect);
 				}
 
 				if (GuardianShieldSpikeReflect > 0)

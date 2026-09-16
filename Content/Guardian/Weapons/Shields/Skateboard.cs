@@ -37,12 +37,12 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			blockRotation = 0f;
 		}
 
-		public override void BlockStart(Player player, Projectile shield)
+		public override void BlockStart(Player player, OrchidGuardian guardian, Projectile shield, bool manuallyFullyCharged)
 		{
 			playerVelocity = 0;
 		}
 
-		public override void SlamHitFirst(Player player, Projectile shield, NPC npc, bool WeakSlam)
+		public override void SlamHitFirst(Player player, OrchidGuardian guardian, Projectile shield, NPC npc, bool WeakSlam)
 		{
 			Player owner = Main.player[shield.owner];
 			if (shield.ModProjectile is GuardianShieldAnchor anchor && !WeakSlam)
@@ -75,7 +75,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			}
 		}
 
-		public override void ExtraAIShield(Player owner, Projectile projectile)
+		public override void ExtraAIShield(Player owner, OrchidGuardian guardian, Projectile projectile)
 		{
 			TimeSpent++;
 			if (projectile.ai[0] > 0f && projectile.ModProjectile is GuardianShieldAnchor anchor) // is blocking

@@ -1,18 +1,13 @@
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OrchidMod.Content.Guardian.Misc;
-using OrchidMod.Content.Guardian.Projectiles.Misc;
-using OrchidMod.Utilities;
 using ReLogic.Content;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.GameContent;
-using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace OrchidMod.Content.Guardian.Tiles;
+namespace OrchidMod.Content.General.Tiles;
 
 public class HorizonBrickTile : ModTile
 {
@@ -30,7 +25,7 @@ public class HorizonBrickTile : ModTile
 		HitSound = SoundID.Tink;
 		AddMapEntry(new Color(159, 122, 163));
 		
-		GlowMask = ModContent.Request<Texture2D>(Texture + "_Glow");
+		GlowMask = ModContent.Request<Texture2D>(Texture + "_Color");
 	}
 	
 	public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)

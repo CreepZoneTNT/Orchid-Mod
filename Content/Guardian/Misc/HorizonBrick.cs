@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using OrchidMod.Content.General.Tiles;
 using OrchidMod.Content.Guardian.Projectiles.Misc;
 using OrchidMod.Content.Guardian.Tiles;
 using OrchidMod.Utilities;
@@ -8,7 +9,6 @@ using ReLogic.Content;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using SpriteBatchSnapshot = OrchidMod.Utilities.SpriteBatchSnapshot;
 
 namespace OrchidMod.Content.Guardian.Misc
 {
@@ -29,7 +29,7 @@ namespace OrchidMod.Content.Guardian.Misc
 			Item.width = 20;
 			Item.height = 20;
 			
-			GlowMask = ModContent.Request<Texture2D>(Texture + "_Glow");
+			GlowMask = ModContent.Request<Texture2D>(Texture + "_Color");
 		}
 
 		public override bool PreDrawInInventory(SpriteBatch spriteBatch, Vector2 position, Rectangle frame, Color drawColor, Color itemColor, Vector2 origin, float scale)

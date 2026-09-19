@@ -3497,6 +3497,10 @@ Items: {
 			Reinforced stab hits will heal allies below 50% health 
 			'''
 	}
+	HorizonCandelabra: {
+        DisplayName: Horizon Candelabra
+        Tooltip: ""
+    }
 
 	ThoriumSteelFencingBlade: {
 		DisplayName: Steel Saber

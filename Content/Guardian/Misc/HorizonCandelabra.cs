@@ -11,18 +11,17 @@ using SpriteBatchSnapshot = OrchidMod.Utilities.SpriteBatchSnapshot;
 
 namespace OrchidMod.Content.Guardian.Misc
 {
-	public class HorizonChandelier : ModItem
+	public class HorizonCandelabra : ModItem
 	{
 		public Texture2D GlowMask;
 		
-
 		public override void SetStaticDefaults()
 		{
 			Item.ResearchUnlockCount = 100;
 		}
 
 		public override void SetDefaults() {
-			Item.DefaultToPlaceableTile(ModContent.TileType<General.Tiles.HorizonChandelier>());
+			Item.DefaultToPlaceableTile(ModContent.TileType<General.Tiles.HorizonCandelabra>());
 			Item.width = 26;
 			Item.height = 26;
 			

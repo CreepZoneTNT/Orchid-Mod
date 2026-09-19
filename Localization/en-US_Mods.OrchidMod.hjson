@@ -3312,9 +3312,8 @@ Items: {
 		DisplayName: Frost Walker
 		Tooltip:
 			'''
-			[c/FF0000:Test Item]
-			Attacks grant Cold Energy charge
-			At full Cold Energy charge, your next charged attack will release a giant snowflake
+			Launches small snowflakes on jab that grant charge and freeze enemies
+			Charged attacks release giant snowflakes that grant resources on hit
 			'''
 	}
 

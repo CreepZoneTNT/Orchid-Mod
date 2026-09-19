@@ -557,6 +557,11 @@ namespace OrchidMod.Common.Global.NPCs
 				{
 					npcLoot.Add(ItemDropRule.Common(ItemType<ThoriumIllusionistPavise>()));
 				}
+				
+				if (thoriumMod.IsNPCTypeEquals("BoreanStriderPopped", npc.type))
+				{
+					npcLoot.Add(ItemDropRule.ByCondition(NotExpert, ItemType<ThoriumBoreanStriderQuarterstaff>(), 5));
+				}
 
 				// TheGrandThunderBirdv2 QueenJelly GraniteEnergyStorm Viscount FallenDeathBeholder BoreanStriderPopped Lich Abyssion PatchWerk
 			}

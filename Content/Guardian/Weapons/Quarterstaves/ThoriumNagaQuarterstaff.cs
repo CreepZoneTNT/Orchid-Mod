@@ -23,10 +23,10 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
             Item.value = Item.sellPrice(0, 2);
             Item.rare = ItemRarityID.LightRed;
             Item.UseSound = SoundID.Item71.WithPitchOffset(0.5f).WithVolumeScale(0.5f);
-            Item.useTime = 20;
-            ParryDuration = 90;
+            Item.useTime = 14;
+            ParryDuration = 55;
             Item.knockBack = 6f;
-            Item.damage = 96;
+            Item.damage = 126;
             Item.shootSpeed = 15f;
             JabStyle = 2;
             JabSpeed = 0.9f;
@@ -79,7 +79,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 	        
 	        int damage = player.GetWeaponDamage(Item);
 	        int projectileType = ModContent.ProjectileType<ThoriumNagaQuarterstaffProjectile>();
-	        Projectile booble = Projectile.NewProjectileDirect(Item.GetSource_FromAI(), player.Center, direction * targetVelocity, projectileType, damage, 0f, anchor.owner);
+	        Projectile booble = Projectile.NewProjectileDirect(Item.GetSource_FromAI(), player.Center, direction * targetVelocity, projectileType, damage, 2f, anchor.owner);
 	        booble.CritChance = guardian.GetGuardianCrit(Item.crit);
         }
 
@@ -94,7 +94,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 						
 					int damage = guardian.GetGuardianDamage(Item.damage * 1.2f);
 					int projectileType = ModContent.ProjectileType<ThoriumNagaQuarterstaffProjectileAlt>();
-					Projectile spearTip = Projectile.NewProjectileDirect(projectile.GetSource_FromAI(), tipPosition, velocity * Item.shootSpeed * 0.8f, projectileType, damage, Item.knockBack, player.whoAmI);
+					Projectile.NewProjectileDirect(projectile.GetSource_FromAI(), tipPosition, velocity * Item.shootSpeed * 0.8f, projectileType, damage, Item.knockBack, player.whoAmI);
 				}
 				else
 				{
@@ -111,7 +111,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 
 						int damage = player.GetWeaponDamage(Item);
 						int projectileType = ModContent.ProjectileType<ThoriumNagaQuarterstaffProjectile>();
-						Projectile booble = Projectile.NewProjectileDirect(Item.GetSource_FromAI(), player.Center, direction * targetVelocity, projectileType, damage, 0f, projectile.owner);
+						Projectile booble = Projectile.NewProjectileDirect(Item.GetSource_FromAI(), player.Center, direction * targetVelocity + player.velocity * 0.5f, projectileType, damage, 0f, projectile.owner);
 						booble.CritChance = guardian.GetGuardianCrit(Item.crit);
 					}
 					
@@ -150,4 +150,26 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			}
 		}
     }    
+    
+    // "boobie"
+    //		-Watercooler
+    /*
+	  █▓▓▓▓▓▓▓▓█        
+	 ▓▓▒▒▒▒▒▒▒▒▓▓       
+	 █▓▓▓▓▓▓▓▓▓▓█       
+	 █▓▓▒▒▒▒▒▒▓▓█       
+	 █▓▓▓▓▓▓▓▓▓▓█   ███ 
+	 ▓▓▒▓▓▓▓▓▓▒▓▓   █▓▓ 
+	 █▓▓▓▓▓▓▓▓▓▓█   █▒▓ 
+	 ▓▓▓▓▓▓▓▓▓▓▓▓  █▓▓▓█
+	█▒██▓▓▓▓▓▓██▒█ █▒▒▒█
+	█▒▒▒▒▒▒▒▒▒▒▒▒█▒▓▒▒▒█
+	█▒▒▒▒▒▒▒▒▒▒▒▒█▒▓▒▒▒█
+	█▒▒▓▓▓▓▓▓▓▓▒▒█▒▓▒▒▒█
+	█▒█▒▒▒▒▒▒▒▒█▒█ █▒▒▒█
+	█▒█▒▓█▒▒██▒█▒█ █▓▓▓█
+	█▒█▒▒▒▒▒▒▒▒█▒█  █▓▓ 
+	█▓██████████▒█      
+	 █▒▒▒▒▒▒▒▒▒▒█       
+     */
 }

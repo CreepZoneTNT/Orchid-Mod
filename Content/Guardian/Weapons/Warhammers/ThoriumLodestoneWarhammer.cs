@@ -10,15 +10,6 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers {
     [CrossmodContent("ThoriumMod")]
     public class ThoriumLodestoneWarhammer : OrchidModGuardianHammer
     {
-    
-        private static Mod ThoriumMod => ModLoader.GetMod("ThoriumMod");
-        private static ModBuff ThoriumSunderedDebuff => ThoriumMod.Find<ModBuff>("Sundered");
-
-        public override bool IsLoadingEnabled(Mod mod)
-        {
-            return ModLoader.HasMod("ThoriumMod");
-        }
-
         public override void SafeSetDefaults()
         {
             Item.width = 42;
@@ -218,7 +209,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers {
 
         private static void DoBlastStuff(Projectile projectile, bool uberCharged, NPC hitTarget = null)
         {
-			if (projectile.active && projectile.ModProjectile is GuardianHammerAnchor anchor)
+	        Mod thoriumMod = OrchidMod.ThoriumMod;
+			if (thoriumMod != null && projectile.active && projectile.ModProjectile is GuardianHammerAnchor anchor)
 			{
 				bool BigBlast = (uberCharged && anchor.Ding);
 				Vector2 position;
@@ -247,7 +239,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers {
                 
                 // We only want the big explosion if the hammer was fully charged before Ultra Smashing
                 // (this may or may not already be covered for in ExtraAI() but it's good to be sure)
-                int blastProjType = BigBlast ? ThoriumMod.Find<ModProjectile>("LodestoneStaffPro4").Type : ThoriumMod.Find<ModProjectile>("LodestoneStaffPro2").Type;
+                int blastProjType = BigBlast ? thoriumMod.Find<ModProjectile>("LodestoneStaffPro4").Type : thoriumMod.Find<ModProjectile>("LodestoneStaffPro2").Type;
                 // Boom projectile
                 Projectile blastProj = Projectile.NewProjectileDirect(
                     projectile.GetSource_FromAI(),
@@ -267,7 +259,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers {
                             projectile.GetSource_FromAI(),
 							position, 
                             new Vector2(Main.rand.NextFloat(-0.5f, 0.5f) * 3.5f, -Main.rand.NextFloat(1.25f,2.5f)*(uberCharged ? 4 : 2)),
-                            ThoriumMod.Find<ModProjectile>("LodestoneStaffPro5").Type, 
+                            thoriumMod.Find<ModProjectile>("LodestoneStaffPro5").Type, 
                             (int)(projectile.damage * 0.2f), 
                             projectile.knockBack, 
                             projectile.owner,

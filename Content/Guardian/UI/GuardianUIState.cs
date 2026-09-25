@@ -443,20 +443,47 @@ namespace OrchidMod.Content.Guardian.UI
 						}
 					}
 					
-					if (guardianItem is GuardianLanternShield lantern && (maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f)))
+					if (guardianItem is GuardianLanternShield)
 					{
-						Projectile lanternShieldProj = Main.projectile.FirstOrDefault(proj => proj.whoAmI < Main.maxProjectiles && proj.active && proj.owner == player.whoAmI && proj.type == ModContent.ProjectileType<GuardianLanternShieldAnchor>());
-						if (lanternShieldProj.ai[1] == -1f)
+						Projectile lanternAnchor = Main.projectile.FirstOrDefault(proj => proj.whoAmI < Main.maxProjectiles && proj.active && proj.owner == player.whoAmI && proj.type == ModContent.ProjectileType<GuardianLanternShieldAnchor>());
+
+						if (maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f))
 						{
-							chargeTextureOn = textureGauntletOn;
-							chargeTextureOff = textureGauntletOff;
-							chargeTextureReady = textureGauntletReady;
+							if (lanternAnchor.ai[1] == 1)
+							{
+								chargeTextureOn = textureBlockOn;
+								chargeTextureOff = textureBlockOff;
+								chargeTextureReady = textureBlockReady;
+							}
+							else if (lanternAnchor.ai[1] == -1)
+							{
+								chargeTextureOn = textureGauntletOn;
+								chargeTextureOff = textureGauntletOff;
+								chargeTextureReady = textureGauntletReady;
+							}
 						}
-						else
+						else if (lanternAnchor.ai[0] > 0)
 						{
-							chargeTextureOn = textureBlockOn;
-							chargeTextureOff = textureBlockOff;
-							chargeTextureReady = textureBlockReady;
+							int val = 22;
+							float block = lanternAnchor.ai[0];
+							float step = (player.HeldItem.ModItem as GuardianLanternShield).ParryDuration;
+							if (lanternAnchor.ai[1] == 3)
+								step *= (player.HeldItem.ModItem as GuardianLanternShield).BlockDurationMult;
+							while (block < step)
+							{
+								block += step / 20f;
+								val--;
+							}
+
+							Rectangle rectangle = textureBlockOn.Bounds;
+							rectangle.Height = val;
+							rectangle.Y = textureBlockOn.Height - val;
+							drawpos = new Vector2(position.X - 9, position.Y - 92 * player.gravDir + 3f * (player.gravDir - 1));
+							spriteBatch.Draw(textureBlockOff, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
+							drawpos = new Vector2(position.X - 9, position.Y - 92 * player.gravDir + textureBlockOn.Height - val + 3f * (player.gravDir - 1));
+							if (player.gravDir < 0) drawpos.Y -= (textureBlockOn.Height - rectangle.Height);
+							spriteBatch.Draw(textureBlockOn, drawpos, rectangle, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
+							return;
 							
 						}
 					}

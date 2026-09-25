@@ -71,8 +71,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 				if (player.HasBuff<GuardianVoidQuarterstaffBuff>() && guardian.GuardianItemCharge >= 180f && !anchor.Ding)
 				{ // Try to fix sound cue not working consistently while supercharged
 					anchor.Ding = true;
-					if (ModContent.GetInstance<OrchidClientConfig>().GuardianAltChargeSounds) SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot, player.Center);
-					else SoundEngine.PlaySound(SoundID.MaxMana, player.Center);
+					SoundEngine.PlaySound(guardian.DingSound, player.Center);
 				}
 			}
 		}

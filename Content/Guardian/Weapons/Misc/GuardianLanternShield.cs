@@ -30,9 +30,6 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 
 		public override int AnchorType => ModContent.ProjectileType<GuardianLanternShieldAnchor>();
 
-		public void PlayGuardSound(Player player, OrchidGuardian guardian, Projectile anchor) => SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(Main.rand.NextFloat(0.4f, 0.6f)), player.Center);
-		public void PlayPunchSound(Player player, OrchidGuardian guardian, Projectile anchor) => SoundEngine.PlaySound(SoundID.DD2_MonkStaffGroundMiss, player.Center);
-
 		public sealed override void SetDefaults()
 		{
 			Item.DamageType = ModContent.GetInstance<GuardianDamageClass>();
@@ -47,14 +44,15 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 			Item.height = 48;
 			Item.value = Item.sellPrice(0, 5);
 			Item.rare = ItemRarityID.LightRed;
-			Item.useTime = Item.useAnimation = 30;
-			Item.knockBack = 5f;
-			Item.damage = 300;
+			Item.useTime = Item.useAnimation = 45;
+			// Item.shootSpeed = 30f;
+			Item.knockBack = 13f;
+			Item.damage = 447;
 			ParryDuration = 30;
 			BlockDurationMult = 4.5f;
 			
 			JabDamage = 0.25f;
-			StrikeVelocity = 20f;
+			StrikeVelocity = 15;
 
 			OrchidGlobalItemPerEntity orchidItem = Item.GetGlobalItem<OrchidGlobalItemPerEntity>();
 			orchidItem.guardianWeapon = true;
@@ -79,32 +77,36 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 		{
 			if (player.whoAmI == Main.myPlayer && !player.cursed)
 			{
-				int projectileType = ModContent.ProjectileType<GuardianLanternShieldAnchor>();
-				if (player.ownedProjectileCounts[projectileType] > 0)
+				if (player.ownedProjectileCounts[AnchorType] > 0)
 				{
-
-					var guardian = player.GetModPlayer<OrchidGuardian>();
-					Projectile proj = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == projectileType);
-					if (proj != null && proj.ModProjectile is GuardianLanternShieldAnchor anchor)
+					OrchidGuardian guardian = player.Guardian();
+					Projectile proj = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == AnchorType);
+					if (proj?.ModProjectile is GuardianLanternShieldAnchor anchor)
 					{
 						bool swap = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs;
 						bool punchHold = swap ? Main.mouseRight : Main.mouseLeft;
-						bool punchTap = swap ? Main.mouseRightRelease : Main.mouseLeftRelease;
 						bool guardHold = swap ? Main.mouseLeft : Main.mouseRight;
-						bool guardTap = swap ? Main.mouseLeftRelease : Main.mouseRightRelease;
 
-						if (proj.ai[1] == 0)
+						if (guardian.GuardianItemCharge == 0f && proj.ai[0] == 0f)
 						{
 							if (guardHold)
 							{
+								proj.ai[0] = 0f;
 								proj.ai[1] = 1f;
+								proj.ai[2] = 0f;
+								anchor.NeedNetUpdate = true;
+								guardian.GuardianItemCharge++;
+								
 							}
 							else if (punchHold)
 							{
+								proj.ai[0] = 0f;
 								proj.ai[1] = -1f;
+								proj.ai[2] = 0f;
+								anchor.NeedNetUpdate = true;
+								guardian.GuardianItemCharge++;
+								
 							}
-							proj.ai[0] = 0f;
-							anchor.NeedNetUpdate = true;
 						}
 					}
 				}
@@ -125,9 +127,9 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 						projectile.Kill();
 				}
 
-				var index = Projectile.NewProjectile(Item.GetSource_FromThis(), player.Center.X, player.Center.Y, 0f, 0f, projectileType, 0, 0f, player.whoAmI);
+				int index = Projectile.NewProjectile(Item.GetSource_FromThis(), player.Center.X, player.Center.Y, 0f, 0f, projectileType, 0, 0f, player.whoAmI);
 
-				var proj = Main.projectile[index];
+				Projectile proj = Main.projectile[index];
 				if (proj.ModProjectile is not GuardianLanternShieldAnchor shield)
 					proj.Kill();
 				else
@@ -136,8 +138,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 			}
 			else
 			{
-				var proj = Main.projectile.First(i => i.active && i.owner == player.whoAmI && i.type == projectileType);
-				if (proj != null && proj.ModProjectile is GuardianLanternShieldAnchor shield)
+				Projectile proj = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == projectileType);
+				if (proj?.ModProjectile is GuardianLanternShieldAnchor shield)
 				{
 					if (shield.SelectedItem != player.selectedItem)
 						shield.OnChangeSelectedItem(player);
@@ -173,11 +175,15 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 			}
 
 			int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Knockback"));
-			tooltips.Insert(index + 1, new TooltipLine(Mod, "ParryDuration", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ParryDuration", OrchidUtils.FramesToSeconds((int)(ParryDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianBlockDuration)))));
-			tooltips.Insert(index + 2, new TooltipLine(Mod, "BlockDuration", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.BlockDuration", OrchidUtils.FramesToSeconds((int)(ParryDuration * BlockDurationMult * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianBlockDuration)))));
+			tooltips.Insert(index + 1, new TooltipLine(Mod, "ParryDuration", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ParryAndBlockDuration", OrchidUtils.FramesToSeconds((int)guardian.GetParryDuration(Item, ParryDuration)), OrchidUtils.FramesToSeconds((int)guardian.GetBlockDuration(Item, (int)(ParryDuration * BlockDurationMult))))));
 
-			string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapPaviseInputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
-			tooltips.Insert(index + 2, new TooltipLine(Mod, "ClickInfo", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.Block", click))
+			string click = OrchidUtils.GetClickInfoTooltip(OrchidMod.OrchidClientConfig.GuardianSwapPaviseInputs, false);
+			tooltips.Insert(index + 2, new TooltipLine(Mod, "ClickInfo", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ChargeToPunchLanternShield", click))
+			{
+				OverrideColor = new Color(175, 255, 175)
+			});
+			click = OrchidUtils.GetClickInfoTooltip(OrchidMod.OrchidClientConfig.GuardianSwapPaviseInputs);
+			tooltips.Insert(index + 3, new TooltipLine(Mod, "ClickInfo2", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ChargeToParryLanternShield", click))
 			{
 				OverrideColor = new Color(175, 255, 175)
 			});
@@ -193,7 +199,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 					debuff = crushDepth.Type;
 				else if (calamityMod.TryFind("AstralTorch", out ModItem astralTorch) && calamityMod.TryFind("AstralInfectionDebuff", out ModBuff astralInfection) && itemID == astralTorch.Type)
 					debuff = astralInfection.Type;
-				else if (calamityMod.TryFind("CausticTorch", out ModItem causticTorch) && calamityMod.TryFind("SulphurousTorch", out ModItem sulphurousTorch) && calamityMod.TryFind("Irradiated", out ModBuff irradiated) && (itemID == causticTorch.Type || itemID == causticTorch.Type))
+				else if (calamityMod.TryFind("CausticTorch", out ModItem causticTorch) && calamityMod.TryFind("SulphurousTorch", out ModItem sulphurousTorch) && calamityMod.TryFind("Irradiated", out ModBuff irradiated) && (itemID == causticTorch.Type || itemID == sulphurousTorch.Type))
 					debuff = irradiated.Type;
 				else if (calamityMod.TryFind("ThermalTorch", out ModItem thermalTorch) && calamityMod.TryFind("BrimstoneFlames", out ModBuff brimstoneFlames) && itemID == thermalTorch.Type)
 					debuff = brimstoneFlames.Type;

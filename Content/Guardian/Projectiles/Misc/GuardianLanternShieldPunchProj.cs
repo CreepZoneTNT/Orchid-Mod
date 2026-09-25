@@ -15,7 +15,6 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 		private static Texture2D TextureMain;
 		public GuardianLanternShield GuardianItem;
 		public bool ChargedHit => Projectile.ai[0] == 1f;
-		public bool OffHand => Projectile.ai[1] == 1f;
 		public bool FirstFrame = false;
 
 		public override void Load()
@@ -42,12 +41,10 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 
 		public override void AI()
 		{
-
-			Player owner = Main.player[Projectile.owner];
 			if (!Initialized)
 			{
 				Initialized = true;
-				Projectile.rotation = (Projectile.velocity - owner.velocity * 0.375f).ToRotation();
+				Projectile.rotation = (Projectile.velocity - Owner.velocity * 0.375f).ToRotation();
 				if (ChargedHit) Strong = true;
 				if (!IsLocalOwner)
 				{
@@ -59,55 +56,35 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 						}
 					}
 
-					owner.GetModPlayer<OrchidGuardian>().GuardianItemCharge = 0; // probably not the best place to put this but it works. (fixes a minor visual issue)
-					SoundEngine.PlaySound(ChargedHit ? SoundID.DD2_MonkStaffGroundMiss : SoundID.DD2_MonkStaffSwing, owner.Center);
+					Owner.GetModPlayer<OrchidGuardian>().GuardianItemCharge = 0; // probably not the best place to put this but it works. (fixes a minor visual issue)
+					// SoundEngine.PlaySound(ChargedHit ? SoundID.DD2_MonkStaffGroundMiss : SoundID.DD2_MonkStaffSwing, owner.Center);
 				}
 
-				float scale = Owner.GetModPlayer<OrchidGuardian>().GuardianWeaponScale;
-				if (scale != 1f)
-				{ // re-centers and adjusts projectiles scale + hitbox to match the players
-					Vector2 oldCenter = Projectile.Center;
-					Projectile.scale = scale;
-					Projectile.width = (int)(Projectile.width * scale);
-					Projectile.height = (int)(Projectile.height * scale);
-					Projectile.Center = oldCenter;
-				}
+				
+				// Projectile.position += Projectile.velocity * 0.5f;
+				Projectile.width = 40;
+				Projectile.height = 40;
+				Projectile.position.X += 10;
+				Projectile.position.Y += 10;
 			}
 			else
 			{
-				if (!FirstFrame)
-				{
-					FirstFrame = true;
-					Projectile.position += Projectile.velocity * 0.5f;
-					Projectile.width = 20;
-					Projectile.height = 20;
-					Projectile.position.X += 5;
-					Projectile.position.Y += 5;
-				}
-
-				Projectile.velocity *= 0.94574f;
+				Projectile.velocity *= 0.97164f;
+				
+				// Item torchItem = Owner.inventory[GuardianItem.TorchIndex];
+				// Dust.NewDustDirect(Projectile.Center - new Vector2(4), 8, 8, torchItem != null ? torchItem.createTile == TileID.Torches ? TorchID.Dust[torchItem.placeStyle] : TileLoader.GetTile(torchItem.createTile).DustType : DustID.Torch);
 			}
 		}
 
-		/*public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone, Player player, OrchidGuardian guardian)
+		public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone, Player player, OrchidGuardian guardian)
 		{
 			var owner = Main.player[Projectile.owner];
 			if (owner.active && !owner.dead && GuardianItem != null)
 			{
-				if (FirstHit)
-				{
-					if (ChargedHit)
-					{
-						guardian.GuardianGuardRecharging += 0.5f;
-					}
-					else
-					{
-						guardian.GuardianSlamRecharging += guardian.GauntletSlamPool;
-						guardian.GauntletSlamPool *= 0.8f;
-					}
-				}
+				if (FirstHit && ChargedHit)
+					guardian.AddGuard();
 			}
-		}*/
+		}
 
 		public override bool OrchidPreDraw(SpriteBatch spriteBatch, ref Color lightColor)
 		{
@@ -123,7 +100,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 			SpriteEffects effect = SpriteEffects.None;
 			if (Projectile.velocity.X < 0f) effect = SpriteEffects.FlipVertically;
 
-			float scale = Projectile.scale * (ChargedHit ? 1.2f : 1f);
+			float scale = Projectile.scale * (ChargedHit ? 1.5f : 1.2f);
 			Vector2 drawPosition = Projectile.Center - offsetVector - Main.screenPosition;
 			spriteBatch.Draw(TextureMain, drawPosition, null, Color.DarkSlateGray * colorMult, Projectile.rotation, TextureMain.Size() * 0.5f, scale, effect, 0f);
 

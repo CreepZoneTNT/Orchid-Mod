@@ -406,12 +406,12 @@ namespace OrchidMod.Content.Guardian
 
 			// string click = OrchidMod.OrchidClientConfig.GuardianSwapGauntletInputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
 			string click = OrchidUtils.GetClickInfoTooltip(OrchidMod.OrchidClientConfig.GuardianSwapGauntletInputs);
-			tooltips.Insert(index + 2, new TooltipLine(Mod, "ClickInfo", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.Parry", click))
+			tooltips.Insert(index + 2, new TooltipLine(Mod, "ClickInfo", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ParryDash", click))
 			{
 				OverrideColor = new Color(175, 255, 175)
 			});
 
-			tooltips.Insert(index + 3, new TooltipLine(Mod, "Swing", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ChargeToSwing", click))
+			tooltips.Insert(index + 3, new TooltipLine(Mod, "Swing", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ChargeToJabKatar", click))
 			{
 				OverrideColor = new Color(175, 255, 175)
 			});

@@ -9,6 +9,7 @@ Tiles: {
 	ShamanBiomeChestTile.MapEntry: "{$Items.ShamanBiomeChest.DisplayName}"
 	GuardianBuffStationTile.MapEntry: "{$Items.GuardianBuffStation.DisplayName}"
 	VerveineQuarterstaffTile.MapEntry: Пердёжное растение
+	// GuideQuickShieldTile.MapEntry: Lost Guidebook
 }
 
 Buffs: {
@@ -3313,9 +3314,8 @@ Items: {
 		// DisplayName: Frost Walker
 		/* Tooltip:
 			'''
-			[c/FF0000:Test Item]
-			Attacks grant Cold Energy charge
-			At full Cold Energy charge, your next charged attack will release a giant snowflake
+			Launches small snowflakes on jab that grant charge and freeze enemies
+			Charged attacks release giant snowflakes that grant resources on hit
 			''' */
 	}
 
@@ -3327,6 +3327,16 @@ Items: {
 			Parrying increases speed for a short time, and launches kunai on punch
 			''' */
 		// Parry: "{0} click fires a grappling claw, costing 2 guards"
+	}
+
+	ThoriumDreadKatar: {
+		// DisplayName: Dread Reaper's Claw
+		/* Tooltip:
+			'''
+			Fully charged attacks launch a flurry of dread hooks
+			Dread hooks damage hooked enemies on jab and store part of damage dealt as bleed
+			Subsequent fully charged attacks rip the hooks out, inflicting empowered bleed at once
+			''' */
 	}
 
 	ThoriumGuardianTitanHead: {
@@ -3500,9 +3510,24 @@ Items: {
 			''' */
 	}
 
-	ThoriumSteelFencingBlade: {
-		// DisplayName: Steel Saber
-		// Tooltip: "'Expertly forged by the Blacksmith'"
+	HorizonCandelabra: {
+		// DisplayName: Horizon Candelabra
+		// Tooltip: ""
+	}
+
+	ImpulseSlate: {
+		// DisplayName: Impulse Slate
+		// Tooltip: Allows generating guardian weapon charge while jabbing
+	}
+
+	GuideQuickShield: {
+		// DisplayName: Guide to Emergency Blocking
+		// Tooltip: Doubles pavise charge speed at the cost of 75% reduced block duration when out of Guards
+	}
+
+	GraniteSpike: {
+		// DisplayName: Granite Spike
+		// Tooltip: ""
 	}
 }
 
@@ -3968,15 +3993,14 @@ Projectiles: {
 	// ThoriumBlackKatarProjectile.DisplayName: Shadow Clone
 	// ConsolariaLepusEggNestProjectile.DisplayName: Egg
 	// GuardianLanternShieldAnchor.DisplayName: Lantern Shield
-	// ThoriumNagaQuarterstaffProjectileDash.DisplayName: Riptide Dive
 	// ThoriumTerrariumQuarterstaffProjectile.DisplayName: Bifrost
 	// GuardianFencingBladeAnchor.DisplayName: Fencing Blade
 	// FencingBladeSlashProjectile.DisplayName: Slash
 	// FencingBladeFocusProjectile.DisplayName: Focus
 	// GuardianLanternShieldPunchProj.DisplayName: Heavy Punch
-	// ThoriumTerrariumWarhammerProjectile.DisplayName: Thorium Terrarium Warhammer Projectile
-	// ThoriumTemplarFencingBladeProjectile.DisplayName: Thorium Templar Fencing Blade Projectile
-	// ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Thorium Naga Quarterstaff Projectile Alt
+	// ThoriumTemplarFencingBladeProjectile.DisplayName: Yoinked Pickup
+	// ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Riptide Reamer
+	// ThoriumDreadKatarProjectile.DisplayName: Thorium Dread Katar Projectile
 }
 
 Configs: {
@@ -4235,13 +4259,17 @@ UI: {
 			Нажмите {0}, чтобы нанести колющий удар во время зарядки
 			'''
 		// ChargeToJab: Charge to swing, {0} to slam while charging
+		// ChargeToJabKatar: Charge to jab, {0} to slam while charging
 		ChargeToDash:
 			'''
 			Зарядите, чтобы совершить рывок
 			Нажмите {0}, чтобы нанести колющий удар во время зарядки
 			'''
+		// ChargeToPunchLanternShield: Charge with {0} to punch
+		// ChargeToParryLanternShield: "{0} to parry, charge with {0} to block"
 		ParryDuration: Длительность парирования: {0} сек.
 		BlockDuration: Длительность блока: {0} сек.
+		// ParryAndBlockDuration: "{0} second parry duration, {1} second block duration"
 		Interrupted: Прервано
 		Charged: Заряжено
 		Reinforced: Усилено
@@ -4250,6 +4278,7 @@ UI: {
 		Slam: "{0} оч. нападения"
 		Parry: Нажмите {0}, чтобы совершить парирование
 		ParryDash: Нажмите {0}, чтобы совершить парирование рывком вниз
+		// ParryDashNeedle: "{0} to parry, dashing downwards"
 		ChargeToThrow: Зарядите, чтобы бросить
 		// ChargeToParry: Charge to parry
 		SwingWhileCharging:

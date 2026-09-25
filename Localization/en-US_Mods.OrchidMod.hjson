@@ -3502,9 +3502,9 @@ Items: {
         Tooltip: ""
     }
 
-	ThoriumSteelFencingBlade: {
-		DisplayName: Steel Saber
-		Tooltip: "'Expertly forged by the Blacksmith'"
+	ImpulseSlate: {
+		DisplayName: Impulse Slate
+		Tooltip: Allows generating guardian weapon charge while jabbing
 	}
 }
 

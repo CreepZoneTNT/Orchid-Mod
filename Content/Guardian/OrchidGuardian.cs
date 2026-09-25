@@ -28,6 +28,11 @@ namespace OrchidMod.Content.Guardian
 		public static ModKeybind ThoriumArmorKey;
 		public static ModKeybind ThoriumAccessoryKey;
 
+		public bool GauntletInputSwap => OrchidMod.OrchidClientConfig.GuardianSwapGauntletInputs;
+		public bool PaviseInputSwap => OrchidMod.OrchidClientConfig.GuardianSwapPaviseInputs;
+		
+		public SoundStyle DingSound => OrchidMod.OrchidClientConfig.GuardianAltChargeSounds ? SoundID.DD2_BetsyFireballShot : SoundID.MaxMana;
+
 		public bool CrossModGodMode;
 
 		// Misc & Static fields
@@ -1416,5 +1421,18 @@ namespace OrchidMod.Content.Guardian
 		
 		public float GetParryDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianParryDuration;
 		public float GetBlockDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianBlockDuration;
+
+		/// <summary>Returns the primary mouse input for "gauntlet-like" weapons: <c>Main.mouseLeft</c> by default, or <c>Main.mouseRight</c> if swapped in the config.</summary>
+		/// <param name="tap">If <c>Main.mouseLeftRelease</c>/<c>Main.mouseRightRelease</c> should be considered as part of the input.</param>
+		public bool GetGauntletPunchInput(bool tap) => GauntletInputSwap ? Main.mouseRight && (!tap || Main.mouseRightRelease) : Main.mouseLeft && (!tap || Main.mouseLeftRelease);
+		/// <summary>Returns the secondary mouse input for "gauntlet-like" weapons: <c>Main.mouseRight</c> by default, or <c>Main.mouseLeft</c> if swapped in the config.</summary>
+		/// <param name="tap">If <c>Main.mouseRightRelease</c>/<c>Main.mouseLeftRelease</c> should be considered as part of the input.</param>
+		public bool GetGauntletBlockInput(bool tap) => GauntletInputSwap ? Main.mouseLeft && (!tap || Main.mouseLeftRelease) : Main.mouseRight && (!tap || Main.mouseRightRelease);
+		/// <summary>Returns the primary mouse input for "pavise-like" weapons: <c>Main.mouseLeft</c> by default, or <c>Main.mouseRight</c> if swapped in the config.</summary>
+		/// <param name="tap">If <c>Main.mouseLeftRelease</c>/<c>Main.mouseRightRelease</c> should be considered as part of the input.</param>
+		public bool GetPaviseSlamInput(bool tap) => PaviseInputSwap ? Main.mouseRight && (!tap || Main.mouseRightRelease) : Main.mouseLeft && (!tap || Main.mouseLeftRelease);
+		/// <summary>Returns the secondary mouse input for "pavise-like" weapons: <c>Main.mouseRight</c> by default, or <c>Main.mouseLeft</c> if swapped in the config.</summary>
+		/// <param name="tap">If <c>Main.mouseRightRelease</c>/<c>Main.mouseLeftRelease</c> should be considered as part of the input.</param>
+		public bool GetPaviseBlockInput(bool tap) => PaviseInputSwap ? Main.mouseLeft && (!tap || Main.mouseLeftRelease) : Main.mouseRight && (!tap || Main.mouseRightRelease);
 	}
 }

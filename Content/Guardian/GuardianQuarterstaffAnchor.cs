@@ -127,7 +127,13 @@ namespace OrchidMod.Content.Guardian
 
 				TimeSpent++;
 				Projectile.timeLeft = 5;
-
+				
+				if (guardian.GuardianItemCharge >= 180f && !Ding)
+				{ // Sound cue when fully charged
+					Ding = true;
+					SoundEngine.PlaySound(guardian.DingSound, owner.Center);
+				}
+				
 				if (Projectile.ai[2] > 0f)
 				{ // Blocking
 					Projectile.friendly = false;
@@ -304,12 +310,7 @@ namespace OrchidMod.Content.Guardian
 
 					if (IsLocalOwner)
 					{
-						if (guardian.GuardianItemCharge >= 180f && !Ding)
-						{ // Sound cue when fully charged
-							Ding = true;
-							if (ModContent.GetInstance<OrchidClientConfig>().GuardianAltChargeSounds) SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot, owner.Center);
-							else SoundEngine.PlaySound(SoundID.MaxMana, owner.Center);
-						}
+						
 
 						bool jabInput = Main.mouseRight;
 						bool chargeInput = Main.mouseLeft;

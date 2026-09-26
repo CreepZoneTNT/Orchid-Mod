@@ -297,7 +297,7 @@ public class ThoriumBoreanStriderQuarterstaffProjectile : OrchidModGuardianProje
 			spriteBatch.Draw(glowTexture, drawPosition, null, Color.CadetBlue * (0.5f + 0.05f * (i + 1)) * Projectile.Opacity, OldRotation[i], glowTexture.Size() * 0.5f, Projectile.scale * 1.1f, effects, 0f);
 		}
 		
-		spriteBatch.Draw(glowTexture, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity, Projectile.rotation, glowTexture.Size() * 0.5f, Projectile.scale * 1.05f, effects, 0f);
+		spriteBatch.Draw(glowTexture, Projectile.Center - Main.screenPosition, null, Color.CadetBlue * Projectile.Opacity, Projectile.rotation, glowTexture.Size() * 0.5f, Projectile.scale * 1.05f, effects, 0f);
 		spriteBatch.Draw(projTexture, Projectile.Center - Main.screenPosition, null, lightColor * Projectile.Opacity, Projectile.rotation, projTexture.Size() * 0.5f, Projectile.scale, effects, 0f);
 		
 		spriteBatch.End();

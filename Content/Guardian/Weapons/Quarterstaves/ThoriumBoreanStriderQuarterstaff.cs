@@ -41,6 +41,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
             ChargeRate = 0.25f;
         }
 
+        public override bool SafeCanHitNPC(Player player, Projectile anchor, NPC target) => false;
+
         public override void HoldItemFrame(Player player)
         {
 	        if (Main.rand.NextBool(3))
@@ -54,7 +56,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
         {
 	        Tip = projectile.Center - Vector2.UnitY.RotatedBy(projectile.rotation + MathHelper.PiOver4) * projectile.width * 0.25f;
 
-	        projectile.friendly = false;
+	        // projectile.friendly = false;
 
 	        // Code borrowed from FlamingQuarterstaff
 	        bool bigAttack = projectile.ai[0] > 14 || projectile.ai[2] < 0;

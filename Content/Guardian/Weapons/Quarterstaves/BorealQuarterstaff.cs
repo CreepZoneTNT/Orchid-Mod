@@ -18,6 +18,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			GuardStacks = 1;
 		}
 
+		public override bool SafeCanHitNPC(Player player, Projectile anchor, NPC target) => Collision.CanHit(player, target);
+		
 		public override void AddRecipes()
 		{
 			var recipe = CreateRecipe();

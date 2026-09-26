@@ -503,6 +503,9 @@ namespace OrchidMod.Content.Guardian
 						Projectile.ai[0] = 0f;
 						Projectile.ai[1] = 0f;
 						Projectile.friendly = false;
+						
+						Ding = false;
+						Projectile.netUpdate = true;
 					}
 
 					guardianItem.ExtraAIQuarterstaffSwinging(owner, guardian, Projectile);
@@ -733,7 +736,8 @@ namespace OrchidMod.Content.Guardian
 
 		public override bool? CanHitNPC(NPC target)
 		{ // hitting wiith the end of the staff or spinning
-			if (target.Hitbox.Intersects(HitBox[0]) || target.Hitbox.Intersects(HitBox[1]) || target.Hitbox.Intersects(HitBox[2]) || Projectile.ai[2] < 0f) return base.CanHitNPC(target);
+			if ((target.Hitbox.Intersects(HitBox[0]) || target.Hitbox.Intersects(HitBox[1]) || target.Hitbox.Intersects(HitBox[2]) || Projectile.ai[2] < 0f) && QuarterstaffItem.ModItem is OrchidModGuardianQuarterstaff guardianItem && guardianItem.SafeCanHitNPC(Owner, Projectile, target))
+				return base.CanHitNPC(target);
 			return false;
 		}
 

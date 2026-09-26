@@ -30,6 +30,8 @@ namespace OrchidMod.Content.Guardian
 		public virtual bool PreSwingAI(Player player, OrchidGuardian guardian, Projectile anchor) { return true; }
 		public virtual bool PreCounterAI(Player player, OrchidGuardian guardian, Projectile anchor) { return true; }
 		public virtual void OnParryQuarterstaff(Player player, OrchidGuardian guardian, Entity aggressor, Projectile anchor) { } // Called on parrying anything
+		/// <summary>Called during the anchor's <c>CanHitNPC</c> check. Defaults to true, which results in <c>base.CanHitNPC()</c> being called.</summary>
+		public virtual bool SafeCanHitNPC(Player player, Projectile anchor, NPC target) => true;
 		public virtual void ExtraAIQuarterstaff(Player player, OrchidGuardian guardian, Projectile projectile) { } // Called at the end of the Anchor Projectile AI
 		public virtual void ExtraAIQuarterstaffJabbing(Player player, OrchidGuardian guardian, Projectile projectile) { } // Called while jabbing
 		public virtual void ExtraAIQuarterstaffBlocking(Player player, OrchidGuardian guardian, Projectile projectile) { } // Called while blocking
@@ -192,7 +194,7 @@ namespace OrchidMod.Content.Guardian
 			}
 			else
 			{
-				var proj = Main.projectile.First(i => i.active && i.owner == player.whoAmI && i.type == AnchorType);
+				var proj = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == AnchorType);
 				if (proj != null && proj.ModProjectile is GuardianQuarterstaffAnchor quarterstaff)
 				{
 					if (quarterstaff.SelectedItem != player.selectedItem)

@@ -3471,7 +3471,7 @@ Items: {
 	DepthDiverGreaves.Tooltip: Increases maximum guards by 2
 
 	GuardianLanternShield: {
-		DisplayName: Guardian Lantern Shield
+		DisplayName: Lantern Shield
 		Tooltip: Can emit light with a torch
 	}
 
@@ -3497,14 +3497,25 @@ Items: {
 			Reinforced stab hits will heal allies below 50% health 
 			'''
 	}
+
 	HorizonCandelabra: {
-        DisplayName: Horizon Candelabra
-        Tooltip: ""
-    }
+		DisplayName: Horizon Candelabra
+		Tooltip: ""
+	}
 
 	ImpulseSlate: {
 		DisplayName: Impulse Slate
 		Tooltip: Allows generating guardian weapon charge while jabbing
+	}
+
+	GraniteSpike: {
+		DisplayName: Granite Spike
+		Tooltip: ""
+	}
+
+	ThoriumDreadKatar: {
+		DisplayName: Thorium Dread Katar
+		Tooltip: ""
 	}
 }
 
@@ -3977,6 +3988,7 @@ Projectiles: {
 	GuardianLanternShieldPunchProj.DisplayName: Heavy Punch
 	ThoriumTemplarFencingBladeProjectile.DisplayName: Yoinked Pickup
 	ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Riptide Reamer
+	ThoriumDreadKatarProjectile.DisplayName: Thorium Dread Katar Projectile
 }
 
 Configs: {
@@ -4223,9 +4235,13 @@ UI: {
 		RightClick: Right click
 		ChargeToSwing: Charge to swing, {0} to jab while charging
 		ChargeToJab: Charge to swing, {0} to slam while charging
+		ChargeToJabKatar: Charge to jab, {0} to slam while charging
 		ChargeToDash: Charge to dash, {0} to jab while charging
+		ChargeToPunchLanternShield: Charge with {0} to punch
+		ChargeToParryLanternShield: "{0} to parry at the cost of 1 slam, charge to block"
 		ParryDuration: "{0} second parry duration"
 		BlockDuration: "{0} second block duration"
+		ParryAndBlockDuration: "{0} second parry duration, {1} second block duration"
 		Interrupted: Interrupted
 		Charged: Charged
 		Reinforced: Reinforced
@@ -4233,7 +4249,8 @@ UI: {
 		Guard: "{0} {^0:guard;guards}"
 		Slam: "{0} {^0:slam;slams}"
 		Parry: "{0} to parry"
-		ParryDash: "{0} to parry, dashing downwards"
+		ParryDash: "{0} to parry dash"
+		ParryDashNeedle: "{0} to parry, dashing downwards"
 		ChargeToThrow: Charge to throw
 		ChargeToParry: Charge to parry
 		SwingWhileCharging: Charge to throw, {0} to swing while charging

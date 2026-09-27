@@ -39,7 +39,7 @@ namespace OrchidMod.Utilities
 			else
 			{
 				if (configSwap ^ rightClick) button = Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
-				else button = Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
+				else button = Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick");
 			}
 			
 			return button;

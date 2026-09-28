@@ -59,16 +59,18 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 					Owner.GetModPlayer<OrchidGuardian>().GuardianItemCharge = 0; // probably not the best place to put this but it works. (fixes a minor visual issue)
 					// SoundEngine.PlaySound(ChargedHit ? SoundID.DD2_MonkStaffGroundMiss : SoundID.DD2_MonkStaffSwing, owner.Center);
 				}
-
-				
-				// Projectile.position += Projectile.velocity * 0.5f;
-				Projectile.width = 40;
-				Projectile.height = 40;
-				Projectile.position.X += 10;
-				Projectile.position.Y += 10;
 			}
 			else
 			{
+				if (!FirstFrame)
+				{
+					FirstFrame = true;
+					Projectile.position += Projectile.velocity * 0.5f;
+					Projectile.width = 40;
+					Projectile.height = 40;
+					Projectile.position.X += 10;
+					Projectile.position.Y += 10;
+				}
 				Projectile.velocity *= 0.97164f;
 				
 				// Item torchItem = Owner.inventory[GuardianItem.TorchIndex];
@@ -94,15 +96,15 @@ namespace OrchidMod.Content.Guardian.Projectiles.Misc
 			spriteBatch.Begin(spriteBatchSnapshot with { BlendState = BlendState.Additive });
 
 			// Draw code here
-			float colorMult = 0.8f;
-			Vector2 offsetVector = new Vector2(0f, 12f).RotatedBy(Projectile.rotation - MathHelper.PiOver2);
+			float colorMult = 1.5f;
+			Vector2 offsetVector = Vector2.UnitY.RotatedBy(Projectile.rotation - MathHelper.PiOver2) * 8f;
 			if (Projectile.timeLeft < 10) colorMult *= Projectile.timeLeft / 10f;
 			SpriteEffects effect = SpriteEffects.None;
 			if (Projectile.velocity.X < 0f) effect = SpriteEffects.FlipVertically;
 
 			float scale = Projectile.scale * (ChargedHit ? 1.5f : 1.2f);
 			Vector2 drawPosition = Projectile.Center - offsetVector - Main.screenPosition;
-			spriteBatch.Draw(TextureMain, drawPosition, null, Color.DarkSlateGray * colorMult, Projectile.rotation, TextureMain.Size() * 0.5f, scale, effect, 0f);
+			spriteBatch.Draw(TextureMain, drawPosition, null, Color.DarkSlateBlue * colorMult, Projectile.rotation, TextureMain.Size() * 0.5f, scale, effect, 0f);
 
 			// Draw code ends here
 

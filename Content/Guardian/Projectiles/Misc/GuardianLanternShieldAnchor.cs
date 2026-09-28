@@ -60,6 +60,7 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 	public bool Charging => Math.Abs(AIState) == 1;
 
 	public Texture2D ItemTexture;
+	public Texture2D AuraTexture;
 	
 	bool shieldEffectReady = true;
 	public Vector2 oldOwnerPos = Vector2.Zero;
@@ -78,6 +79,8 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 		Projectile.usesLocalNPCImmunity = true;
 		Projectile.localNPCHitCooldown = 20;
 		Projectile.netImportant = true;
+
+		AuraTexture ??= ModContent.Request<Texture2D>("OrchidMod/Content/Guardian/Weapons/Misc/GuardianLanternShield_Aura", AssetRequestMode.ImmediateLoad).Value;
 	}
 	
 	public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
@@ -144,7 +147,7 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 			
 		if (IsLocalOwner) // Offhand is always loaded first; no need to do that twice
 		{
-			if (Projectile.ai[0] == 0f)
+			if (AIState is >= -1 and <= 2)
 			{
 				if (Main.MouseWorld.X > owner.Center.X && owner.direction != 1) owner.ChangeDir(1);
 				else if (Main.MouseWorld.X < owner.Center.X && owner.direction != -1) owner.ChangeDir(-1);
@@ -180,7 +183,7 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 				Tile tile = Framing.GetTileSafely(flamePoint);
 				if (ItemID.Sets.WaterTorches[torchItem.type] || !owner.wet || (tile.LiquidAmount < (flamePoint.Y + owner.gfxOffY) % 16 * 16 && !tile.HasUnactuatedTile))
 				{
-					bool bigAttack = Projectile.ai[0] < 0 || (Projectile.ai[0] > 0 && Projectile.ai[1] == 3f);
+					bool bigAttack = Projectile.ai[0] < 0 || (Projectile.ai[0] > 0 && AIState == 3);
 					if (Main.rand.NextBool(bigAttack ? 1 : 3))
 					{
 						Dust dust = Dust.NewDustDirect(flamePoint - new Vector2(8), 12, 12, torchItem.createTile == TileID.Torches ? TorchID.Dust[torchItem.placeStyle] : TileLoader.GetTile(torchItem.createTile).DustType, Scale: Main.rand.NextFloat(0.5f, 1f), SpeedY: -Main.rand.NextFloat(3f));
@@ -228,8 +231,8 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 
 			if (AIState == 3) // Blocking
 			{
-				Vector2 HitboxOrigin = Projectile.Center + Vector2.UnitX * 4 * owner.direction + Vector2.UnitY * (Projectile.gfxOffY - Projectile.height * 0.5f) - new Vector2(4f);
-
+				Vector2 HitboxOrigin = owner.MountedCenter + Vector2.Normalize(Projectile.velocity) * 40f + Vector2.UnitY * (Projectile.gfxOffY - Projectile.height * 0.5f) - new Vector2(4f);
+				
 				Vector2 Hitbox = (Vector2.UnitY * Projectile.height);
 
 				Point p1 = new Point((int)HitboxOrigin.X, (int)HitboxOrigin.Y);
@@ -296,6 +299,55 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 						}
 					}
 				}
+
+				if (IsLocalOwner && !Main.dedServ)
+				{
+					Vector2 toCursor = Vector2.Normalize(Main.MouseWorld - owner.MountedCenter);
+					Vector2 directionStraight = Vector2.UnitY.RotatedBy(NetworkedRotation);
+					Vector2 directionClock = directionStraight.RotatedBy(0.157f);
+					Vector2 directionCClock = directionStraight.RotatedBy(-0.157f);
+					float angle = MathF.Acos(Vector2.Dot(toCursor, directionStraight));
+					float angleClock = MathF.Acos(Vector2.Dot(toCursor, directionClock));
+					float angleCClock = MathF.Acos(Vector2.Dot(toCursor, directionCClock));
+					if ((angle < 0.157f || angle < angleClock && angle < angleCClock) && BlockRotation != 0)
+					{
+						BlockRotation = 0;
+						Projectile.netUpdate = true;
+					}
+					else if (angle > angleClock && angle < angleCClock && BlockRotation != 1)
+					{
+						BlockRotation = 1;
+						Projectile.netUpdate = true;
+					}
+					else if (angle > angleCClock && angle < angleClock && BlockRotation != 2)
+					{
+						BlockRotation = 2;
+						Projectile.netUpdate = true;
+					}
+
+					Projectile.velocity = Projectile.velocity.RotatedBy(0.0157f * -(BlockRotation == 1).ToDirectionInt());
+					NetworkedRotation = Projectile.velocity.ToRotation();
+					
+					Vector2 limitUp = -Vector2.UnitY.RotatedBy(0.524f * LockedOwnerDir);
+					Vector2 limitDown = Vector2.UnitY.RotatedBy(0.524f * -LockedOwnerDir);
+					float angleUp = MathF.Acos(Vector2.Dot(Projectile.velocity, limitUp));
+					float angleDown = MathF.Acos(Vector2.Dot(Projectile.velocity, limitDown));
+
+					if (angleDown >= MathHelper.TwoPi / 3 && angleUp < angleDown)
+					{
+						Projectile.velocity = limitUp;
+						NetworkedRotation = limitUp.ToRotation();
+					}
+					else if (angleUp >= MathHelper.TwoPi / 3 && angleDown < angleUp)
+					{
+						Projectile.velocity = limitDown;
+						NetworkedRotation = limitDown.ToRotation();
+					}
+
+				}
+				
+				
+				
 						
 				if (guardian.GuardianDebugVisuals == 1)
 				{
@@ -393,8 +445,6 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 					SoundEngine.PlaySound(SoundID.DD2_MonkStaffGroundMiss, Projectile.Center);
 
 					newProj.netUpdate = true;
-					
-					Dust.QuickDustLine(Projectile.Center, newProj.Center, 4f, Color.Red);
 				}
 				else
 				{
@@ -458,6 +508,8 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 								AIState = 3;
 								
 								Projectile.ai[0] = (int)(blockTime * guardianItem.BlockDurationMult);
+								NetworkedRotation = LockedOwnerDir == -1 ? MathHelper.PiOver2 : -MathHelper.PiOver2;
+								Projectile.velocity = Vector2.UnitY.RotatedBy(NetworkedRotation);
 
 								SoundEngine.PlaySound(SoundID.Item37, Projectile.Center);
 								
@@ -502,24 +554,24 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 						{
 							if (guardian.GuardianItemCharge >= 180f)
 							{
-								if (guardian.UseSlam(1, true))
-								{
-									guardian.UseSlam();
+								SlamTime = 35f / owner.GetAttackSpeed<MeleeDamageClass>();
+								Projectile.ai[0] = -SlamTime;
+								// if (guardian.GuardianDebugVisuals == 1)
+								// 	CombatText.NewText(owner.getRect(), Color.DarkOrchid, (int)SlamTime + ", " + -(int)Projectile.ai[0]);
 
-									SlamTime = 35f / owner.GetAttackSpeed<MeleeDamageClass>();
-									Projectile.ai[0] = -SlamTime;
-									if (guardian.GuardianDebugVisuals == 1)
-										CombatText.NewText(owner.getRect(), Color.DarkOrchid, (int)SlamTime + ", " + -(int)Projectile.ai[0]);
+								AIState = -3;
+								NetworkedRotation = MathHelper.WrapAngle(Vector2.Normalize(Main.MouseWorld - Owner.MountedCenter).ToRotation() - MathHelper.PiOver2);
+							}
+							else if (guardian.UseSlam(1, true))
+							{
+								guardian.UseSlam();
+								SlamTime = 40f / owner.GetAttackSpeed<MeleeDamageClass>();
+								Projectile.ai[0] = -SlamTime;
+								// if (guardian.GuardianDebugVisuals == 1)
+								// 	CombatText.NewText(owner.getRect(), Color.DarkOrchid, (int)SlamTime + ", " + -(int)Projectile.ai[0]);
 
-									AIState = -3;
-									NetworkedRotation = MathHelper.WrapAngle(Vector2.Normalize(Main.MouseWorld - Owner.MountedCenter).ToRotation() - MathHelper.PiOver2);
-								}
-								else
-								{
-									SoundEngine.PlaySound(SoundID.Item16, owner.MountedCenter);
-									AIState = 0;
-									Projectile.ai[0] = 0f;
-								}
+								AIState = -2;
+								NetworkedRotation = MathHelper.WrapAngle(Vector2.Normalize(Main.MouseWorld - Owner.MountedCenter).ToRotation() - MathHelper.PiOver2);
 							}
 							else
 							{
@@ -594,6 +646,17 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 			else effect = SpriteEffects.FlipHorizontally;
 		}
 
+		if (AIState == 3)
+		{
+			spriteBatch.End(out SpriteBatchSnapshot snapshot);
+			spriteBatch.Begin(snapshot with { BlendState = BlendState.Additive });
+			
+			spriteBatch.Draw(AuraTexture, Owner.MountedCenter + Vector2.UnitX.RotatedBy(NetworkedRotation) * 40f - Main.screenPosition, null, Color.DarkSlateBlue, NetworkedRotation, AuraTexture.Size() * 0.5f, Projectile.scale, effect, 0f);
+			
+			spriteBatch.End();
+			spriteBatch.Begin(snapshot);
+		}
+
 		float drawRotation = Projectile.rotation;
 		Vector2 posproj = Projectile.Center;
 		if (player.gravDir == -1)
@@ -616,7 +679,6 @@ public class GuardianLanternShieldAnchor : OrchidModGuardianParryAnchor
 		}
 
 		var drawPosition = Vector2.Transform(posproj - Main.screenPosition + Vector2.UnitY * player.gfxOffY, Main.GameViewMatrix.EffectMatrix);
-		float rotation = Projectile.rotation;
 		spriteBatch.Draw(ItemTexture, drawPosition, null, color, drawRotation, ItemTexture.Size() * 0.5f, Projectile.scale, effect, 0f);
 		
 		Vector2 flamePoint = Projectile.Center + (Vector2.UnitY * 4 * Projectile.scale).RotatedBy(Projectile.rotation);

@@ -1,27 +1,29 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Microsoft.Xna.Framework;
 using OrchidMod.Common.ModObjects;
-using OrchidMod.Content.Guardian;
 using OrchidMod.Content.Guardian.Buffs;
 using OrchidMod.Content.Guardian.Projectiles.Misc;
 using OrchidMod.Content.Guardian.Projectiles.Standards;
 using OrchidMod.Content.Guardian.Weapons.Gauntlets;
-using System;
-using System.Reflection;
-using System.Collections.Generic;
 using Terraria;
-using Terraria.Localization;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.GameInput;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using System.Linq;
 using OrchidMod.Content.Guardian.Accessories;
 
-namespace OrchidMod
+namespace OrchidMod.Content.Guardian
 {
 	public class OrchidGuardian : ModPlayer
 	{
-
+		public static ModKeybind ThoriumArmorKey;
+		public static ModKeybind ThoriumAccessoryKey;
 
 		public bool CrossModGodMode;
 
@@ -208,6 +210,30 @@ namespace OrchidMod
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("OctopusArm").Type);
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("GraniteEradicatorArm").Type);
 				ProjectilesBlockBlacklist.Add(thoriumMod.Find<ModProjectile>("KrakenArm").Type);
+				
+				FieldInfo armorKey = thoriumMod.Code.GetType("ThoriumMod.ThoriumHotkeySystem")?.GetField("ArmorKey", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				if (armorKey != null)
+				{
+					Mod.Logger.Debug("OrchidGuardian: ArmorKey detected");
+					ModKeybind keybind = (ModKeybind)armorKey.GetValue(null);
+					if (keybind != null)
+					{
+						ThoriumArmorKey = keybind;
+						Mod.Logger.Debug(ThoriumArmorKey.DisplayName);
+					}
+				}
+				
+				FieldInfo accessKey = thoriumMod.Code.GetType("ThoriumMod.ThoriumHotkeySystem")?.GetField("AccessoryKey", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+				if (accessKey != null)
+				{
+					Mod.Logger.Debug("OrchidGuardian: AccessoryKey detected");
+					ModKeybind keybind = (ModKeybind)accessKey.GetValue(null);
+					if (keybind != null)
+					{
+						ThoriumAccessoryKey = keybind;
+						Mod.Logger.Debug(ThoriumAccessoryKey.DisplayName);
+					}
+				}
 			}
 			
 			if (ModLoader.TryGetMod("CheatSheet", out Mod cheatSheet))
@@ -247,6 +273,9 @@ namespace OrchidMod
 					Mod.Logger.Debug("OrchidGuardian: DragonLens detected");
 				}
 			}
+			
+			if (ThoriumArmorKey != null && ThoriumAccessoryKey != null) 
+				Mod.Logger.Debug("Both Thorium hotkeys loaded!");
 		}
 
 
@@ -258,6 +287,9 @@ namespace OrchidMod
 			CSGodMode = null;
 			HMGodMode = null;
 			DLGodMode = null;
+			
+			ThoriumArmorKey = null;
+			ThoriumAccessoryKey = null;
 		}
 
 		public override void Initialize()
@@ -324,6 +356,17 @@ namespace OrchidMod
 			}
 
 			if (GauntletPunchCooldown > -10) GauntletPunchCooldown--;
+		}
+
+		public override void ProcessTriggers(TriggersSet triggersSet)
+		{
+			var thoriumMod = OrchidMod.ThoriumMod;
+			if (thoriumMod != null && ThoriumAccessoryKey != null)
+			{
+				if (ThoriumArmorKey != null && ThoriumArmorKey.JustPressed && Player.active && !Player.dead)
+				{
+				}
+			}
 		}
 
 		public override void UpdateLifeRegen()

@@ -211,11 +211,6 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 	        Texture2D snowflakeUIOn = ModContent.Request<Texture2D>(Texture + "_UIOn").Value;
 	        Texture2D snowflakeUIReady = ModContent.Request<Texture2D>(Texture + "_UIReady").Value;
 	        
-	        if (OrchidMod.OrchidClientConfig.GuardianThoriumBoreanStriderColorUI)
-		        snowflakeUIOn = ModContent.Request<Texture2D>(ModContent.GetInstance<IceGauntletProjectile>().Texture).Value;
-
-	        
-	        
 	        int val = 26;
 	        float stacks = SnowflakeStacks / 10f; 
 	        while (stacks < 1)

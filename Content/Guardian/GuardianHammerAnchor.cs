@@ -303,8 +303,7 @@ namespace OrchidMod.Content.Guardian
 						if (guardian.GuardianItemCharge >= 180f && !Ding)
 						{
 							Ding = true;
-							if (ModContent.GetInstance<OrchidClientConfig>().GuardianAltChargeSounds) SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot, owner.Center);
-							else SoundEngine.PlaySound(SoundID.MaxMana, owner.Center);
+							SoundEngine.PlaySound(guardian.DingSound, owner.Center);
 						}
 
 						if (Projectile.ai[1] == 0)

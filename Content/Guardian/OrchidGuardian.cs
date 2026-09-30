@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using OrchidMod.Common.ModObjects;
+using OrchidMod.Content.General.Prefixes;
 using OrchidMod.Content.Guardian.Buffs;
 using OrchidMod.Content.Guardian.Projectiles.Misc;
 using OrchidMod.Content.Guardian.Projectiles.Standards;
@@ -26,6 +27,11 @@ namespace OrchidMod.Content.Guardian
 		public static Type ThoriumPlayerType;
 		public static ModKeybind ThoriumArmorKey;
 		public static ModKeybind ThoriumAccessoryKey;
+
+		public bool GauntletInputSwap => OrchidMod.OrchidClientConfig.GuardianSwapGauntletInputs;
+		public bool PaviseInputSwap => OrchidMod.OrchidClientConfig.GuardianSwapPaviseInputs;
+		
+		public SoundStyle DingSound => OrchidMod.OrchidClientConfig.GuardianAltChargeSounds ? SoundID.DD2_BetsyFireballShot : SoundID.MaxMana;
 
 		public bool CrossModGodMode;
 
@@ -365,17 +371,19 @@ namespace OrchidMod.Content.Guardian
 
 				// Condition for parrying an Aggro Dummy or Boss Dummy from Thorium 
 				// (only if the player is either in godmode, or if there aren't any enemies/bosses within 45 tiles)
+				NPC dummy = null;
 				if (OrchidMod.ThoriumMod != null && Main.npc.Any(npc => {
 					int aggroDummy = OrchidMod.ThoriumMod.Find<ModNPC>("AggroDummy").Type;
 					int bossDummy = OrchidMod.ThoriumMod.Find<ModNPC>("BossDummy").Type;
 					if ((npc.type == aggroDummy || npc.type == bossDummy) && Collision.CheckAABBvAABBCollision(Player.Center, Player.Hitbox.Size(), npc.Center, npc.Hitbox.Size())) 
 					{
+						dummy = npc;
 						if (Player.creativeGodMode || CrossModGodMode) return true;
-						else return !Main.npc.Any(n => n.active && (!n.friendly || n.boss) && !(npc.type == aggroDummy || npc.type == bossDummy) && n.Center.DistanceSQ(Player.Center) <= 1638400f);
+						return !Main.npc.Any(n => n.active && (!n.friendly || n.boss) && !(npc.type == aggroDummy || npc.type == bossDummy) && n.Center.DistanceSQ(Player.Center) <= 1638400f);
 					}
 					return false;
 				})
-				) DoParryItemParry(null);
+				) DoParryItemParry(dummy);
 			}
 
 			if (GauntletPunchCooldown > -10) GauntletPunchCooldown--;
@@ -1068,7 +1076,7 @@ namespace OrchidMod.Content.Guardian
 			{
 				if (shieldAnchor.ShieldItem.ModItem is OrchidModGuardianShield shield)
 				{
-					shield.Reflect(Player, anchor, blockedProjectile, ref GuardianShieldSpikeReflect);
+					shield.Reflect(Player, this, anchor, blockedProjectile, ref GuardianShieldSpikeReflect);
 				}
 
 				if (GuardianShieldSpikeReflect > 0)
@@ -1349,6 +1357,20 @@ namespace OrchidMod.Content.Guardian
 			return 4;
 		}
 		
-		public void ThoriumForceShieldHealth() {}
+		public float GetParryDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianParryDuration;
+		public float GetBlockDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianBlockDuration;
+
+		/// <summary>Returns the primary mouse input for "gauntlet-like" weapons: <c>Main.mouseLeft</c> by default, or <c>Main.mouseRight</c> if swapped in the config.</summary>
+		/// <param name="tap">If <c>Main.mouseLeftRelease</c>/<c>Main.mouseRightRelease</c> should be considered as part of the input.</param>
+		public bool GetGauntletPunchInput(bool tap) => GauntletInputSwap ? Main.mouseRight && (!tap || Main.mouseRightRelease) : Main.mouseLeft && (!tap || Main.mouseLeftRelease);
+		/// <summary>Returns the secondary mouse input for "gauntlet-like" weapons: <c>Main.mouseRight</c> by default, or <c>Main.mouseLeft</c> if swapped in the config.</summary>
+		/// <param name="tap">If <c>Main.mouseRightRelease</c>/<c>Main.mouseLeftRelease</c> should be considered as part of the input.</param>
+		public bool GetGauntletBlockInput(bool tap) => GauntletInputSwap ? Main.mouseLeft && (!tap || Main.mouseLeftRelease) : Main.mouseRight && (!tap || Main.mouseRightRelease);
+		/// <summary>Returns the primary mouse input for "pavise-like" weapons: <c>Main.mouseLeft</c> by default, or <c>Main.mouseRight</c> if swapped in the config.</summary>
+		/// <param name="tap">If <c>Main.mouseLeftRelease</c>/<c>Main.mouseRightRelease</c> should be considered as part of the input.</param>
+		public bool GetPaviseSlamInput(bool tap) => PaviseInputSwap ? Main.mouseRight && (!tap || Main.mouseRightRelease) : Main.mouseLeft && (!tap || Main.mouseLeftRelease);
+		/// <summary>Returns the secondary mouse input for "pavise-like" weapons: <c>Main.mouseRight</c> by default, or <c>Main.mouseLeft</c> if swapped in the config.</summary>
+		/// <param name="tap">If <c>Main.mouseRightRelease</c>/<c>Main.mouseLeftRelease</c> should be considered as part of the input.</param>
+		public bool GetPaviseBlockInput(bool tap) => PaviseInputSwap ? Main.mouseLeft && (!tap || Main.mouseLeftRelease) : Main.mouseRight && (!tap || Main.mouseRightRelease);
 	}
 }

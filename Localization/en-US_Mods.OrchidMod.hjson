@@ -253,8 +253,13 @@ Buffs: {
 	}
 
 	GuardianVoidQuarterstaffBuff: {
-		Description: Void Rush
-		DisplayName: 150% increased Flux Ripper attack speed
+		DisplayName: Void Rush
+		Description: 150% increased Flux Ripper attack speed
+	}
+
+	GuardianDreadGauntletBuff: {
+		DisplayName: Dread Reaper's Fury
+		Description: 60% increased melee speed and 20% increased movement speed, at a cost...
 	}
 }
 
@@ -2619,7 +2624,7 @@ Items: {
 
 	Quarterstaff: {
 		DisplayName: Quarterstaff
-		Tooltip: ""
+		Tooltip: Can be upgraded with torches
 	}
 
 	HellboneMaterial: {
@@ -2766,7 +2771,7 @@ Items: {
 
 	ThoriumViscountQuarterstaff: {
 		DisplayName: Pipistrelle
-		Tooltip: Counterattacks turn you into a swarm of bats, ignoring 20 defense
+		Tooltip: Counterattacks turn you into a swarm of bats, ignoring 25 defense
 	}
 
 	ThoriumThoriumQuarterstaff: {
@@ -2866,7 +2871,7 @@ Items: {
 	}
 
 	ShawlOfTheWind: {
-		DisplayName: Shawl Of The Wind
+		DisplayName: Shawl of the Wind
 		Tooltip:
 			'''
 			12% increased movement speed
@@ -3235,7 +3240,12 @@ Items: {
 
 	ToyWarhammers: {
 		DisplayName: The Big Honkers
-		Tooltip: Lets you dual wield a pair of very squeaky hammers
+		Tooltip:
+			'''
+			'Honk honk'
+			Lets you dual wield a pair of very squeaky hammers
+			'''
+		AnnoyingPrefix: "{0:+0;-0}% obnoxiousness"
 	}
 
 	ThoriumValadiumWarhammer: {
@@ -3283,8 +3293,8 @@ Items: {
 		Tooltip:
 			'''
 			[c/FF0000:Test Item]
-			Jab is replaced by a powerful sweep
-			Fully charge while underwater to propel yourself to your cursor, ending in a massive full sweep attack
+			Blows lingering bubbles on jab, up to 10
+			Charged attacks pop bubbles, potentially triggering a chain reaction
 			'''
 	}
 
@@ -3294,6 +3304,7 @@ Items: {
 			'''
 			[c/FF0000:Test Item]
 			Fully charging creates a damage-sharing link between enemies
+			'The wonders of the world shall be connected'
 			'''
 	}
 
@@ -3308,7 +3319,12 @@ Items: {
 
 	ThoriumDreadGauntlet: {
 		DisplayName: Dread Reaper's Claw
-		Tooltip: ""
+		Tooltip:
+			'''
+			Hooking an enemy refunds a guard, deals damage, and triggers your active parry
+			Parrying increases speed for a short time, and launches kunai on punch
+			'''
+		Parry: "{0} click fires a grappling claw, costing 2 guards"
 	}
 
 	ThoriumGuardianTitanHead: {
@@ -3337,7 +3353,7 @@ Items: {
 	}
 
 	ThoriumGuardianVoidHead: {
-		DisplayName: Thorium Guardian Void Head
+		DisplayName: Void Sentinel Helmet
 		Tooltip:
 			'''
 			[c/FF0000:Test Item]
@@ -3348,9 +3364,10 @@ Items: {
 			'''
 		SetBonus:
 			'''
-			Decreases max life by 250
-			Guardian attacks briefly grant massively increased health and resource regeration
-			While blocking or parrying you will attract nearby blockable projectiles
+			Decreases max life by 100
+			Summons a stinger tail above you
+			Pressing the 'Armor Ability' key consumes life to stab toward your cursor
+			On hit you gain massively increased life and guardian resource regeneration 
 			'''
 	}
 
@@ -3387,11 +3404,7 @@ Items: {
 
 	ThoriumTerrariumWarhammer: {
 		DisplayName: Terrarium Warhammer
-		Tooltip:
-			'''
-			[c/FF0000:Test Item]
-			Calls down piercing afterimages on hit
-			'''
+		Tooltip: Melee swings deal increased damage
 	}
 
 	IceAxeHammer: {
@@ -3399,15 +3412,38 @@ Items: {
 		Tooltip: Pierces foes when hurled
 	}
 
-	HorizonBrick: {
-		DisplayName: Horizon Brick
+	ThoriumPharaohQuarterstaff: {
+		DisplayName: Shuwt
+		Tooltip: Fully charge to release a burst of sand
+	}
+
+	VampireWarhammer: {
+		DisplayName: Vampire Slayer
+		Tooltip:
+			'''
+			Blocking or fully charging throws a short-lived piercing cross that blocks
+			'Die, monster!'
+			'''
+		InstantChargeText: Die, monster!
+	}
+
+	ThoriumLifeQuartzCenser: {
+		DisplayName: Life Censer
+		Tooltip: Spending a slam shields the lowest health nearby ally life by 5, up to 10
+	}
+	
+	ConsolariaLepusEggNest: {
+		DisplayName: Consolaria Lepus Egg Nest
 		Tooltip: ""
 	}
 
-	HorizonChandelier: {
-		Tooltip: ""
-		DisplayName: Horizon Chandelier
-	}
+	DepthDiverHelmet.Tooltip: Regenerates guards over time
+	DepthDiverChestplate.Tooltip:
+		'''
+		Increases maximum guards by 2
+		Enemies are more likely to target you
+		'''
+	DepthDiverGreaves.Tooltip: Increases maximum guards by 2
 }
 
 NPCs: {
@@ -3563,6 +3599,7 @@ Prefixes: {
 	BlockingPrefix.DisplayName: Blocking
 	# Guardian
 	HaidexPrefix.DisplayName: Haidex
+	AnnoyingPrefixGuardian.DisplayName: Annoying
 	FlimsyPrefix.DisplayName: Flimsy
 	FeeblePrefix.DisplayName: Feeble
 	FragilePrefix.DisplayName: Fragile
@@ -3861,14 +3898,8 @@ Projectiles: {
 	GuardianKatarAnchor.DisplayName: Katar
 	HellstoneKatarProjectile.DisplayName: Trailblaze
 	ThoriumGraniteKatarProjectile.DisplayName: Ion Deluge
-	ToyWarhammerProjectile.DisplayName: The Big Honker
-	ThoriumVoidQuarterstaffProjectile.DisplayName: Thorium Void Quarterstaff Projectile
-	ThoriumDemonBloodGauntletProjectile.DisplayName: Thorium Demon Blood Gauntlet Projectile
 	ThoriumNagaQuarterstaffProjectile.DisplayName: Thorium Naga Quarterstaff Projectile
-	ThoriumConcentratedThoriumQuarterstaffProjectile.DisplayName: Leyline
-	ThoriumTerrariumWarhammerProjectile.DisplayName: Terrarium Warhammer
-	GuardianDoubleHammerAnchor.DisplayName: Warhammer
-	ThoriumBoreanStriderQuarterstaffProjectile.DisplayName: Frost Walker Snowflake
+	ThoriumBoreanStriderQuarterstaffProjectile.DisplayName: Giga Snowflake
 }
 
 Configs: {
@@ -3888,7 +3919,11 @@ Configs: {
 
 		ShowModTags: {
 			Label: Show Mod Tags
-			Tooltip: Enables/Disables the display of cross-content items tooltips (Load Crossmod-Content without required mods must be enabled in Orchid Server Config)
+			Tooltip:
+				'''
+				Enables/Disables the display of cross-content items tooltips
+				(Load Crossmod-Content without required mods must be enabled in Orchid Server Config)
+				'''
 		}
 
 		GuardianUseOldHammerUi: {
@@ -3918,17 +3953,25 @@ Configs: {
 
 		ShapeshifterUseHairColor: {
 			Label: Use Hair Color for Wildshapes
-			Tooltip: Applies the 'Peculiar Hairpin' accessory effect at all times, and has it apply the default wildshape color instead. The hairpin can still be used to apply dye to wildshape hair.
+			Tooltip:
+				'''
+				Applies the 'Peculiar Hairpin' accessory effect at all times, and has it apply the default wildshape color instead.
+				The hairpin can still be used to apply dye to wildshape hair
+				'''
 		}
 
 		ShapeshifterHookDelay: {
 			Label: Shawl Dash Hook Delay
-			Tooltip: While a 'Shawl' accessory is equipped, how long should the hook key be held (in frames) before the hook is fired.
+			Tooltip: While a 'Shawl' accessory is equipped, how long should the hook key be held (in frames) before the hook is fired
 		}
 
 		ShapeshifterHookDashRelease: {
 			Label: Shawl Dash on release
-			Tooltip: Triggers 'Shawl' accessory dashes when releasing the hook key instead of pressing it (allowing to launch a hook without dashing)
+			Tooltip:
+				'''
+				Triggers 'Shawl' accessory dashes when releasing the hook key instead of pressing it
+				(allowing to launch a hook without dashing)
+				'''
 		}
 
 		ShapeshifterScrollDelay: {
@@ -3969,6 +4012,15 @@ Configs: {
 		GuardianThoriumBoreanStriderColorUI: {
 			Label: Frost Walker UI uses colored icon
 			Tooltip: The Frost Walker's special 'snowflake charge' UI will use a colored icon (the Ice Gauntlet's crystal projectile) instead of a monochrome variant
+		}
+
+		SmartSmartCursor: {
+			Label: Smart Smart Cursor
+			Tooltip:
+				'''
+				Smart Cursor automatically toggles off and on when holding a guardian weapon or shapeshifting.
+				No effect if Smart Cursor isn't set to 'Toggle'
+				'''
 		}
 	}
 
@@ -4066,30 +4118,37 @@ UI: {
 	}
 
 	GuardianItem: {
-		LeftClick: Left
-		RightClick: Right
-		ChargeToSwing: Charge to swing, {0} click to jab while charging
-		ChargeToJab: Charge to swing, {0} click to slam while charging
-		ChargeToDash: Charge to dash, {0} click to jab while charging
+		LeftClick: Left click
+		RightClick: Right click
+		ChargeToSwing: Charge to swing, {0} to jab while charging
+		ChargeToJab: Charge to swing, {0} to slam while charging
+		ChargeToJabKatar: Charge to jab, {0} to slam while charging
+		ChargeToDash: Charge to dash, {0} to jab while charging
+		ChargeToPunchLanternShield: Charge with {0} to punch
+		ChargeToParryLanternShield: "{0} to parry at the cost of 1 slam, charge to block"
 		ParryDuration: "{0} second parry duration"
 		BlockDuration: "{0} second block duration"
+		ParryAndBlockDuration: "{0} second parry duration, {1} second block duration"
 		Interrupted: Interrupted
 		Charged: Charged
 		Reinforced: Reinforced
 		Failed: Failed
 		Guard: "{0} {^0:guard;guards}"
 		Slam: "{0} {^0:slam;slams}"
-		Parry: "{0} click to parry"
-		ParryDash: "{0} click to parry, dashing downwards"
+		Parry: "{0} to parry"
+		ParryDash: "{0} to parry dash"
+		ParryDashNeedle: "{0} to parry, dashing downwards"
 		ChargeToThrow: Charge to throw
-		SwingWhileCharging: Charge to throw, right click to swing while charging
+		ChargeToParry: Charge to parry
+		SwingWhileCharging: Charge to throw, {0} to swing while charging
 		UsesUpTo: Uses up to {0} slams
 		RuneDuration: "{0} second rune duration"
-		Block: "{0} click to block"
-		BlockGuard: "{0} click to block, costing {1} {^1:guard;guards}"
-		BlockSlam: "{0} click to block, costing {2} {^2:slam;slams}"
-		BlockGuardSlamSame: "{0} click to block, costing {1} {^1:guard;guards} and {^1:slam;slams}"
-		BlockGuardSlam: "{0} click to block, costing {1} {^1:guard;guards} and {2} {^2:slam;slams}"
+		DashDuringSwing: "{0} during reinforced attack to dash"
+		Block: "{0} to block"
+		BlockGuard: "{0} to block, costing {1} {^1:guard;guards}"
+		BlockSlam: "{0} to block, costing {2} {^2:slam;slams}"
+		BlockGuardSlamSame: "{0} to block, costing {1} {^1:guard;guards} and {^1:slam;slams}"
+		BlockGuardSlam: "{0} to block, costing {1} {^1:guard;guards} and {2} {^2:slam;slams}"
 		BuffDuration: "{0} second buff duration"
 		HorizonLaceShieldStacks: Grants 3 guards when fully charged
 		DamageOfDefense: Deals {0}% of defense as opposing damage
@@ -4144,3 +4203,5 @@ Conditions: {
 	EnableContentGambler: Gambler content is enabled
 	EnableContentShapeshifter: Shapeshifter content is enabled
 }
+
+RecipeGroups.Any: Mods.OrchidMod.RecipeGroups.Any

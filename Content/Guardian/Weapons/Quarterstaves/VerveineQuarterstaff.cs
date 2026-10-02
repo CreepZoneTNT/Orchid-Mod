@@ -5,12 +5,18 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using Terraria.Localization;
-using System.Collections.Generic;
+using Terraria.Audio;
+using Terraria.DataStructures;
 
 namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 {
 	public class VerveineQuarterstaff : OrchidModGuardianQuarterstaff
 	{
+		public override void SetStaticDefaults()
+		{
+			ItemID.Sets.ShimmerTransformToItem[Type] = ModContent.ItemType<VerveineAltQuarterstaff>();
+		}
+
 		public override void SafeSetDefaults()
 		{
 			Item.width = 40;
@@ -65,16 +71,39 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 
 		public override void ModifyLight(int i, int j, ref float r, ref float g, ref float b)
 		{
-			r = 0.06f;
+			r = 0.045f + Main.DiscoR * 0.0002f + Main.DiscoG * 0.0001f;
 			g = 0.03f;
-			b = 0.075f;
+			b = 0.06f + Main.DiscoR * 0.0002f + Main.DiscoG * 0.0002f;
+		}
+		public override void NearbyEffects(int i, int j, bool closer)
+		{
+			if (!Main.gamePaused && Main.rand.NextBool(3000))
+			{
+				Tile tile = Main.tile[i, j];
+				SoundEngine.PlaySound(SoundID.Item16.WithVolumeScale(0.5f), new Vector2(i * 16, j * 16));
+				for (int n = 1; n < Main.rand.Next(2, 4); n++)
+				{
+					Gore fartCloud = Gore.NewGoreDirect(new EntitySource_TileUpdate(i, j), new Vector2(i * 16 - tile.TileFrameX, j * 16 - tile.TileFrameY), Vector2.UnitY * 1.25f, GoreID.FartCloud1 + Main.rand.Next(3));
+					fartCloud.velocity.X *= 0.3f;
+					fartCloud.scale *= (n + Main.rand.NextFloat()) * 0.5f;
+					fartCloud.alpha = 120;
+					fartCloud.rotation += Main.rand.NextFloat(MathHelper.TwoPi);
+				}
+			}
 		}
 
 		public override bool IsTileDangerous(int i, int j, Player player) => true;
 		public override bool CanDrop(int i, int j) => true;
-		public override IEnumerable<Item> GetItemDrops(int i, int j)
+		public override void MouseOver(int i, int j)
 		{
-			return base.GetItemDrops(i, j);
+			Player player = Main.LocalPlayer;
+			player.cursorItemIconEnabled = true;
+			player.cursorItemIconID = ModContent.ItemType<VerveineQuarterstaff>();
+		}
+		public override bool RightClick(int i, int j)
+		{
+			WorldGen.KillTile(i, j);
+			return true;
 		}
 	}
 

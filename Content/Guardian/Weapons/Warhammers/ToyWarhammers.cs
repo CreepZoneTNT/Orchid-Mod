@@ -58,7 +58,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 
 	        if (VolumeModifier != 1f)
 	        {
-		        int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("PrefixKnockback"));
+		        int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("PrefixDamage"));
 		        tooltips.Insert(index, new TooltipLine(Mod, "AnnoyingnessPrefix", Language.GetTextValue(Mod.GetLocalizationKey("Items.ToyWarhammers.AnnoyingPrefix"), (VolumeModifier - 1) * 100f))
 		        {
 			        IsModifier = true,

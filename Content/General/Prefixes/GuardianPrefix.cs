@@ -244,9 +244,9 @@ namespace OrchidMod.Content.General.Prefixes
 				{
 					foreach (var prefix in GuardianPrefix.GetPrefixes)
 					{
+						if (prefix is AnnoyingPrefixGuardian && item.ModItem is not ToyWarhammers)
+							continue;
 						if (prefix is not HaidexPrefix || Main.rand.NextBool(100))
-							UniversalPrefixesIDs.Add(prefix.Type);
-						if (prefix is AnnoyingPrefixGuardian && item.ModItem is ToyWarhammers)
 							UniversalPrefixesIDs.Add(prefix.Type);
 					}
 				}

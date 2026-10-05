@@ -3240,24 +3240,13 @@ Items: {
 	}
 
 	ToyWarhammers: {
-		DisplayName: The Big Honkers
+		DisplayName: Toy Hammers
 		Tooltip:
 			'''
 			'Honk honk'
-			Lets you dual wield a pair of very squeaky hammers
+			Lets you dual wield a pair of very squeaky rubber hammers
 			'''
 		AnnoyingPrefix: "{0:+0;-0}% obnoxiousness"
-	}
-
-	ThoriumValadiumWarhammer: {
-		DisplayName: Thorium Valadium Warhammer
-		Tooltip:
-			'''
-			[c/FF0000:Test Item]
-			Right click after throwing to make the hammer pull nearby enemies towards its center, costing a slam
-			Blocking will periodically gravitate nearby enemies towards the center
-			Damage will blast enemies with inter-dimensional energy
-			'''
 	}
 
 	ThoriumLodestoneWarhammer: {
@@ -3432,7 +3421,7 @@ Items: {
 		DisplayName: Life Censer
 		Tooltip: Spending a slam shields the lowest health nearby ally life by 5, up to 10
 	}
-	
+
 	ConsolariaLepusEggNest: {
 		DisplayName: Consolaria Lepus Egg Nest
 		Tooltip: ""

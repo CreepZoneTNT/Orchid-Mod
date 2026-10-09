@@ -77,13 +77,6 @@ namespace OrchidMod.Common.Global.NPCs
 						shop.Add(ItemType<GuideTorches>(), OrchidConditions.EnableContentShapeshifter);
 					}
 					break;
-				case NPCID.Clothier:
-					{
-						shop.Add(ItemType<EmpressPlateHead>(), [Condition.DownedEmpressOfLight, Condition.InHallow]);
-						shop.Add(ItemType<EmpressPlateChest>(), [Condition.DownedEmpressOfLight, Condition.InHallow]);
-						shop.Add(ItemType<EmpressPlateLegs>(), [Condition.DownedEmpressOfLight, Condition.InHallow]);
-					}
-					break;
 				case NPCID.BestiaryGirl:
 					{
 						shop.Add(ItemType<ShapeshifterShampoo>(), [Condition.BestiaryFilledPercent(30), OrchidConditions.EnableContentShapeshifter]);
@@ -384,6 +377,12 @@ namespace OrchidMod.Common.Global.NPCs
 						npcLoot.Add(ItemDropRule.Common(ItemType<ToyWarhammers>(), 5));
 					}
 					break;
+				case NPCID.Vampire:
+				case NPCID.VampireBat:
+					{
+						npcLoot.Add(ItemDropRule.NormalvsExpert(ItemType<VampireWarhammer>(), 30, 15));
+						break;
+					}
 				default:
 					break;
 			}

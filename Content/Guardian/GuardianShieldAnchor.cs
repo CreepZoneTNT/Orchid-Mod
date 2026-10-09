@@ -64,20 +64,18 @@ namespace OrchidMod.Content.Guardian
 			Projectile.ai[1] = 0f;
 			Projectile.netUpdate = true;
 			Projectile.spriteDirection = 1;
-			
 		}
 
-		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers, Player owner, OrchidGuardian guardian)
 		{
-			var owner = Main.player[Projectile.owner];
-			if (ShieldItem.ModItem is OrchidModGuardianShield shield) shield.PaviseModifyHitNPC(owner, owner.GetModPlayer<OrchidGuardian>(), target, Projectile, ref modifiers, FirstHit);
+			if (ShieldItem.ModItem is OrchidModGuardianShield) (ShieldItem.ModItem as OrchidModGuardianShield).PaviseModifyHitNPC(owner, guardian, target, Projectile, ref modifiers, FirstHit);
 		}
 
 		public override void SafeOnHitNPC(NPC target, NPC.HitInfo hit, int damageDone, Player player, OrchidGuardian guardian)
 		{
 			var owner = Main.player[Projectile.owner];
 			var item = ShieldItem;
-			if (item == null || item.ModItem is not OrchidModGuardianShield guardianItem)
+			if (item == null || !(item.ModItem is OrchidModGuardianShield guardianItem))
 			{
 				Projectile.Kill();
 				return;

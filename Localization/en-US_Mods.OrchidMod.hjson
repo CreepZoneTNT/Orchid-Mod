@@ -262,6 +262,11 @@ Buffs: {
 		DisplayName: Dread Reaper's Fury
 		Description: 60% increased melee speed and 20% increased movement speed, at a cost...
 	}
+
+	GuardianBoreanStriderQuarterstaffBuff: {
+		DisplayName: Flash Freezing
+		Description: Your next charged attack with the Frost Walker is expedited
+	}
 }
 
 AlchemistRecipe: {
@@ -3303,7 +3308,8 @@ Items: {
 		Tooltip:
 			'''
 			Launches small snowflakes on jab that grant charge and freeze enemies
-			Charged attacks release giant snowflakes that grant resources on hit
+			Charged attacks conjure massive snowflakes that grant resources on hit
+			Counterattacks temporarily boost next attack's charge rate greatly on hit
 			'''
 	}
 
@@ -3895,6 +3901,10 @@ Projectiles: {
 	ThoriumGraniteKatarProjectile.DisplayName: Ion Deluge
 	ThoriumNagaQuarterstaffProjectile.DisplayName: Thorium Naga Quarterstaff Projectile
 	ThoriumBoreanStriderQuarterstaffProjectile.DisplayName: Giga Snowflake
+	ThoriumBoreanStriderQuarterstaffProjectile: {
+		DisplayName: Snowflake
+		StrongName: Giga Snowflake
+	}
 }
 
 Configs: {
@@ -4002,11 +4012,6 @@ Configs: {
 		GuardianUseFancyUI: {
 			Label: Fancy Guardian UI
 			Tooltip: Use 'fancy' textures for Guardian UI elements
-		}
-
-		GuardianThoriumBoreanStriderColorUI: {
-			Label: Frost Walker UI uses colored icon
-			Tooltip: The Frost Walker's special 'snowflake charge' UI will use a colored icon (the Ice Gauntlet's crystal projectile) instead of a monochrome variant
 		}
 
 		SmartSmartCursor: {

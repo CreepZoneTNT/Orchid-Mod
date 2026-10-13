@@ -204,7 +204,7 @@ namespace OrchidMod.Common.Global.Items
 			
 			if (thoriumMod.IsItemTypeEquals("BoreanBag", arg))
 			{
-				QuickSpawnItem<ThoriumBoreanStriderQuarterstaff>(player, 1, 5);
+				QuickSpawnItem<ThoriumBoreanStriderQuarterstaff>(player, 1, 3);
 				return;
 			}
 

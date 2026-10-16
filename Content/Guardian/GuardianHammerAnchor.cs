@@ -498,6 +498,15 @@ namespace OrchidMod.Content.Guardian
 							guardian.OnAttack(WeakThrow ? AttackID.HammerBash : AttackID.HammerCharge, HammerItem);
 						}
 
+						if (Projectile.tileCollide)
+						{
+							(int u, int v) = Projectile.Bottom.ToTileCoordinates().XYTuple();
+							if (WorldGen.InWorld(u, v) && Main.tile[u, v] != null && Main.tile[u, v].LiquidAmount == 255 && Main.tile[u, v].LiquidType == LiquidID.Shimmer && Projectile.velocity.Y > 0f) {
+								Projectile.velocity.Y *= -1f;
+								Projectile.netUpdate = true;
+							}
+						}
+
 						if (guardian.GuardianHammerMagnet > 0f && !HammerItem.CannotMagnet && Projectile.timeLeft < 598 && range > 0 && BlockDuration == 0 && owner == Main.LocalPlayer && !Main.dedServ)
 						{ // hammer rotates towards cursor
 							Vector2 directionStraight = Vector2.Normalize(Projectile.velocity);

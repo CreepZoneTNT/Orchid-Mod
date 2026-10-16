@@ -1,6 +1,8 @@
 using System;
 using Microsoft.Xna.Framework;
+using ReLogic.Utilities;
 using Terraria;
+using Terraria.DataStructures;
 
 namespace OrchidMod.Utilities;
 
@@ -50,6 +52,9 @@ public static partial class OrchidUtils
 	public static int GetDimension(this Entity entity, bool useLargestDim = true) => useLargestDim ? entity.GetLargestDimension() : entity.GetSmallestDimension();
 
 	public static (float, float) XYTuple(this Vector2 vector) => (vector.X, vector.Y);
+	public static (double, double) XYTuple(this Vector2D vector) => (vector.X, vector.Y);
+	public static (int, int) XYTuple(this Point point) => (point.X, point.Y);
+	public static (short, short) XYTuple(this Point16 point) => (point.X, point.Y);
 	
 	public static bool HasPointInCircle(this Circle circle, Vector2 point) => Circle.HasPointInCircle(circle, point);	
 	public static Vector2 ClosestPointInCircle(this Circle circle, Vector2 point) => Circle.ClosestPointInCircle(circle, point);

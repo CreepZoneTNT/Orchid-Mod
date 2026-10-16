@@ -29,8 +29,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers {
             CannotMagnet = true;
             CannotExplode = true;
 			Penetrate = true;
-		}
-        
+			CannotBlock = true;
+        }
 
         public override void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile, bool OffHand)
         {
@@ -65,17 +65,17 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers {
                         projectile.velocity.X = 2f * projectile.direction;
                     }
 
-                    if (anchor.range <= 285)
+                    if (anchor.range <= Range - 15)
                     {
                         // Blip sound to 
                        //  if (anchor.range == 285) SoundEngine.PlaySound(SoundID.MaxMana); // I don't like the bleep
-                        guardian.SlamCostUI = 3;
+                       if (anchor.Ding) guardian.SlamCostUI = 3;
                     
                         projectile.velocity.Y += 0.75f;
                         if (projectile.velocity.Y > 20f) projectile.velocity.Y = 20f;
                         projectile.velocity.X *= 0.95f;
                     
-                        if (Main.mouseLeft && Main.mouseLeftRelease && anchor.Ding && IsLocalPlayer(player) && (int)projectile.ai[2] != 1 && guardian.UseSlam(3, true))
+                        if (guardian.GetGauntletPunchInput(true) && anchor.Ding && IsLocalPlayer(player) && (int)projectile.ai[2] != 1 && guardian.UseSlam(3, true))
 						{
 							guardian.UseSlam(3);
 							SoundEngine.PlaySound(SoundID.Item88);
@@ -83,7 +83,9 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers {
 							projectile.ai[2] = 1f;
 							projectile.netUpdate = true;
                         }
-                    } 
+                    }
+
+                    if (projectile.shimmerWet && anchor.range > 30) anchor.range = 30;
                 }
             }
         }
@@ -268,7 +270,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers {
                         );
                         rockProj.DamageType = ModContent.GetInstance<GuardianDamageClass>();
                     }
-                SoundEngine.PlaySound(SoundID.Item14); 
+                SoundEngine.PlaySound(SoundID.Item70); 
                 // Kill the projectile so it can only go "boom" once
                 projectile.Kill();
             }

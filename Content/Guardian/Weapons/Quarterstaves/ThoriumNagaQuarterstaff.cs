@@ -264,12 +264,12 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			orchidPlayer.PlayerImmunity = 20;
 			orchidPlayer.ForcedVelocityUpkeep = 0;
 			
-			int dashType = ModContent.ProjectileType<ThoriumNagaQuarterstaffProjectileDash>();
-			if (player.ownedProjectileCounts[dashType] != 1)
-			{
-				Projectile dash = Projectile.NewProjectileDirect(projectile.GetSource_FromAI(), projectile.Center, velocity, dashType, 0, 0);
-				((ThoriumNagaQuarterstaffProjectileDash)dash.ModProjectile).Anchor = projectile;
-			}
+			// int dashType = ModContent.ProjectileType<ThoriumNagaQuarterstaffProjectileDash>();
+			// if (player.ownedProjectileCounts[dashType] != 1)
+			// {
+			// 	Projectile dash = Projectile.NewProjectileDirect(projectile.GetSource_FromAI(), projectile.Center, velocity, dashType, 0, 0);
+			// 	((ThoriumNagaQuarterstaffProjectileDash)dash.ModProjectile).Anchor = projectile;
+			// }
 			
 		}
     }    

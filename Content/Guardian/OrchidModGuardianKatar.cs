@@ -401,7 +401,7 @@ namespace OrchidMod.Content.Guardian
 			}
 
 			int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Knockback"));
-			tooltips.Insert(index + 1, new TooltipLine(Mod, "ParryDuration", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ParryDuration", OrchidUtils.FramesToSeconds((int)(ParryDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianParryDuration)))));
+			tooltips.Insert(index + 1, new TooltipLine(Mod, "ParryDuration", GetDashTooltip(guardian)));
 
 
 			string click = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
@@ -438,6 +438,51 @@ namespace OrchidMod.Content.Guardian
 			{
 				return null;
 			}
+		}
+
+		public string GetDashTooltip(OrchidGuardian guardian)
+		{
+			OrchidClientConfig.KatarDistanceUnits units = OrchidMod.OrchidClientConfig.KatarDistanceUnit;
+			if (units == OrchidClientConfig.KatarDistanceUnits.Duration)
+				return Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ParryDuration", OrchidUtils.FramesToSeconds((int)guardian.GetParryDuration(Item, ParryDuration)));
+			
+			float distance = ParryDuration * ParryDashSpeed;
+			float unitConversion = units switch
+			{
+				OrchidClientConfig.KatarDistanceUnits.Tiles => 0.0625f,
+				OrchidClientConfig.KatarDistanceUnits.Feet => 0.125f,
+				_ => 1f
+			};
+
+			const string unitBaseKey = "Mods.OrchidMod.UI.Units";
+			string unitName = units switch
+			{
+				OrchidClientConfig.KatarDistanceUnits.Pixels => Language.GetTextValue(unitBaseKey + ".Pixels"),
+				OrchidClientConfig.KatarDistanceUnits.Tiles => Language.GetTextValue(unitBaseKey + ".Tiles"),
+				OrchidClientConfig.KatarDistanceUnits.Feet => Language.GetTextValue(unitBaseKey + ".Feet"),
+				OrchidClientConfig.KatarDistanceUnits.Descriptor => "",
+				_ => Language.GetTextValue(unitBaseKey + ".Pixels")
+			};
+
+			object distanceValue = distance * unitConversion;
+			if (units == OrchidClientConfig.KatarDistanceUnits.Descriptor)
+			{
+				const string descriptorBaseKey = "Mods.OrchidMod.UI.GuardianItem.ParryDistanceDescriptor";
+				distanceValue = distance switch
+				{
+					>= 800 => Language.GetTextValue(descriptorBaseKey + ".AbsurdlyFar"),
+					> 560 => Language.GetTextValue(descriptorBaseKey + ".ExtremelyFar"),
+					> 400 => Language.GetTextValue(descriptorBaseKey + ".VeryFar"),
+					> 280 => Language.GetTextValue(descriptorBaseKey + ".Far"),
+					> 180 => Language.GetTextValue(descriptorBaseKey + ".Average"),
+					> 120 => Language.GetTextValue(descriptorBaseKey + ".Short"),
+					> 60 => Language.GetTextValue(descriptorBaseKey + ".VeryShort"),
+					> 0 => Language.GetTextValue(descriptorBaseKey + ".ExtremelyShort"),
+					_ => Language.GetTextValue(descriptorBaseKey + ".None")
+				};
+			}
+			
+			return Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.ParryDistance", distanceValue, unitName);
 		}
 	}
 }

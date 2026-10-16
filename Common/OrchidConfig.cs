@@ -64,14 +64,19 @@ namespace OrchidMod.Common
 		[BackgroundColor(151, 120, 79)]
 		public bool GuardianGauntletAlwaysSlam { get; set; }
 
-		[DefaultValue(false)]
-		[BackgroundColor(151, 120, 79)]
-		public bool GuardianThoriumThorsHammerConversion { get; set; }
-
+		public enum KatarDistanceUnits
+		{
+			Descriptor,
+			Pixels,
+			Tiles,
+			Feet,
+			Duration
+		}
 		
-		[DefaultValue(false)]
+		[DefaultValue(KatarDistanceUnits.Descriptor)]
+		[Dropdown]
 		[BackgroundColor(151, 120, 79)]
-		public bool GuardianFencingBlade { get; set; }
+		public KatarDistanceUnits KatarDistanceUnit { get; set; }
 
 		[Header("Shapeshifter")]
 		[DefaultValue(false)]

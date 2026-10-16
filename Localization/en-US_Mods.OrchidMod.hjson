@@ -4024,7 +4024,7 @@ Configs: {
 			Tooltip:
 				'''
 				The unit of measure used to describe katars' parry-dash distance.
-				Uses default parry-duration tooltip behavior if either 'TickDuration' or 'SecondDuration' is used
+				Uses default parry-duration tooltip behavior if 'Duration' is used
 				'''
 		}
 	}
@@ -4215,7 +4215,7 @@ UI: {
 		Guard: "{0} {^0:guard;guards}"
 		Slam: "{0} {^0:slam;slams}"
 		Parry: "{0} to parry"
-		ParryDash: "{0} to parry dash"
+		ParryDash: "{0} to parry and dash"
 		ParryDashNeedle: "{0} to parry, dashing downwards"
 		ChargeToThrow: Charge to throw
 		ChargeToParry: Charge to parry
@@ -4233,10 +4233,10 @@ UI: {
 		DamageOfDefense: Deals {0}% of defense as opposing damage
 
 		ParryDistanceDescriptor: {
-			AbsurdlyFar: Absurdly far
-			ExtremelyFar: Extremely far
-			VeryFar: Very far
-			Far: Far
+			AbsurdlyFar: Absurdly long
+			ExtremelyFar: Extremely long
+			VeryFar: Very long
+			Far: Long
 			Average: Average
 			Short: Short
 			VeryShort: Very short

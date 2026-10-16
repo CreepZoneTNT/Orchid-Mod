@@ -2501,7 +2501,7 @@ Items: {
 		RightClick: Blasts enemies and yourself away, stronger based on attack charge
 		Jump: Jump to dash, before being able to float for a few seconds
 		Passive: Nearby enemies splatter on death, dealing damage in an area
-		Tooltip: Transforms you into an Corruptor, gaining unique abilities
+		Tooltip: Transforms you into a Corruptor, gaining unique abilities
 	}
 
 	SageCrimson: {

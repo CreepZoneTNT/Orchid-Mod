@@ -4231,6 +4231,19 @@ UI: {
 		BuffDuration: "{0} second buff duration"
 		HorizonLaceShieldStacks: Grants 3 guards when fully charged
 		DamageOfDefense: Deals {0}% of defense as opposing damage
+		
+		ActionTemplates: {
+		    Single: "{0} to {1}"
+		    
+		}
+		
+		ActionKeywords: {
+		    Swing: swing
+		    Jab: jab
+		    Parry: parry
+		    Block: block
+		    Deflect: deflect
+		}
 
 		ParryDistanceDescriptor: {
 			AbsurdlyFar: Absurdly long

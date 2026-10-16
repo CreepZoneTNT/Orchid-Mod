@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using OrchidMod.Common.ModObjects;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent.Items;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -21,10 +22,10 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 
 		public override void SafeSetDefaults()
 		{
-			Item.value = Item.sellPrice(0, 2, 0, 0);
 			Item.width = 26;
 			Item.height = 42;
 			Item.UseSound = SoundID.Item1;
+			Item.value = Item.sellPrice(0, 2, 0, 0);
 			Item.knockBack = 13f;
 			Item.damage = 93;
 			Item.rare = ItemRarityID.Green;
@@ -32,6 +33,18 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			distance = 28f;
 			slamDistance = 50f;
 			blockDuration = 240;
+			
+			if (Main.remixWorld)
+			{
+				Item.value = Item.sellPrice(0, 7, 0, 0);
+				Item.knockBack = 15f;
+				Item.damage = 243;
+				Item.rare = ItemRarityID.Pink;
+				Item.useTime = 20;
+				distance = 30f;
+				slamDistance = 80f;
+				blockDuration = 450;
+			}
 			TextureWheels ??= ModContent.Request<Texture2D>(Texture + "_Wheels", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
 			ShieldFrames = 4;
 			blockRotation = 0f;

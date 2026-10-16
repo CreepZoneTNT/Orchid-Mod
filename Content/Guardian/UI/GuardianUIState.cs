@@ -21,6 +21,8 @@ namespace OrchidMod.Content.Guardian.UI
 
 		public static Texture2D textureBlockBarOn;
 		public static Texture2D textureBlockBarOff;
+		public static Texture2D textureBlockBarOnVoid;
+		public static Texture2D textureBlockBarOffVoid;
 		public static Texture2D textureBlockReady;
 
 		public static Texture2D textureBlockBarHighlight;
@@ -78,6 +80,7 @@ namespace OrchidMod.Content.Guardian.UI
 		public override void OnInitialize()
 		{
 			ReloadTextures();
+			
 
 			Width.Set(0f, 0f);
 			Height.Set(0f, 0f);
@@ -91,6 +94,9 @@ namespace OrchidMod.Content.Guardian.UI
 			textureHammerMain = ModContent.Request<Texture2D>(path + "HammerBar", AssetRequestMode.ImmediateLoad).Value;
 			textureHammerIcon = ModContent.Request<Texture2D>(path + "HammerIcon1", AssetRequestMode.ImmediateLoad).Value;
 			textureHammerIconBig = ModContent.Request<Texture2D>(path + "HammerIcon2", AssetRequestMode.ImmediateLoad).Value;
+			
+			textureBlockBarOnVoid = ModContent.Request<Texture2D>(path + "BlockBarOnVoid", AssetRequestMode.ImmediateLoad).Value;
+			textureBlockBarOffVoid = ModContent.Request<Texture2D>(path + "BlockBarOffVoid", AssetRequestMode.ImmediateLoad).Value;
 
 			// Chance textures file path if the fancy config option is enabled
 			if (ModContent.GetInstance<OrchidClientConfig>().GuardianUseFancyUI) path += "Fancy/";
@@ -179,25 +185,51 @@ namespace OrchidMod.Content.Guardian.UI
 				int offSetIcons = offSet;
 				for (int i = 0; i < modPlayer.GuardianGuardMax; i++)
 				{
-					Texture2D texture = modPlayer.GuardianGuard > i ? textureBlockBarOn : textureBlockBarOff;
-					drawpos = new Vector2(position.X - offSet + (textureBlockBarOn.Width + 2) * i, position.Y);
-					spriteBatch.Draw(texture, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
 					bool check = modPlayer.GuardianGuard > i;
+					bool voidCheck = modPlayer.GuardianVoid;
+					
+					Texture2D textureOff = textureBlockBarOff;
+					Texture2D textureOn = textureBlockBarOn;
+					if (voidCheck)
+					{
+						textureOff = textureBlockBarOffVoid;
+						textureOn = textureBlockBarOnVoid;
+					}
+					
+					Texture2D texture = check ? textureOn : textureOff;
+					
+					drawpos = new Vector2(position.X - offSet + (textureOn.Width + 2) * i, position.Y);
+					Color bgColor = Color.White;
+					Color fgColor = bgColor;
+					Vector2 voidShake = Main.rand.NextVector2Unit() * Utils.Remap(modPlayer.GuardianGuard + modPlayer.GuardianGuardRecharging, 0, modPlayer.GuardianGuardMax / 2f, 1.5f, 0f);
+					if (voidCheck)
+					{
+						if (Main.rand.NextBool((int)Utils.Remap(modPlayer.GuardianGuard + modPlayer.GuardianGuardRecharging, 0, modPlayer.GuardianGuardMax / 2f, 1, 20))) drawpos += voidShake;
+						bgColor = modPlayer.GuardianGuard < 2 ? Color.Lerp(new Color(57, 0, 86), modPlayer.GuardianGuard < 1 ? new Color(255, 58, 228) : new(120, 0, 181), Utils.Turn01ToCyclic010(player.miscCounterNormalized * (modPlayer.GuardianGuard < 1 ? player.statLife / (float)player.statLifeMax2 < 0.8f ? 6 : 4 : 2))) : new (57, 0, 86);
+					}
+					
+					spriteBatch.Draw(texture, drawpos, null, check ? fgColor : bgColor, 0f, Vector2.Zero, 1f, effect, 0f);
+					
 					Vector2 drawposHighlight = new Vector2(position.X - offSet - 2 + 18 * i, position.Y - 2);
+					if (voidCheck) drawposHighlight += voidShake;
+					
 					if (modPlayer.GuardCostUI > i)
 					{
 						spriteBatch.Draw(textureBlockBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * 0.8f, 0f, Vector2.Zero, 1f, effect, 0f);
 					}
 					if (modPlayer.GuardianGuard - 1 == i && modPlayer.GuardianGuardRecharging < 0)
 					{
-						int chargingWidth = (int)(-modPlayer.GuardianGuardRecharging * textureBlockBarOn.Width + 0.5f);
+						int chargingWidth = (int)(-modPlayer.GuardianGuardRecharging * textureOn.Width + 0.5f);
 						float flash = 0.6f + (float)Math.Sin(player.miscCounterNormalized * 2 * MathHelper.TwoPi) * 0.2f;
-						spriteBatch.Draw(textureBlockBarOff, drawpos + Vector2.UnitX * (textureBlockBarOn.Width - chargingWidth), new Rectangle(textureBlockBarOn.Width - chargingWidth, 0, chargingWidth, textureBlockBarOn.Height), new Color(flash, flash, flash, 0.6f));
+						spriteBatch.Draw(textureOff, drawpos + Vector2.UnitX * (textureOn.Width - chargingWidth), new Rectangle(textureOn.Width - chargingWidth, 0, chargingWidth, textureOn.Height),
+							/*new Color(flash, flash, flash, 0.6f));*/ (bgColor * flash) with { A = 163 }
+						);
 					}
 					else if (modPlayer.GuardianGuard == i && modPlayer.GuardianGuardRecharging > 0)
 					{
 						float flash = 0.5f + (float)Math.Sin((player.miscCounterNormalized + modPlayer.GuardianGuardRecharging * 1.5f) * 2 * MathHelper.TwoPi) * 0.1f;
-						spriteBatch.Draw(textureBlockBarOn, drawpos, new Rectangle(0, 0, (int)(modPlayer.GuardianGuardRecharging * textureBlockBarOn.Width + 0.5f), textureBlockBarOn.Height), new Color(flash, flash, flash, 0.5f));
+						
+						spriteBatch.Draw(textureOn, drawpos, new Rectangle(0, 0, (int)(modPlayer.GuardianGuardRecharging * textureOn.Width + 0.5f), textureBlockBarOn.Height), new Color(flash, flash, flash, 0.5f));
 					}
 				}
 

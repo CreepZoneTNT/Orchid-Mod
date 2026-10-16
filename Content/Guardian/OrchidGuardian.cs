@@ -18,6 +18,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using System.Linq;
 using OrchidMod.Content.Guardian.Accessories;
+using Terraria.Graphics.Shaders;
 
 namespace OrchidMod.Content.Guardian
 {
@@ -32,7 +33,8 @@ namespace OrchidMod.Content.Guardian
 		public bool PaviseInputSwap => OrchidMod.OrchidClientConfig.GuardianSwapPaviseInputs;
 		
 		public SoundStyle DingSound => OrchidMod.OrchidClientConfig.GuardianAltChargeSounds ? SoundID.DD2_BetsyFireballShot : SoundID.MaxMana;
-
+		public PlayerDeathReason VoidDeath => PlayerDeathReason.ByCustomReason(NetworkText.FromKey(Mod.GetLocalizationKey("Items.ThoriumGuardianVoidHead.Death"), Player.name));
+		
 		public bool CrossModGodMode;
 
 		// Misc & Static fields
@@ -69,6 +71,7 @@ namespace OrchidMod.Content.Guardian
 		public bool GuardianGit = false;
 		public bool GuardianHorizon = false;
 		public bool GuardianCrystalNinja = false;
+		public bool GuardianVoid = false;
 		public float GuardianSpikeDamage = 0; // Accessories
 		public bool GuardianSpikeDungeon = false;
 		public bool GuardianSpikeMech = false;
@@ -187,6 +190,14 @@ namespace OrchidMod.Content.Guardian
 						drawInfo.compTorsoFrame = new(0, 112, 40, 56); //Jumping
 					}
 				}
+			}
+
+			if (GuardianVoid && GuardianGuard == 0 && OrchidMod.ThoriumMod is { } thoriumMod)
+			{
+				int glitchDye = thoriumMod.Find<ModItem>("GlitchDye").Type;
+				int glitchShaderID = GameShaders.Armor.GetShaderIdFromItemId(glitchDye);
+
+				drawInfo.cHead = drawInfo.cBody = drawInfo.cLegs = glitchShaderID;
 			}
 		}
 		
@@ -335,6 +346,33 @@ namespace OrchidMod.Content.Guardian
 		public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
 		{
 			GuardianItemCharge = 0;
+			
+			if (GuardianVoid)
+			{
+				bool voidOverloaded = damageSource == VoidDeath;
+				
+				SoundEngine.PlaySound(SoundID.NPCDeath24, Player.Center);
+				if (voidOverloaded) SoundEngine.PlaySound(SoundID.NPCDeath10 with { Pitch = -1f, Volume = 0.3f }, Player.Center);
+				
+				int dustType = DustID.Shadowflame;
+					
+				for (int i = 0; i < (voidOverloaded ? 100 : 20); i++)
+				{
+					Dust dust = Dust.NewDustPerfect(Player.Center, dustType, Main.rand.NextVector2CircularEdge(8f, 8f), Alpha: 255, newColor: new Color(255, 98, 236), Scale: Main.rand.NextFloat(0.5f, 5f));
+					dust.velocity *= Main.rand.NextFloat(voidOverloaded ? 5f : 1f);
+					dust.noGravity = true;
+				}
+				if (OrchidMod.ThoriumMod is {} thoriumMod)
+				{
+					dustType = thoriumMod.Find<ModDust>("VoidHeartDust").Type;
+					for (int i = 0; i < (voidOverloaded ? 20 : 4); i++)
+					{
+						Dust dust = Dust.NewDustDirect(Player.Center, 0, 0, dustType);
+						dust.velocity *= Main.rand.NextFloat(voidOverloaded ? 10f : 1.5f);
+						dust.scale = Main.rand.NextFloat(3f) + 1.5f;
+						dust.fadeIn = 1f;
+					}
+				}}
 		}
 
 		public override void PostUpdate()
@@ -387,6 +425,25 @@ namespace OrchidMod.Content.Guardian
 			}
 
 			if (GauntletPunchCooldown > -10) GauntletPunchCooldown--;
+
+
+			if (GuardianVoid)
+			{
+				if (Main.rand.NextBool((int)Utils.Remap(GuardianGuard, 0, GuardianGuardMax, 4, 20)) && OrchidMod.ThoriumMod is {} thoriumMod)
+				{
+					Dust dust = Dust.NewDustDirect(Player.Center, 0, 0, thoriumMod.Find<ModDust>("VoidHeartDust").Type);
+					dust.velocity.X *= Main.rand.NextFloat(1.5f);
+					dust.velocity.Y -= Main.rand.NextFloat(5f);
+					dust.scale = Main.rand.NextFloat() + 0.5f;
+					dust.fadeIn = 1f;
+				}
+
+				bool hpDangerZone = Player.statLife / (float)Player.statLifeMax2 < 0.5f;
+
+				if (GuardianGuard <= 0 && !Main.dedServ && Player.miscCounterNormalized * (hpDangerZone ? 6 : 4) % 1 == 0)
+					SoundEngine.PlaySound(SoundID.Item15 with { Volume = hpDangerZone ? 2f : 1.5f, Pitch = hpDangerZone ? 0.2f : 0f, MaxInstances = 5 }, Player.Center );
+			}
+			
 		}
 
 		public override void ProcessTriggers(TriggersSet triggersSet)
@@ -519,7 +576,9 @@ namespace OrchidMod.Content.Guardian
 			GuardCostUI = 0;
 
 			if (GuardianGuard > GuardianGuardMax) GuardianGuard = GuardianGuardMax;
+			else if (GuardianGuard < 0) GuardianGuard = 0;
 			if (GuardianSlam > GuardianSlamMax) GuardianSlam = GuardianSlamMax;
+			else if (GuardianSlam < 0) GuardianSlam = 0;
 
 			RuneProjectiles.Clear();
 
@@ -563,6 +622,7 @@ namespace OrchidMod.Content.Guardian
 			GuardianGit = false;
 			GuardianHorizon = false;
 			GuardianCrystalNinja = false;
+			GuardianVoid = false;
 			GuardianHoneyPotion = false;
 			GuardianWormTooth = false;
 			GuardianMonsterFang = false;
@@ -772,6 +832,74 @@ namespace OrchidMod.Content.Guardian
 				modifiers.DamageSource.TryGetCausingEntity(out Entity entity);
 				DoParryItemParry(entity);
 				modifiers.Cancel();
+			}
+			
+			if (GuardianVoid)
+			{
+				modifiers.DamageSource.TryGetCausingEntity(out Entity entity);
+
+				modifiers.DisableSound();
+				if (!Player.dead) SoundEngine.PlaySound(SoundID.NPCHit21, Player.Center);
+				if (entity is not null) modifiers.Cancel();
+				else return;
+				
+				if (modifiers.Dodgeable)
+				{
+					SoundEngine.PlaySound(SoundID.NPCHit21, Player.Center);
+					
+					if (Player.immune) return;
+					
+					if (UseGuard(1, true))
+					{
+						if (Player.HeldItem.ModItem is OrchidModGuardianParryItem) DoParryItemParry(entity);
+						else modPlayer.SetDodgeImmuneTime();
+
+						SoundEngine.PlaySound(SoundID.Item52 with {Volume = 0.5f}, Player.Center);
+						SoundEngine.PlaySound(SoundID.Item67 with {PitchRange = (0.4f, 0.6f), Volume = 0.5f}, Player.Center);
+						
+						if (GuardianDisplayUI < 60) GuardianDisplayUI = 60;
+						
+						int dustType = DustID.Shadowflame;
+						for (int i = 0; i < 15; i++)
+						{
+							Dust dust = Dust.NewDustPerfect(Player.Center, dustType, Main.rand.NextVector2CircularEdge(3f, 3f), Alpha: 255, newColor: new Color(255, 98, 236), Scale: 1.5f);
+							dust.noGravity = true;
+						}
+						if (OrchidMod.ThoriumMod is {} thoriumMod)
+						{
+							dustType = thoriumMod.Find<ModDust>("VoidHeartDust").Type;
+							for (int i = 0; i < 4; i++)
+							{
+								Dust dust = Dust.NewDustDirect(Player.Center, 0, 0, dustType);
+								dust.velocity *= Main.rand.NextFloat() * 2.0f + 0.5f;
+								dust.scale = Main.rand.NextFloat() + 1.5f;
+								dust.fadeIn = 1f;
+							}
+						}
+
+						CombatText.NewText(Player.getRect(), Color.DarkMagenta, Language.GetTextValue(Mod.GetLocalizationKey("UI.GuardianItem.Interrupted")), dot: true);
+
+						UseGuard();
+						if (GuardianItemCharge > 0) GuardianItemCharge = 0;
+						
+						return;
+					}
+					
+					if (Player.statLife > (int)(Player.statLifeMax2 * 0.5f))
+					{
+						int damage = Player.statLife - 10;
+						Player.statLife = 10;
+						CombatText.NewText(Player.getRect(), Color.DarkOrchid, damage, true, true);
+						Player.AddImmuneTime(modifiers.CooldownCounter, Player.longInvince ? 80 : 40);
+						Player.immune = true;
+						modifiers.Cancel();	
+						SoundEngine.PlaySound(SoundID.Item46 with { Pitch = -0.2f, Volume = 1.5f }, Player.Center);
+
+						return;
+					}
+				}
+				
+				Player.KillMe(VoidDeath, 9999, 1);
 			}
 		}
 

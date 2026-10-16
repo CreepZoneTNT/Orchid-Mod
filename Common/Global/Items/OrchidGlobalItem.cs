@@ -70,7 +70,7 @@ namespace OrchidMod.Common.Global.Items
 
 		private void Detour_RightClick(orig_RightClick orig, Item item, Player player)
 		{
-			if (OrchidMod.ThoriumMod != null && item.type == OrchidMod.ThoriumMod.Find<ModItem>("MagicThorHammer").Type && ModContent.GetInstance<OrchidClientConfig>().GuardianThoriumThorsHammerConversion)
+			if (OrchidMod.ThoriumMod != null && item.type == OrchidMod.ThoriumMod.Find<ModItem>("MagicThorHammer").Type)
 			{
 				item.ChangeItemType(ModContent.ItemType<ThoriumThorsHammerWarhammer>());
 				return;
@@ -97,7 +97,7 @@ namespace OrchidMod.Common.Global.Items
 				}
 			}
 
-			if (OrchidMod.ThoriumMod != null && item.type == OrchidMod.ThoriumMod.Find<ModItem>("MagicThorHammer").Type && ModContent.GetInstance<OrchidClientConfig>().GuardianThoriumThorsHammerConversion)
+			if (OrchidMod.ThoriumMod is not null && item.type == OrchidMod.ThoriumMod.Find<ModItem>("MagicThorHammer").Type && OrchidMod.OrchidServerConfig.GuardianThoriumThorsHammerConversion)
 			{
 				var index = tooltips.FindIndex(i => i.Mod.Equals("Terraria") && i.Name.Equals("Tooltip0"));
 				tooltips[index].Text = Language.GetTextValue("Mods.OrchidMod.Misc.ThoriumMagicThorHammer");

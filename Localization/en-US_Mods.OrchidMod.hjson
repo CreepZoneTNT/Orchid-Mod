@@ -4026,7 +4026,11 @@ Configs: {
 
 	OrchidServerConfig: {
 		DisplayName: Orchid Server Config
-		Headers.General: General Header
+
+		Headers: {
+			General: General Header
+			Guardian: Guardian Header
+		}
 
 		LoadCrossmodContentWithoutRequiredMods: {
 			Label: Load Crossmod-Content without required mods
@@ -4046,6 +4050,10 @@ Configs: {
 		EnableContentShapeshifter: {
 			Label: Enable Shapeshifter Content
 			Tooltip: Allows shapeshifter items to be obtainable
+		}
+		GuardianThoriumThorsHammerConversion: {
+			Label: Thor's Hammer Recipe
+			Tooltip: Re-enables the original Thor's Hammer: Opposing recipe using any of the other Thor's Hammer variants
 		}
 	}
 }

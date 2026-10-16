@@ -133,5 +133,10 @@ namespace OrchidMod.Common
 		[BackgroundColor(150, 0, 50)]
 		[ReloadRequired]
 		public bool EnableContentShapeshifter { get; set; }
+		
+		[Header("Guardian")]
+		[DefaultValue(true)]
+		[BackgroundColor(151, 120, 79)]
+		public bool GuardianThoriumThorsHammerConversion { get; set; }
 	}
 }

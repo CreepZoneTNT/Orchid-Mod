@@ -101,7 +101,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 			
 				if (Targets.Count > 0)
 				{
-					if (projectile.ai[1] == 0 && guardian.GuardianItemCharge < 210f)
+					if (projectile.ai[1] == 0 && guardian.GuardianItemCharge is > 0 and < 210f)
 					{
 						guardian.GuardianItemCharge += 7.5f * Targets.Count / Item.useTime * player.GetTotalAttackSpeed(DamageClass.Melee);
 						if (guardian.GuardianItemCharge > 210f)

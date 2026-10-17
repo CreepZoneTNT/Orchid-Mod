@@ -110,73 +110,88 @@ namespace OrchidMod.Content.Guardian
 			}
 		}
 
+		public void ReturnFromThrow()
+		{
+			Player player = Main.player[Projectile.owner];
+			ChangeState(IdleAnim, 25, Projectile.velocity.ToRotation());
+			DoAnim(2, 0, player.MountedCenter.Floor(), Extra);
+			Ding = false;
+			Projectile.localNPCHitCooldown = -1;
+			if (player.HeldItem.ModItem is OrchidModGuardianGreathammer)
+			{
+				if (HammerItem.PreSound(player, player.GetModPlayer<OrchidGuardian>(), Projectile, false)) SoundEngine.PlaySound(SoundID.Grab.WithPitchOffset(-0.5f), Projectile.Center);
+				player.SetDummyItemTime(0);
+			}
+		}
+
 		public override void AI()
 		{
 			Player player = Main.player[Projectile.owner];
+			OrchidGuardian guardian = player.GetModPlayer<OrchidGuardian>();
+			if (NeedNetUpdate)
+			{
+				Projectile.netUpdate = NeedNetUpdate;
+				NeedNetUpdate = false;
+			}
 			if (IsThrown)
 			{
-				if (Anim > 0)
+				if (HammerItem?.ThrowAI(player, guardian, Projectile, this) ?? true)
 				{
-					Projectile.timeLeft = 2;
-					//projectile will lose speed linearly
-					Anim--;
-					Projectile.velocity *= Anim / (Anim + 1f);
-					if (Anim <= 0)
+					if (Anim > 0)
 					{
-						Extra *= HammerItem.ReturnSpeed;
-						if (Extra == 0) Projectile.timeLeft = 15;
+						Projectile.timeLeft = 2;
+						//projectile will lose speed linearly
+						Anim--;
+						Projectile.velocity *= Anim / (Anim + 1f);
+						if (Anim <= 0)
+						{
+							Extra *= HammerItem.ReturnSpeed;
+							if (Extra == 0) Projectile.timeLeft = 15;
+							else
+							{
+								Projectile.timeLeft = 180;
+							}
+						}
+					}
+					else //returning
+					{
+						if (Anim > -80)
+						{
+							Projectile.velocity += new Vector2(Extra, 0).RotatedBy(Projectile.Center.AngleTo(player.Center));
+							if (Projectile.velocity.Length() > Extra / 80 * -Anim) Projectile.velocity /= Projectile.velocity.Length() / (Extra / 40 * -Anim);
+						}
 						else
 						{
-							Projectile.timeLeft = 180;
+							Projectile.velocity = new Vector2(Extra, 0).RotatedBy(Projectile.Center.AngleTo(player.Center));
 						}
-					}
-				}
-				else //returning
-				{
-					if (Anim > -80)
-					{
-						Projectile.velocity += new Vector2(Extra, 0).RotatedBy(Projectile.Center.AngleTo(player.Center));
-						if (Projectile.velocity.Length() > Extra / 80 * -Anim) Projectile.velocity /= Projectile.velocity.Length() / (Extra / 40 * -Anim);
-					}
-					else
-					{
-						Projectile.velocity = new Vector2(Extra, 0).RotatedBy(Projectile.Center.AngleTo(player.Center));
-					}
-					if (IsLocalOwner && Projectile.velocity.Length() > Projectile.Center.Distance(player.Center))
-					{
-						ChangeState(IdleAnim, 25, Projectile.velocity.ToRotation());
-						DoAnim(2, 0, player.MountedCenter.Floor(), Extra);
-						Ding = false;
-						Projectile.extraUpdates = 0;
-						Projectile.localNPCHitCooldown = -1;
-						if (player.HeldItem.ModItem is OrchidModGuardianGreathammer)
+						if (IsLocalOwner && Projectile.velocity.Length() > Projectile.Center.Distance(player.Center))
 						{
-							if (HammerItem.PreSound(player, player.GetModPlayer<OrchidGuardian>(), Projectile, false)) SoundEngine.PlaySound(SoundID.Grab.WithPitchOffset(-0.5f), Projectile.Center);
-							player.SetDummyItemTime(0);
+							ReturnFromThrow();
 						}
-					}
-					else
-					{
-						if (Anim > -79f)
-							Anim--;
-						else if (Anim > -80f)
+						else
 						{
-							Anim = -80f;
-							Projectile.friendly = false;
+							if (Anim > -79f)
+								Anim--;
+							else if (Anim > -80f)
+							{
+								Anim = -80f;
+								Projectile.friendly = false;
+							}
 						}
 					}
-				}
-				if (IsThrown) //generic thrown ai. it may have just been caught in the returning ai above, so we only want to run this if it hasn't been caught yet
-				{
-					Projectile.rotation += (0.325f + Anim * 0.005f) * Projectile.spriteDirection;
-					AuraIntensity = 0.4f + Anim * 0.005f;
-					AuraFlip = false;
-					int sound = (int)Anim;
-					if (sound > 20)
+					if (IsThrown) //generic thrown ai. it may have just been caught in the returning ai above, so we only want to run this if it hasn't been caught yet
 					{
-						if (sound % 20 == 0 && HammerItem.PreSound(player, player.GetModPlayer<OrchidGuardian>(), Projectile, false)) SoundEngine.PlaySound(SoundID.Item18.WithPitchOffset(-0.9f), Projectile.Center);
+						Projectile.extraUpdates = 1;
+						Projectile.rotation += (0.325f + Anim * 0.005f) * Projectile.spriteDirection;
+						AuraIntensity = 0.4f + Anim * 0.005f;
+						AuraFlip = false;
+						int sound = (int)Anim;
+						if (sound > 20)
+						{
+							if (sound % 20 == 0 && HammerItem.PreSound(player, player.GetModPlayer<OrchidGuardian>(), Projectile, false)) SoundEngine.PlaySound(SoundID.Item18.WithPitchOffset(-0.9f), Projectile.Center);
+						}
+						else if ((sound == 14 || sound == -20 || sound == -60) && HammerItem.PreSound(player, player.GetModPlayer<OrchidGuardian>(), Projectile, false))  SoundEngine.PlaySound(SoundID.Item18.WithPitchOffset(-1f), Projectile.Center);
 					}
-					else if ((sound == 14 || sound == -20 || sound == -60) && HammerItem.PreSound(player, player.GetModPlayer<OrchidGuardian>(), Projectile, false))  SoundEngine.PlaySound(SoundID.Item18.WithPitchOffset(-1f), Projectile.Center);
 				}
 			}
 			else
@@ -186,7 +201,6 @@ namespace OrchidMod.Content.Guardian
 					Projectile.Kill();
 					return;
 				}
-				OrchidGuardian guardian = player.GetModPlayer<OrchidGuardian>();
 				if (IsLocalOwner)
 				{
 					if (IsIdle || IsCharging)
@@ -203,6 +217,7 @@ namespace OrchidMod.Content.Guardian
 					Projectile.rotation = MathHelper.Pi - Projectile.rotation;
 				}
 				Projectile.timeLeft = 2;
+				Projectile.extraUpdates = 0;
 				AuraIntensity = 0f;
 				if (player.heldProj != Projectile.whoAmI)
 				{
@@ -259,7 +274,7 @@ namespace OrchidMod.Content.Guardian
 						}
 						if (guardian.GuardianItemCharge < 210f)
 						{
-							guardian.GuardianItemCharge += 30f / HammerItem.Item.useTime * player.GetTotalAttackSpeed(DamageClass.Melee);
+							guardian.GuardianItemCharge += 30f / HammerItem.Item.useTime * HammerItem.WaitChargeGain * player.GetTotalAttackSpeed(DamageClass.Melee);
 							if (guardian.GuardianItemCharge > 210) guardian.GuardianItemCharge = 210;
 						}
 						if (!Ding && guardian.GuardianItemCharge >= 180)
@@ -286,7 +301,6 @@ namespace OrchidMod.Content.Guardian
 								Projectile.ResetLocalNPCHitImmunity();
 								ResetHitStatus(true);
 								HitCount = 0;
-								Projectile.extraUpdates = 1;
 								if (HammerItem.ThrowHitCooldown > 0)
 									Projectile.localNPCHitCooldown = HammerItem.ThrowHitCooldown * 2; //localnpchitcooldown is affected by extraupdates... idk if this is a tmodloader bug or something
 								player.SetDummyItemTime(item.useTime);
@@ -322,7 +336,7 @@ namespace OrchidMod.Content.Guardian
 						//do fake charging for remote clients
 						if (Extra < 210f)
 						{
-							Extra += 30f / HammerItem.Item.useTime * player.GetTotalAttackSpeed(DamageClass.Melee);
+							Extra += 30f / HammerItem.Item.useTime * HammerItem.WaitChargeGain * player.GetTotalAttackSpeed(DamageClass.Melee);
 							if (Extra > 210) Extra = 210;
 						}
 					}
@@ -409,6 +423,7 @@ namespace OrchidMod.Content.Guardian
 				if (Mode != 0 || player.bodyFrame.Y != 0) //looks better with back arm in the default position if idle
 					player.compositeBackArm = GetArmData(player.MountedCenter.Floor() + new Vector2(player.direction * 8, 0), 10 * offset);
 			}
+			HammerItem?.ExtraAI(player, guardian, Projectile, this);
 		}
 
 		static float Progress(float value, float start, float end) => (value - start) / (end - start);
@@ -585,19 +600,22 @@ namespace OrchidMod.Content.Guardian
 
 		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers, Player player, OrchidGuardian guardian)
 		{
-			if (IsThrown)
+			if (HammerItem?.ModifyHit(player, guardian, Projectile, this, target, ref modifiers) ?? true)
 			{
-				if (HitCount > 0)
+				if (IsThrown)
 				{
-					modifiers.FinalDamage *= 1 - HitCount / 10f;
+					if (HitCount > 0)
+					{
+						modifiers.FinalDamage *= 1 - HitCount / 10f;
+					}
 				}
-			}
-			else if (FirstHit && IsSlamming)
-			{
-				float charge = guardian.GuardianItemCharge / 180f;
-				float chargeToGain = 0.5f * HammerItem.SlamChargeGain;
-				if (charge + chargeToGain > 1)
-					modifiers.SourceDamage *= charge + chargeToGain;
+				else if (FirstHit && IsSlamming)
+				{
+					float charge = guardian.GuardianItemCharge / 180f;
+					float chargeToGain = 0.5f * HammerItem.SlamChargeGain;
+					if (charge + chargeToGain > 1)
+						modifiers.SourceDamage *= charge + chargeToGain;
+				}
 			}
 		}
 

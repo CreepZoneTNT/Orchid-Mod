@@ -183,10 +183,10 @@ namespace OrchidMod.Content.Guardian
 					}
 					else if (swingInput)
 					{ //do deflect
-						int size = 80;
-						Rectangle hitbox = new((int)player.Center.X, (int)player.Center.Y - size / 2, size, size);
+						int size = 120;
+						Rectangle hitbox = new((int)player.Center.X, (int)player.Center.Y - size / 2, size / 3 * 2, size);
 						if (projectile.spriteDirection == -1) hitbox.X -= size;
-						if (guardian.UseGuard(GuardCost, true) && guardian.DoDeflect(hitbox, out bool caughtProjectile, this, anchor))
+						if (guardian.UseGuard(GuardCost, true) && guardian.DoDeflect(hitbox, out bool caughtProjectile, out bool killedNPC, this, anchor))
 						{
 							guardian.UseGuard(GuardCost);
 							guardian.AddSlam(GuardCost);
@@ -194,7 +194,7 @@ namespace OrchidMod.Content.Guardian
 							SoundEngine.PlaySound(SoundID.Item52, player.Center);
 							guardian.OnAttack(AttackID.GreathammerDeflect);
 							if (guardian.DeflectedEnemies.Count() > 0) SoundEngine.PlaySound(SoundID.Item110.WithPitchOffset(-0.3f), player.Center);
-							if (OnDeflect(player, guardian, projectile, anchor, caughtProjectile))
+							if (OnDeflect(player, guardian, projectile, anchor, caughtProjectile, killedNPC))
 							{
 								foreach (NPC npc in guardian.DeflectedEnemies)
 								{
@@ -214,9 +214,9 @@ namespace OrchidMod.Content.Guardian
 		}
 
 		/// <summary>Handles behavior after a deflect. Projectiles caught have been killed and the player's <c>OrchidGuardian.DeflectedEnemies</c> has been populated. Return true to stun enemies hit by the deflect. Remember if overriding to spawn a projectile for caughtProjectile. Returns true by default.</summary>
-		public bool OnDeflect(Player player, OrchidGuardian guardian, Projectile projectile, GuardianGreathammerAnchor anchor, bool caughtProjectile)
+		public bool OnDeflect(Player player, OrchidGuardian guardian, Projectile projectile, GuardianGreathammerAnchor anchor, bool caughtProjectile, bool killedNPC)
 		{
-			if (caughtProjectile)
+			if (caughtProjectile || killedNPC)
 			{
 				Vector2 vel = player.Center.DirectionTo(Main.MouseWorld) * 8f;
 				Projectile deflectProj = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center + vel * 4, vel, ProjectileType<GreathammerDeflectedProjectile>(), guardian.GetGuardianDamage(Item.damage), Item.knockBack, player.whoAmI);

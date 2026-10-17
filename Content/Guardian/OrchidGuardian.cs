@@ -1278,10 +1278,11 @@ namespace OrchidMod
 
 		/// <summary>If <c>item</c> is null or <c>item.PreDeflect</c>, returns true, performs a deflect. Any enemies or blockable projectiles intersecting a point in <c>targetArea</c> within <c>range</c> distance of <c>origin</c> and matching <c>EnemyPredicate</c> or <c>ProjPredicate</c> respectively will be deflected, caching enemies in the player's <c>DeflectedEnemies</c> and deleting projectiles. Returns <c>true</c> if a deflect occurred, and flags <c>caughtProjectile</c> if at least one projectile was deflected.</summary>
 		/// <remarks>Fields left default will be treated with default behavior. <c>item</c> functions will not be called if <c>null</c>. The default <c>Predicate</c>s will check only for <c>!NPC.friendly</c> or <c>Projectile.hostile</c>. <c>range</c> defaults to -1 and will be ignored if less than 0. <c>origin</c> defaults to the <c>Center</c> of this player.</remarks>
-		public bool DoDeflect(Rectangle targetArea, out bool caughtProjectile, OrchidModGuardianDeflectItem item = null, ModProjectile anchor = null, Predicate<NPC> EnemyPredicate = null, Predicate<Projectile> ProjPredicate = null, float range = -1, Vector2? origin = null, int? damage = null)
+		public bool DoDeflect(Rectangle targetArea, out bool caughtProjectile, out bool killedNPC, OrchidModGuardianDeflectItem item = null, ModProjectile anchor = null, Predicate<NPC> EnemyPredicate = null, Predicate<Projectile> ProjPredicate = null, float range = -1, Vector2? origin = null, int? damage = null)
 		{
 			Vector2 from = origin ?? Player.Center; 
 			caughtProjectile = false;
+			killedNPC = false;
 			bool success = false;
 			int dmg = GetGuardianDamage(damage ?? item?.Item.damage * item?.DeflectDamage ?? 0);
 			int crit = GetGuardianCrit(item?.Item.crit ?? 0);
@@ -1292,26 +1293,29 @@ namespace OrchidMod
 				return false;
 			
 			Predicate<NPC> NPCInRange;
-			if (range < 0) NPCInRange = new Predicate<NPC>(T => T.Hitbox.Intersects(targetArea));
-			else NPCInRange = new Predicate<NPC>(T => T.Hitbox.Intersects(targetArea) && T.Hitbox.ClosestPointInRect(from).Distance(from) <= range);
+			if (range < 0) NPCInRange = new Predicate<NPC>(T => T.Hitbox.Intersects(targetArea) || targetArea.Contains((T.Hitbox.ClosestPointInRect(from) + T.velocity * 5f).ToPoint()));
+			else NPCInRange = new Predicate<NPC>(T => (T.Hitbox.Intersects(targetArea) || targetArea.Contains((T.Hitbox.ClosestPointInRect(from) + T.velocity * 5f).ToPoint())) && (T.Hitbox.ClosestPointInRect(from).Distance(from) <= range || (T.Hitbox.ClosestPointInRect(from) + T.velocity * 5f).Distance(from) <= range));
 			foreach (NPC npc in Main.npc.Where(T => T.active && NPCInRange(T) && EnemyPredicate(T)))
 			{
 				if (item != null && !item.OnDeflectNPC(Player, this, npc, anchor)) continue;
 				if (dmg > 0)
 				{
+					NPCKillAttempt isKill = new(npc);
 					Player.ApplyDamageToNPC(npc, dmg, 0, npc.Center.X > from.X ? 1 : -1, Main.rand.Next(100) < crit, ModContent.GetInstance<GuardianDamageClass>(), true);
+					if (isKill.DidNPCDie()) killedNPC = true;
+					else DeflectedEnemies.Add(npc);
 				}
-				DeflectedEnemies.Add(npc);
+				else DeflectedEnemies.Add(npc);
 				success = true;
 			}
 			Predicate<Projectile> ProjInRange;
-			if (range < 0) ProjInRange = new Predicate<Projectile>(T => T.Hitbox.Intersects(targetArea) && !ProjectilesBlockBlacklist.Contains(T.type));
-			else ProjInRange = new Predicate<Projectile>(T => T.Hitbox.Intersects(targetArea) && !ProjectilesBlockBlacklist.Contains(T.type) && T.Hitbox.ClosestPointInRect(from).Distance(from) <= range);
-			foreach (Projectile proj in Main.projectile.Where(T => T.active && ProjInRange(T) && ProjPredicate(T)))
+			if (range < 0) ProjInRange = new Predicate<Projectile>(T => T.Hitbox.Intersects(targetArea) || targetArea.Contains((T.Hitbox.ClosestPointInRect(from) + T.velocity * 5f).ToPoint()));
+			else ProjInRange = new Predicate<Projectile>(T => (T.Hitbox.Intersects(targetArea) || targetArea.Contains((T.Hitbox.ClosestPointInRect(from) + T.velocity * 5f).ToPoint())) && (T.Hitbox.ClosestPointInRect(from).Distance(from) <= range || (T.Hitbox.ClosestPointInRect(from) + T.velocity * 5f).Distance(from) <= range));
+			foreach (Projectile proj in Main.projectile.Where(T => T.active && !ProjectilesBlockBlacklist.Contains(T.type) && ProjInRange(T) && ProjPredicate(T)))
 			{
 				if (proj.ModProjectile == anchor)
 				{
-					Main.NewText("A deflect weapon's anchor just attempted to deflect itself. Please report this!");
+					Main.NewText("A deflect weapon's anchor just attempted to deflect itself. Please report which weapon caused this and when!");
 					continue;
 				}
 				if (item == null || item.OnDeflectProjectile(Player, this, proj, anchor))

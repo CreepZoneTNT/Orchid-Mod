@@ -116,7 +116,7 @@ namespace OrchidMod.Content.Guardian
 		{
 			if (StunTimer > 0)
 			{
-				Color color = new Color(191, 191, 191, 63) * Math.Min(StunTimer / 30f, 1f);
+				Color color = new Color(191, 191, 191, 95) * Math.Min(StunTimer / 30f, 1f);
 				Vector2 origin = npc.Center - Vector2.UnitY * (npc.height / 2 + 10) - screenPos;
 				for (int i = 0; i < 3; i++)
 				{

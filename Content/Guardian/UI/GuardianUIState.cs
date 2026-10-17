@@ -187,11 +187,17 @@ namespace OrchidMod.Content.Guardian.UI
 				int offSetIcons = offSet;
 				for (int i = 0; i < modPlayer.GuardianGuardMax; i++)
 				{
+					bool check = modPlayer.GuardianGuard > i;
 					Texture2D texture = modPlayer.GuardianGuard > i ? textureBlockBarOn : textureBlockBarOff;
 					drawpos = new Vector2(position.X - offSet + (textureBlockBarOn.Width + 2) * i, position.Y);
-					spriteBatch.Draw(texture, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
-					bool check = modPlayer.GuardianGuard > i;
 					Vector2 drawposHighlight = new Vector2(position.X - offSet - 2 + 18 * i, position.Y - 2);
+					if (i < modPlayer.MissingGuardsUI)
+					{
+						float flash = 0.5f + (float)Math.Cos(modPlayer.MissingResourcesTimer * 0.28) * 0.5f;
+						spriteBatch.Draw(textureBlockBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * (1 - flash), 0f, Vector2.Zero, 1f, effect, 0f);
+						spriteBatch.Draw(texture, drawpos, null, check ? Color.White : new Color(1f, flash, flash), 0f, Vector2.Zero, 1f, effect, 0f);
+					}
+					else spriteBatch.Draw(texture, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
 					if (modPlayer.GuardCostUI > i)
 					{
 						spriteBatch.Draw(textureBlockBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * 0.8f, 0f, Vector2.Zero, 1f, effect, 0f);
@@ -217,7 +223,13 @@ namespace OrchidMod.Content.Guardian.UI
 					Texture2D texture = check ? textureSlamBarOn : textureSlamBarOff;
 					drawpos = new Vector2(position.X - offSet + 18 * i, position.Y + 18 * player.gravDir);
 					Vector2 drawposHighlight = new Vector2(position.X - offSet - 2 + 18 * i, position.Y + 16 * player.gravDir + 2f * (player.gravDir - 1));
-					spriteBatch.Draw(texture, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
+					if (i < modPlayer.MissingSlamsUI)
+					{
+						float flash = 0.5f + (float)Math.Cos(modPlayer.MissingResourcesTimer * 0.28) * 0.5f;
+						spriteBatch.Draw(textureSlamBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * (1 - flash), 0f, Vector2.Zero, 1f, effect, 0f);
+						spriteBatch.Draw(texture, drawpos, null, check ? Color.White : new Color(1f, flash, flash), 0f, Vector2.Zero, 1f, effect, 0f);
+					}
+					else spriteBatch.Draw(texture, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
 					if (modPlayer.SlamCostUI > i)
 					{
 						spriteBatch.Draw(textureSlamBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * 0.8f, 0f, Vector2.Zero, 1f, effect, 0f);

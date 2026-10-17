@@ -204,6 +204,7 @@ namespace OrchidMod.Content.Guardian
 						}
 						else
 						{
+							if (!guardian.UseGuard(GuardCost, true)) guardian.WarnMissingResources(GuardCost, 0);
 							anchor.ChangeState(4, 30, updateDelay: true);
 							guardian.OnAttack(AttackID.GreathammerWeakDeflect);
 						}

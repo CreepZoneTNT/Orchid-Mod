@@ -118,7 +118,7 @@
 	public static class AttackID
 	{
 		/// <summary> AttackInfo with Offense. </summary>
-		static readonly GuardianAttackInfo Bash = new(1); // free shield bash, uncharged hammer throw
+		static readonly GuardianAttackInfo Bash = new(1); // free shield bash, uncharged hammer throw, greathammer failed deflect
 		/// <summary> AttackInfo with Defense. </summary>
 		static readonly GuardianAttackInfo Defend = new(2); // parry resolve
 		/// <summary> AttackInfo with Guard. </summary>
@@ -128,19 +128,21 @@
 		/// <summary> AttackInfo with Defense and Guard. </summary>
 		static readonly GuardianAttackInfo Block = new(6); // shield block
 		/// <summary> AttackInfo with Offense, Defense, and Guard. </summary>
-		static readonly GuardianAttackInfo BlockAttack = new(7); // hammer block
+		static readonly GuardianAttackInfo BlockAttack = new(7); // hammer block, greathammer successful deflect
 		/// <summary> Attackinfo with Offense and Slam. </summary>
 		static readonly GuardianAttackInfo Slam = new(9); // shield slam, gauntlet slam
 		/// <summary> Attackinfo with Charged. </summary>
 		static readonly GuardianAttackInfo ChargedBuff = new(16); // rune charge, standard charge
 		/// <summary> Attackinfo with Offense and Charged. </summary>
-		static readonly GuardianAttackInfo Charged = new(17); // charged hammer throw, quarterstaff swing
+		static readonly GuardianAttackInfo Charged = new(17); // charged hammer throw, quarterstaff swing, charged greathammer throw
 		/// <summary> Attackinfo with Defense, Guard, and Charged. </summary>
 		static readonly GuardianAttackInfo ChargedBlock = new(22); // charged shield block
 		/// <summary> Attackinfo with Offense, Slam and Charged. </summary>
 		static readonly GuardianAttackInfo ChargedSlam = new(25); // charged gauntlet slam
 		/// <summary> Attackinfo with Offense and Jab. </summary>
 		static readonly GuardianAttackInfo Jab = new(33); // hammer swing, gauntlet jab, quarterstaff jab
+		/// <summary> Attackinfo with Offense, Slam, and Jab. </summary>
+		static readonly GuardianAttackInfo SlamJab = new(41); // katar slam, greathammer slam
 		/// <summary> Attackinfo with Reinforced. </summary>
 		static readonly GuardianAttackInfo ReinforcedBuff = new(48); // rune reinforce, standard reinforce
 		/// <summary> Attackinfo with Offense, Defense and Counter. </summary>
@@ -188,11 +190,19 @@
 		public static GuardianAttackInfo QuarterstaffGuard => Guard;
 		/// <inheritdoc cref="CounterDefend"/>
 		public static GuardianAttackInfo QuarterstaffCounter => CounterDefend;
-		/// <inheritdoc cref="KatarSlam"/>
-		public static GuardianAttackInfo KatarSlam => Slam;
+		/// <inheritdoc cref="SlamJab"/>
+		public static GuardianAttackInfo KatarSlam => SlamJab;
 		/// <inheritdoc cref="Charged"/>
 		public static GuardianAttackInfo KatarCharge => Charged;
 		/// <inheritdoc cref="GuardAttack"/>
 		public static GuardianAttackInfo KatarDash => GuardAttack;
+		/// <inheritdoc cref="Charged"/>
+		public static GuardianAttackInfo GreathammerCharge => Charged;
+		/// <inheritdoc cref="Slam"/>
+		public static GuardianAttackInfo GreathammerSlam => SlamJab;
+		/// <inheritdoc cref="BlockAttack"/>
+		public static GuardianAttackInfo GreathammerDeflect => BlockAttack;
+		/// <inheritdoc cref="Bash"/>
+		public static GuardianAttackInfo GreathammerWeakDeflect => Bash;
 	}
 }

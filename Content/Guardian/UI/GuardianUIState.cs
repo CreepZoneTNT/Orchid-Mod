@@ -312,7 +312,7 @@ namespace OrchidMod.Content.Guardian.UI
 
 				if (player.HeldItem.ModItem is OrchidModGuardianItem guardianItem)
 				{
-					if ((maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f)) && guardianItem is OrchidModGuardianHammer)
+					if ((maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f)) && guardianItem is OrchidModGuardianHammer or OrchidModGuardianGreathammer)
 					{
 						if (ModContent.GetInstance<OrchidClientConfig>().GuardianUseOldHammerUi)
 						{

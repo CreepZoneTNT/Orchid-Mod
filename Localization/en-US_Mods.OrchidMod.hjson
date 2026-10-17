@@ -267,6 +267,11 @@ Buffs: {
 		DisplayName: Flash Freezing
 		Description: Your next charged attack with the Frost Walker is expedited
 	}
+
+	GreathammerStunDebuff: {
+		DisplayName: Stunned
+		Description: Can't act after being hit with a giant hammer
+	}
 }
 
 AlchemistRecipe: {
@@ -2097,7 +2102,7 @@ Items: {
 	}
 
 	CorruptionWarhammer: {
-		DisplayName: Soul Crusher
+		DisplayName: Ancient Soul Crusher
 		Tooltip: ""
 	}
 
@@ -2630,7 +2635,7 @@ Items: {
 
 	Quarterstaff: {
 		DisplayName: Quarterstaff
-		Tooltip: Can be upgraded with torches
+		Tooltip: ""
 	}
 
 	HellboneMaterial: {
@@ -3288,8 +3293,8 @@ Items: {
 		Tooltip:
 			'''
 			[c/FF0000:Test Item]
-			Blows lingering bubbles on jab, up to 10
-			Charged attacks pop bubbles, potentially triggering a chain reaction
+			Jab is replaced by a powerful sweep
+			Fully charge while underwater to propel yourself to your cursor, ending in a massive full sweep attack
 			'''
 	}
 
@@ -3441,6 +3446,16 @@ Items: {
 	VerveineAltQuarterstaff: {
 		DisplayName: Wormsbane
 		Tooltip: Counterattacks release a cloud of ooze
+	}
+
+	CorruptionGreathammer: {
+		DisplayName: Soul Crusher
+		Tooltip: ""
+	}
+
+	ChlorophyteGreathammer: {
+		DisplayName: Chlorophyte Greataxe
+		Tooltip: ""
 	}
 }
 
@@ -3905,7 +3920,8 @@ Projectiles: {
 
 	ConsolariaLepusEggNestProjectile.DisplayName: Easter Egg
 	ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
-	ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Thorium Naga Quarterstaff Projectile Alt
+	GuardianGreathammerAnchor.DisplayName: Guardian Greathammer Anchor
+	GreathammerDeflectedProjectile.DisplayName: Greathammer Deflected Projectile
 }
 
 Configs: {

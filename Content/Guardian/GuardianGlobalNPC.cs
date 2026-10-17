@@ -116,14 +116,15 @@ namespace OrchidMod.Content.Guardian
 		{
 			if (StunTimer > 0)
 			{
-				Color color = new Color(191, 191, 191, 63) * Math.Min(StunTimer / 30f, 1f);
+				Color color = new Color(191, 191, 191, 95) * Math.Min(StunTimer / 30f, 1f);
 				Vector2 origin = npc.Center - Vector2.UnitY * (npc.height / 2 + 10) - screenPos;
+				float time = (float)(Main.timeForVisualEffects * (1 + Math.Sin(npc.whoAmI) * 0.1)); //appears random
 				for (int i = 0; i < 3; i++)
 				{
-					int frame = (StunTimer + i * 24) / 9 % 8;
+					int frame = ((int)time + i * 24) / 9 % 8;
 					SpriteEffects effect = frame > 5 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 					if (frame > 4) frame = 8 - frame;
-					Vector2 offs = Vector2.UnitX.RotatedBy(StunTimer * 0.08f - i * 2.0944f) * (10f + npc.width * 0.25f);
+					Vector2 offs = Vector2.UnitX.RotatedBy(time * 0.08f - i * 2.0944f) * (10f + npc.width * 0.25f);
 					offs.Y *= 0.3f;
 					spriteBatch.Draw(StunStarTexture, origin + offs, new Rectangle(12 * frame, 0, 10, 12), color, 0, new Vector2(5, 6), 1, effect, 0);
 				}

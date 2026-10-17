@@ -145,7 +145,7 @@ namespace OrchidMod.Content.Guardian
 					if (IsLocalOwner && Projectile.velocity.Length() > Projectile.Center.Distance(player.Center))
 					{
 						ChangeState(IdleAnim, 25, Projectile.velocity.ToRotation());
-						DoAnim(2, 0, player.Center, Extra);
+						DoAnim(2, 0, player.MountedCenter.Floor(), Extra);
 						Ding = false;
 						Projectile.extraUpdates = 0;
 						Projectile.localNPCHitCooldown = -1;
@@ -224,7 +224,7 @@ namespace OrchidMod.Content.Guardian
 						}
 						else
 						{
-							DoAnim(2, Progress(Anim, 25, 5), player.Center, Extra);
+							DoAnim(2, Progress(Anim, 25, 5), player.MountedCenter.Floor(), Extra);
 							Anim--;
 						}
 					}
@@ -232,11 +232,11 @@ namespace OrchidMod.Content.Guardian
 					{
 						if (Anim > 0) //tween from previous position if another animation just finished
 						{
-							TweenAnim(player.velocity.X == 0 ? 0 : 1, 0, 1 / (Anim + 1), player.Center);
+							TweenAnim(player.velocity.X == 0 ? 0 : 1, 0, 1 / (Anim + 1), player.MountedCenter.Floor());
 							Anim--;
 						}
 						else 
-							DoAnim(player.velocity.X == 0 ? 0 : 1, 0, player.Center);
+							DoAnim(player.velocity.X == 0 ? 0 : 1, 0, player.MountedCenter.Floor());
 					}
 				}
 				else
@@ -285,8 +285,10 @@ namespace OrchidMod.Content.Guardian
 								Projectile.friendly = true;
 								Projectile.ResetLocalNPCHitImmunity();
 								ResetHitStatus(true);
+								HitCount = 0;
 								Projectile.extraUpdates = 1;
-								Projectile.localNPCHitCooldown = HammerItem.ThrowHitCooldown * 2; //localnpchitcooldown is affected by extraupdates... idk if this is a tmodloader bug or something
+								if (HammerItem.ThrowHitCooldown > 0)
+									Projectile.localNPCHitCooldown = HammerItem.ThrowHitCooldown * 2; //localnpchitcooldown is affected by extraupdates... idk if this is a tmodloader bug or something
 								player.SetDummyItemTime(item.useTime);
 								if (HammerItem.PreSound(player, guardian, Projectile, true)) SoundEngine.PlaySound(SoundID.DD2_WyvernDiveDown.WithPitchOffset(-0.2f), player.Center);
 								guardian.OnAttack(AttackID.GreathammerCharge);
@@ -313,27 +315,40 @@ namespace OrchidMod.Content.Guardian
 								guardian.OnAttack(AttackID.GreathammerSlam);
 							}
 						}
+						else
+						{
+							Extra = guardian.GuardianItemCharge;
+						}
+					}
+					else
+					{
+						//do fake charging for remote clients
+						if (Extra < 210f)
+						{
+							Extra += 30f / HammerItem.Item.useTime * player.GetTotalAttackSpeed(DamageClass.Melee);
+							if (Extra > 210) Extra = 210;
+						}
 					}
 					if (IsCharging)
 					{
-						float chargeProgress = Progress(guardian.GuardianItemCharge, 0, 180);
+						float chargeProgress = Progress(Extra, 0, 180);
 						if (chargeProgress < 1f)
 						{
-							if (Anim > 0) TweenAnim(10, chargeProgress, 1 / (Anim + 2), player.Center);
-							else DoAnim(10, chargeProgress, player.Center);
+							if (Anim > 0) TweenAnim(10, chargeProgress, 1 / (Anim + 2), player.MountedCenter.Floor());
+							else DoAnim(10, chargeProgress, player.MountedCenter.Floor());
 						}
 						else
 						{
-							chargeProgress = Progress(guardian.GuardianItemCharge, 180, 210);
+							chargeProgress = Progress(Extra, 180, 210);
 							if (chargeProgress < 1f)
 							{
-								if (Anim > 0) TweenAnim(11, chargeProgress, 1 / (Anim + 1), player.Center);
-								else DoAnim(11, chargeProgress, player.Center);
+								if (Anim > 0) TweenAnim(11, chargeProgress, 1 / (Anim + 1), player.MountedCenter.Floor());
+								else DoAnim(11, chargeProgress, player.MountedCenter.Floor());
 							}
 							else
 							{
-								if (Anim > 0) TweenAnim(12, 0, Anim > 0 ? 1 / (Anim + 1) : 1, player.Center);
-								else DoAnim(12, 0, player.Center);
+								if (Anim > 0) TweenAnim(12, 0, Anim > 0 ? 1 / (Anim + 1) : 1, player.MountedCenter.Floor());
+								else DoAnim(12, 0, player.MountedCenter.Floor());
 							}
 						}
 						if (Anim > 0) Anim--;
@@ -346,11 +361,11 @@ namespace OrchidMod.Content.Guardian
 					{
 						case > 35:
 							//tween into animation start
-							TweenAnim(20, 0, Progress(Anim, 40, 35), player.Center);
+							TweenAnim(20, 0, Progress(Anim, 40, 35), player.MountedCenter.Floor());
 						break;
 						case > 25:
 							//attack
-							DoAnim(21, Progress(Anim, 35, 25), player.Center);
+							DoAnim(21, Progress(Anim, 35, 25), player.MountedCenter.Floor());
 							if (!Projectile.friendly)
 							{
 								if (HammerItem.PreSound(player, guardian, Projectile, false)) SoundEngine.PlaySound(SoundID.DD2_MonkStaffSwing.WithPitchOffset(-0.5f), player.Center);
@@ -359,18 +374,18 @@ namespace OrchidMod.Content.Guardian
 						break;
 						case > 0:
 							//recovery
-							DoAnim(22, Progress(Anim, 25, 0), player.Center);
+							DoAnim(22, Progress(Anim, 25, 0), player.MountedCenter.Floor());
 							Projectile.friendly = false;
 						break;
 						case <= 0:
-							ChangeState(Charging, guardian.GuardianItemCharge < 210 ? 20 : 5, quiet: true);
+							ChangeState(Charging, guardian.GuardianItemCharge < 210 ? 20 : 5, guardian.GuardianItemCharge, quiet: true);
 						break;
 					}
 				}
 				if (IsStrongDeflecting)
 				{
 					//animation wip
-					DoAnim(30, Progress(Anim, 30, 0), player.Center);
+					DoAnim(30, Progress(Anim, 30, 0), player.MountedCenter.Floor());
 					Anim--;
 					if (Anim <= 0)
 					{
@@ -381,7 +396,7 @@ namespace OrchidMod.Content.Guardian
 				if (IsWeakDeflecting)
 				{
 					//animation wip
-					DoAnim(30, Progress(Anim, 30, 0), player.Center);
+					DoAnim(40, Progress(Anim, 30, 0), player.MountedCenter.Floor());
 					Anim--;
 					if (Anim <= 0)
 					{
@@ -474,6 +489,13 @@ namespace OrchidMod.Content.Guardian
 				break;
 				case 32: //deflect recovery
 				break;
+
+				case 40: //failed deflect
+					sin = (float)Math.Sin(progress * 2 - 0.4);
+					cos = (float)Math.Cos(progress * 3);
+					Projectile.rotation = -MathHelper.PiOver2 + (1.5f - sin) * Projectile.spriteDirection;
+					Projectile.Center = center + new Vector2(cos * -10 * Projectile.spriteDirection, sin * -6);
+				break;
 			}
 		}
 
@@ -494,14 +516,18 @@ namespace OrchidMod.Content.Guardian
 			//re-apply line's rotation to offset and add to line position to get world coordinates
 			hand = Projectile.Center + hand.RotatedBy(Projectile.rotation);
 
-			/*Dust dust = Dust.NewDustPerfect(shoulder, DustID.TheDestroyer);
-			dust.velocity = Vector2.Zero;
-			dust.scale = 0.5f;
-			dust.noGravity = true;
-			dust = Dust.NewDustPerfect(hand, DustID.PurpleCrystalShard);
-			dust.velocity = Vector2.Zero;
-			dust.scale = 0.5f;
-			dust.noGravity = true;*/
+			bool debug = Main.player[Projectile.owner].GetModPlayer<OrchidGuardian>().GuardianDebugVisuals > 0;
+			if (debug)
+			{
+				Dust dust = Dust.NewDustPerfect(shoulder, DustID.TheDestroyer);
+				dust.velocity = Vector2.Zero;
+				dust.scale = 0.5f;
+				dust.noGravity = true;
+				dust = Dust.NewDustPerfect(hand, DustID.PurpleCrystalShard);
+				dust.velocity = Vector2.Zero;
+				dust.scale = 0.5f;
+				dust.noGravity = true;
+			}
 
 			float stretch = shoulder.Distance(hand);
 			float angle = shoulder.AngleTo(hand) - MathHelper.PiOver2;
@@ -509,11 +535,14 @@ namespace OrchidMod.Content.Guardian
 			{
 				hand -= (Vector2.UnitX * Projectile.spriteDirection - Vector2.UnitX.RotatedBy(angle) * Projectile.spriteDirection) * 5f;
 				angle = shoulder.AngleTo(hand) - MathHelper.PiOver2;
-
-				/*dust = Dust.NewDustPerfect(hand, DustID.GemSapphire);
-				dust.velocity = Vector2.Zero;
-				dust.scale = 0.5f;
-				dust.noGravity = true;*/
+			
+				if (debug)
+				{
+					Dust dust = Dust.NewDustPerfect(hand, DustID.GemSapphire);
+					dust.velocity = Vector2.Zero;
+					dust.scale = 0.5f;
+					dust.noGravity = true;
+				}
 			}
 
 			return stretch switch
@@ -563,7 +592,7 @@ namespace OrchidMod.Content.Guardian
 			{
 				if (HitCount > 0)
 				{
-					modifiers.FinalDamage *= 1 - HitCount / 10;
+					modifiers.FinalDamage *= 1 - HitCount / 10f;
 				}
 			}
 			else if (FirstHit && IsSlamming)

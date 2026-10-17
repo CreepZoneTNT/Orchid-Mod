@@ -38,6 +38,10 @@ namespace OrchidMod.Content.Guardian.UI
 		public static Texture2D textureHammerOff;
 		public static Texture2D textureHammerReady;
 
+		public static Texture2D textureGreathammerOn;
+		public static Texture2D textureGreathammerOff;
+		public static Texture2D textureGreathammerReady;
+
 		public static Texture2D textureGauntletOn;
 		public static Texture2D textureGauntletOff;
 		public static Texture2D textureGauntletReady;
@@ -136,6 +140,10 @@ namespace OrchidMod.Content.Guardian.UI
 			textureHammerOn = ModContent.Request<Texture2D>(path + "HammerOn", AssetRequestMode.ImmediateLoad).Value;
 			textureHammerOff = ModContent.Request<Texture2D>(path + "HammerOff", AssetRequestMode.ImmediateLoad).Value;
 			textureHammerReady = ModContent.Request<Texture2D>(path + "HammerReady", AssetRequestMode.ImmediateLoad).Value;
+
+			textureGreathammerOn = ModContent.Request<Texture2D>(path + "GreathammerOn", AssetRequestMode.ImmediateLoad).Value;
+			textureGreathammerOff = ModContent.Request<Texture2D>(path + "GreathammerOff", AssetRequestMode.ImmediateLoad).Value;
+			textureGreathammerReady = ModContent.Request<Texture2D>(path + "GreathammerReady", AssetRequestMode.ImmediateLoad).Value;
 
 			textureHorizonLanceOn = ModContent.Request<Texture2D>(path + "HorizonLanceOn", AssetRequestMode.ImmediateLoad).Value;
 			textureHorizonLanceOff = ModContent.Request<Texture2D>(path + "HorizonLanceOff", AssetRequestMode.ImmediateLoad).Value;
@@ -312,7 +320,7 @@ namespace OrchidMod.Content.Guardian.UI
 
 				if (player.HeldItem.ModItem is OrchidModGuardianItem guardianItem)
 				{
-					if ((maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f)) && guardianItem is OrchidModGuardianHammer or OrchidModGuardianGreathammer)
+					if ((maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f)) && guardianItem is OrchidModGuardianHammer)
 					{
 						if (ModContent.GetInstance<OrchidClientConfig>().GuardianUseOldHammerUi)
 						{
@@ -440,6 +448,13 @@ namespace OrchidMod.Content.Guardian.UI
 						chargeTextureOn = textureBlockOn;
 						chargeTextureOff = textureBlockOff;
 						chargeTextureReady = textureBlockReady;
+					}
+
+					if (guardianItem is OrchidModGuardianGreathammer greathammer && (maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - (player.HeldItem.useTime * greathammer.WaitChargeGain)) / 2.5f)))
+					{
+						chargeTextureOn = textureGreathammerOn;
+						chargeTextureOff = textureGreathammerOff;
+						chargeTextureReady = textureGreathammerReady;
 					}
 
 					// Parry duration display on standard weapons

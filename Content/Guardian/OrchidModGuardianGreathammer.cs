@@ -179,32 +179,32 @@ namespace OrchidMod.Content.Guardian
 				{
 					if (chargeInput)
 					{ //do charge
-						anchor.ChangeState(1, 5);
+						anchor.ChangeState(1, 5, updateDelay: true);
 					}
 					else if (swingInput)
 					{ //do deflect
 						int size = 120;
 						Rectangle hitbox = new((int)player.Center.X, (int)player.Center.Y - size / 2, size / 3 * 2, size);
-						if (projectile.spriteDirection == -1) hitbox.X -= size;
-						if (guardian.UseGuard(GuardCost, true) && guardian.DoDeflect(hitbox, out bool caughtProjectile, out bool killedNPC, this, anchor))
+						if (projectile.spriteDirection == -1) hitbox.X -= hitbox.Width;
+						if (guardian.UseGuard(GuardCost, true) && guardian.DoDeflect(hitbox, out bool caughtProjectile, out bool killedNPC, this, anchor, lenience: 5f))
 						{
 							guardian.UseGuard(GuardCost);
 							guardian.AddSlam(GuardCost);
-							anchor.ChangeState(3, 30);
+							anchor.ChangeState(3, 30, updateDelay: true);
 							SoundEngine.PlaySound(SoundID.Item52, player.Center);
 							guardian.OnAttack(AttackID.GreathammerDeflect);
 							if (guardian.DeflectedEnemies.Count() > 0) SoundEngine.PlaySound(SoundID.Item110.WithPitchOffset(-0.3f), player.Center);
-							if (OnDeflect(player, guardian, projectile, anchor, caughtProjectile, killedNPC))
+							if (GreathammerPostDeflect(player, guardian, projectile, anchor, caughtProjectile, killedNPC))
 							{
 								foreach (NPC npc in guardian.DeflectedEnemies)
 								{
-									npc.AddBuff(BuffType<GreathammerStunDebuff>(), 90);
+									npc.AddBuff(BuffType<GreathammerStunDebuff>(), 120);
 								}
 							}
 						}
 						else
 						{
-							anchor.ChangeState(4, 30);
+							anchor.ChangeState(4, 30, updateDelay: true);
 							guardian.OnAttack(AttackID.GreathammerWeakDeflect);
 						}
 					}
@@ -214,11 +214,11 @@ namespace OrchidMod.Content.Guardian
 		}
 
 		/// <summary>Handles behavior after a deflect. Projectiles caught have been killed and the player's <c>OrchidGuardian.DeflectedEnemies</c> has been populated. Return true to stun enemies hit by the deflect. Remember if overriding to spawn a projectile for caughtProjectile. Returns true by default.</summary>
-		public bool OnDeflect(Player player, OrchidGuardian guardian, Projectile projectile, GuardianGreathammerAnchor anchor, bool caughtProjectile, bool killedNPC)
+		public bool GreathammerPostDeflect(Player player, OrchidGuardian guardian, Projectile projectile, GuardianGreathammerAnchor anchor, bool caughtProjectile, bool killedNPC)
 		{
 			if (caughtProjectile || killedNPC)
 			{
-				Vector2 vel = player.Center.DirectionTo(Main.MouseWorld) * 8f;
+				Vector2 vel = player.Center.DirectionTo(Main.MouseWorld) * 10f;
 				Projectile deflectProj = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center + vel * 4, vel, ProjectileType<GreathammerDeflectedProjectile>(), guardian.GetGuardianDamage(Item.damage), Item.knockBack, player.whoAmI);
 				deflectProj.CritChance = guardian.GetGuardianCrit(Item.crit);
 				if (PreSound(player, guardian, projectile, false)) SoundEngine.PlaySound(SoundID.DD2_SkyDragonsFuryShot, player.Center);

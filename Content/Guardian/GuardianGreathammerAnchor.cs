@@ -315,10 +315,23 @@ namespace OrchidMod.Content.Guardian
 								guardian.OnAttack(AttackID.GreathammerSlam);
 							}
 						}
+						else
+						{
+							Extra = guardian.GuardianItemCharge;
+						}
+					}
+					else
+					{
+						//do fake charging for remote clients
+						if (Extra < 210f)
+						{
+							Extra += 30f / HammerItem.Item.useTime * player.GetTotalAttackSpeed(DamageClass.Melee);
+							if (Extra > 210) Extra = 210;
+						}
 					}
 					if (IsCharging)
 					{
-						float chargeProgress = Progress(guardian.GuardianItemCharge, 0, 180);
+						float chargeProgress = Progress(Extra, 0, 180);
 						if (chargeProgress < 1f)
 						{
 							if (Anim > 0) TweenAnim(10, chargeProgress, 1 / (Anim + 2), player.MountedCenter.Floor());
@@ -326,7 +339,7 @@ namespace OrchidMod.Content.Guardian
 						}
 						else
 						{
-							chargeProgress = Progress(guardian.GuardianItemCharge, 180, 210);
+							chargeProgress = Progress(Extra, 180, 210);
 							if (chargeProgress < 1f)
 							{
 								if (Anim > 0) TweenAnim(11, chargeProgress, 1 / (Anim + 1), player.MountedCenter.Floor());
@@ -365,7 +378,7 @@ namespace OrchidMod.Content.Guardian
 							Projectile.friendly = false;
 						break;
 						case <= 0:
-							ChangeState(Charging, guardian.GuardianItemCharge < 210 ? 20 : 5, quiet: true);
+							ChangeState(Charging, guardian.GuardianItemCharge < 210 ? 20 : 5, guardian.GuardianItemCharge, quiet: true);
 						break;
 					}
 				}
@@ -383,7 +396,7 @@ namespace OrchidMod.Content.Guardian
 				if (IsWeakDeflecting)
 				{
 					//animation wip
-					DoAnim(30, Progress(Anim, 30, 0), player.MountedCenter.Floor());
+					DoAnim(40, Progress(Anim, 30, 0), player.MountedCenter.Floor());
 					Anim--;
 					if (Anim <= 0)
 					{
@@ -503,14 +516,18 @@ namespace OrchidMod.Content.Guardian
 			//re-apply line's rotation to offset and add to line position to get world coordinates
 			hand = Projectile.Center + hand.RotatedBy(Projectile.rotation);
 
-			/*Dust dust = Dust.NewDustPerfect(shoulder, DustID.TheDestroyer);
-			dust.velocity = Vector2.Zero;
-			dust.scale = 0.5f;
-			dust.noGravity = true;
-			dust = Dust.NewDustPerfect(hand, DustID.PurpleCrystalShard);
-			dust.velocity = Vector2.Zero;
-			dust.scale = 0.5f;
-			dust.noGravity = true;*/
+			bool debug = Main.player[Projectile.owner].GetModPlayer<OrchidGuardian>().GuardianDebugVisuals > 0;
+			if (debug)
+			{
+				Dust dust = Dust.NewDustPerfect(shoulder, DustID.TheDestroyer);
+				dust.velocity = Vector2.Zero;
+				dust.scale = 0.5f;
+				dust.noGravity = true;
+				dust = Dust.NewDustPerfect(hand, DustID.PurpleCrystalShard);
+				dust.velocity = Vector2.Zero;
+				dust.scale = 0.5f;
+				dust.noGravity = true;
+			}
 
 			float stretch = shoulder.Distance(hand);
 			float angle = shoulder.AngleTo(hand) - MathHelper.PiOver2;
@@ -518,11 +535,14 @@ namespace OrchidMod.Content.Guardian
 			{
 				hand -= (Vector2.UnitX * Projectile.spriteDirection - Vector2.UnitX.RotatedBy(angle) * Projectile.spriteDirection) * 5f;
 				angle = shoulder.AngleTo(hand) - MathHelper.PiOver2;
-
-				/*dust = Dust.NewDustPerfect(hand, DustID.GemSapphire);
-				dust.velocity = Vector2.Zero;
-				dust.scale = 0.5f;
-				dust.noGravity = true;*/
+			
+				if (debug)
+				{
+					Dust dust = Dust.NewDustPerfect(hand, DustID.GemSapphire);
+					dust.velocity = Vector2.Zero;
+					dust.scale = 0.5f;
+					dust.noGravity = true;
+				}
 			}
 
 			return stretch switch

@@ -300,20 +300,17 @@ namespace OrchidMod.Content.Guardian
 							}
 							guardian.GuardianItemCharge = 0;
 						}
-						else if (swingInput)
+						else if (swingInput && guardian.UseSlam())
 						{
-							if (guardian.UseSlam())
-							{
-								Item item = HammerItem.Item;
-								Projectile.damage = guardian.GetGuardianDamage(item.damage * HammerItem.SlamDamage);
-								Projectile.CritChance = guardian.GetGuardianCrit(item.crit);
-								Projectile.knockBack = item.knockBack;
-								//not set to friendly until animation reaches the attack
-								ChangeState(Slamming, 40);
-								Projectile.ResetLocalNPCHitImmunity();
-								ResetHitStatus(true);
-								guardian.OnAttack(AttackID.GreathammerSlam);
-							}
+							Item item = HammerItem.Item;
+							Projectile.damage = guardian.GetGuardianDamage(item.damage * HammerItem.SlamDamage);
+							Projectile.CritChance = guardian.GetGuardianCrit(item.crit);
+							Projectile.knockBack = item.knockBack;
+							//not set to friendly until animation reaches the attack
+							ChangeState(Slamming, 40);
+							Projectile.ResetLocalNPCHitImmunity();
+							ResetHitStatus(true);
+							guardian.OnAttack(AttackID.GreathammerSlam);
 						}
 						else
 						{
@@ -408,9 +405,9 @@ namespace OrchidMod.Content.Guardian
 				//handle arms
 				float offset = new Vector2(4 * Projectile.spriteDirection, 0).RotatedBy(Projectile.rotation).X;
 				if (Math.Abs(offset) > 1) offset /= Math.Abs(offset);
-				player.compositeFrontArm = GetArmData(player.MountedCenter + new Vector2(player.direction * -8, 0), -10 * offset, true);
+				player.compositeFrontArm = GetArmData(player.MountedCenter.Floor() + new Vector2(player.direction * -8, 0), -10 * offset, true);
 				if (Mode != 0 || player.bodyFrame.Y != 0) //looks better with back arm in the default position if idle
-					player.compositeBackArm = GetArmData(player.MountedCenter + new Vector2(player.direction * 8, 0), 10 * offset);
+					player.compositeBackArm = GetArmData(player.MountedCenter.Floor() + new Vector2(player.direction * 8, 0), 10 * offset);
 			}
 		}
 

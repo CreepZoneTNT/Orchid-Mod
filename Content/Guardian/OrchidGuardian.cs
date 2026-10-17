@@ -131,6 +131,12 @@ namespace OrchidMod.Content.Guardian
 		public int SlamCostUI = 0; // 
 		/// <summary> Displays an outline around slams in the UI if > 0.</summary>
 		public int GuardCostUI = 0; // Displays an outline around slams in the UI if > 0
+		/// <summary>Causes this number amount of guards to flash red on the UI.</summary>
+		public int MissingGuardsUI = 0;
+		/// <summary>Causes this number amount of slams to flash red on the UI.</summary>
+		public int MissingSlamsUI = 0;
+		/// <summary>How long until MissingGuardsUI and MissingSlamsUI is cleared.</summary>
+		public int MissingResourcesTimer = 0;
 		public int ChargeHoldTimer; // Timer (in frames) since GuardianItemCharge has been >0 
 		/// <summary> Allows the player to trigger counterattack effects. Set when able to use an item that has counterattack effects. Use GuardianCounterTime to check for counterattack eligibility. </summary>
 		public bool GuardianCounter;
@@ -552,6 +558,16 @@ namespace OrchidMod.Content.Guardian
 			}
 			else GuardianCounterTime = 0;
 
+			if (MissingResourcesTimer > 0)
+			{
+				MissingResourcesTimer--;
+				if (MissingResourcesTimer <= 0)
+				{
+					MissingGuardsUI = 0;
+					MissingSlamsUI = 0;
+				}
+			}
+
 			GuardianDisplayUI--;
 
 			for (int i = GuardianBlockedEnemies.Count - 1; i >= 0; i--)
@@ -937,9 +953,23 @@ namespace OrchidMod.Content.Guardian
 				int projectileType = OrchidMod.ThoriumMod.Find<ModProjectile>("HealerShield").Type;
 				Projectile.NewProjectile(Player.GetSource_FromThis(), lowestHealthPlayer.Center, Vector2.Zero, projectileType, 0, 0.0f, Player.whoAmI, 5f, 10f, 0.0f);
 			}
+			if (MissingResourcesTimer > 0)
+			{
+				MissingResourcesTimer = 0;
+				MissingGuardsUI = 0;
+				MissingSlamsUI = 0;
+			}
 		}
 
-		public void OnUseGuard() {}
+		public void OnUseGuard()
+		{
+			if (MissingResourcesTimer > 0)
+			{
+				MissingResourcesTimer = 0;
+				MissingGuardsUI = 0;
+				MissingSlamsUI = 0;
+			}
+		}
 
 		public void AddSlam(int nb = 1)
 		{
@@ -1546,6 +1576,33 @@ namespace OrchidMod.Content.Guardian
 			}
 			if (success) item?.PostDeflect(Player, this, anchor, caughtProjectile, killedNPC);
 			return success;
+		}
+
+		/// <summary>Highlights that the player is missing resources. The number of guards or slams specified will flash red for the time specified, and text will optionally be displayed for which one the player doesn't have enough of.</summary>
+		public void WarnMissingResources(int guards, int slams, int time = 45, bool playSound = true, bool spawnText = true)
+		{
+			if (MissingGuardsUI != guards || MissingSlamsUI != slams)
+			{
+				if (playSound) SoundEngine.PlaySound(SoundID.NPCHit42);
+				if (spawnText)
+				{
+					if (guards > GuardianGuard && slams > GuardianSlam)
+						CombatText.NewText(Player.Hitbox, Color.Red, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingGuardsAndSlams"), false, true);
+					else if (guards > GuardianGuard)
+						CombatText.NewText(Player.Hitbox, Color.Red, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingGuards"), false, true);
+					else if (slams > GuardianSlam)
+						CombatText.NewText(Player.Hitbox, Color.Red, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingSlams"), false, true);
+					else //what is the player even being warned for
+					{
+						SoundEngine.PlaySound(SoundID.Item150);
+						CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "you're playing it wrong give me the controller");
+					}
+				}
+			}
+			else if (playSound) SoundEngine.PlaySound(SoundID.NPCHit42.WithVolumeScale(0.5f));
+			MissingGuardsUI = guards;
+			MissingSlamsUI = slams;
+			MissingResourcesTimer = time;
 		}
 
 		public int ThrowLevel()

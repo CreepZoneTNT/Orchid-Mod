@@ -156,6 +156,7 @@ namespace OrchidMod.Content.Guardian
 								}
 								else
 								{
+									guardian.WarnMissingResources(0, 1);
 									shield.WeakSlam = true;
 									SoundEngine.PlaySound(Item.UseSound.Value.WithPitchOffset(Main.rand.NextFloat(-0.5f, -0.25f)).WithVolumeScale(0.5f), player.Center);
 								}

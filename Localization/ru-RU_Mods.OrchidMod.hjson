@@ -261,6 +261,11 @@ Buffs: {
 		// Description: Void Rush
 		// DisplayName: 150% increased Flux Ripper attack speed
 	}
+
+	GreathammerStunDebuff: {
+		// DisplayName: Stunned
+		// Description: Can't act after being hit with a giant hammer
+	}
 }
 
 AlchemistRecipe: {
@@ -3435,6 +3440,16 @@ Items: {
 		// DisplayName: Wormsbane
 		// Tooltip: Counterattacks release a cloud of ooze
 	}
+
+	CorruptionGreathammer: {
+		// DisplayName: Soul Crusher
+		// Tooltip: ""
+	}
+
+	ChlorophyteGreathammer: {
+		// DisplayName: Chlorophyte Greataxe
+		// Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -3897,6 +3912,8 @@ Projectiles: {
 	// GuardianDoubleHammerAnchor.DisplayName: Dual Warhammers
 	// ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
 	// ConsolariaLepusEggNestProjectile.DisplayName: Consolaria Lepus Egg Nest Projectile
+	// GuardianGreathammerAnchor.DisplayName: Guardian Greathammer Anchor
+	// GreathammerDeflectedProjectile.DisplayName: Greathammer Deflected Projectile
 }
 
 Configs: {

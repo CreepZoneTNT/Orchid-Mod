@@ -127,6 +127,8 @@ namespace OrchidMod
 		public bool GuardianCounterHorizon;
 		public int GuardianShieldSpikeReflect = 5; // Shgield spikes only fire a projectile if this is >0
 		public List<BlockedEnemy> GuardianBlockedEnemies = new List<BlockedEnemy>();
+		/// <summary>Enemies deflected by the player's last <c>DoDeflect</c>. Cleared and repopulated when <c>DoDeflect</c> is called.</summary>
+		public List<NPC> DeflectedEnemies = new List<NPC>();
 		public List<Projectile> RuneProjectiles = new List<Projectile>();
 		public Projectile GuardianCurrentStandardAnchor;
 		public float GauntletSlamPool = 0f; // How much slam charge will be granted by hitting the next punch
@@ -1272,6 +1274,55 @@ namespace OrchidMod
 			{
 				CombatText.NewText(new Rectangle((int)Player.Center.X, Player.Hitbox.Y, 0, 0), Color.White, GuardianTest.AttackTypeString(info) + " (" + (byte)info + ")");
 			}
+		}
+
+		/// <summary>If <c>item</c> is null or <c>item.PreDeflect</c>, returns true, performs a deflect. Any enemies or blockable projectiles intersecting a point in <c>targetArea</c> within <c>range</c> distance of <c>origin</c> and matching <c>EnemyPredicate</c> or <c>ProjPredicate</c> respectively will be deflected, caching enemies in the player's <c>DeflectedEnemies</c> and deleting projectiles. Returns <c>true</c> if a deflect occurred, and flags <c>caughtProjectile</c> if at least one projectile was deflected.</summary>
+		/// <remarks>Fields left default will be treated with default behavior. <c>item</c> functions will not be called if <c>null</c>. The default <c>Predicate</c>s will check only for <c>!NPC.friendly</c> or <c>Projectile.hostile</c>. <c>range</c> defaults to -1 and will be ignored if less than 0. <c>origin</c> defaults to the <c>Center</c> of this player.</remarks>
+		public bool DoDeflect(Rectangle targetArea, out bool caughtProjectile, OrchidModGuardianDeflectItem item = null, ModProjectile anchor = null, Predicate<NPC> EnemyPredicate = null, Predicate<Projectile> ProjPredicate = null, float range = -1, Vector2? origin = null, int? damage = null)
+		{
+			Vector2 from = origin ?? Player.Center; 
+			caughtProjectile = false;
+			bool success = false;
+			int dmg = GetGuardianDamage(damage ?? item?.Item.damage * item?.DeflectDamage ?? 0);
+			int crit = GetGuardianCrit(item?.Item.crit ?? 0);
+			DeflectedEnemies.Clear();
+			EnemyPredicate ??= new Predicate<NPC>(T => !T.friendly);
+			ProjPredicate ??= new Predicate<Projectile>(T => T.hostile);
+			if (!item.PreDeflect(ref targetArea, ref success, ref caughtProjectile, anchor, ref EnemyPredicate, ref ProjPredicate, ref range, ref from, ref dmg))
+				return false;
+			
+			Predicate<NPC> NPCInRange;
+			if (range < 0) NPCInRange = new Predicate<NPC>(T => T.Hitbox.Intersects(targetArea));
+			else NPCInRange = new Predicate<NPC>(T => T.Hitbox.Intersects(targetArea) && T.Hitbox.ClosestPointInRect(from).Distance(from) <= range);
+			foreach (NPC npc in Main.npc.Where(T => T.active && NPCInRange(T) && EnemyPredicate(T)))
+			{
+				if (item != null && !item.OnDeflectNPC(Player, this, npc, anchor)) continue;
+				if (dmg > 0)
+				{
+					Player.ApplyDamageToNPC(npc, dmg, 0, npc.Center.X > from.X ? 1 : -1, Main.rand.Next(100) < crit, ModContent.GetInstance<GuardianDamageClass>(), true);
+				}
+				DeflectedEnemies.Add(npc);
+				success = true;
+			}
+			Predicate<Projectile> ProjInRange;
+			if (range < 0) ProjInRange = new Predicate<Projectile>(T => T.Hitbox.Intersects(targetArea) && !ProjectilesBlockBlacklist.Contains(T.type));
+			else ProjInRange = new Predicate<Projectile>(T => T.Hitbox.Intersects(targetArea) && !ProjectilesBlockBlacklist.Contains(T.type) && T.Hitbox.ClosestPointInRect(from).Distance(from) <= range);
+			foreach (Projectile proj in Main.projectile.Where(T => T.active && ProjInRange(T) && ProjPredicate(T)))
+			{
+				if (proj.ModProjectile == anchor)
+				{
+					Main.NewText("A deflect weapon's anchor just attempted to deflect itself. Please report this!");
+					continue;
+				}
+				if (item == null || item.OnDeflectProjectile(Player, this, proj, anchor))
+				{
+					proj.Kill();
+					caughtProjectile = true;
+					success = true;
+				}
+			}
+			if (success) item.PostDeflect(Player, this, anchor, caughtProjectile);
+			return success;
 		}
 
 		public int ThrowLevel()

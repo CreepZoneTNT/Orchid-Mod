@@ -2242,7 +2242,11 @@ Items: {
 
 	TinStandard: {
 		DisplayName: Tin Standard
-		Tooltip: "{$Items.CopperStandard.Tooltip}"
+		Tooltip:
+			'''
+			Fully charging increases defense by 4
+			When reinforced, increases maximum guards and slams by 1 and slowly regenerates them
+			'''
 	}
 
 	PirateStandard: {
@@ -3409,11 +3413,7 @@ Items: {
 
 	VampireWarhammer: {
 		DisplayName: Vampire Slayer
-		Tooltip:
-			'''
-			Blocking or fully charging throws a short-lived piercing cross that blocks
-			'Die, monster!'
-			'''
+		Tooltip: Guarding or fully charging throws a returning cross that blocks attackers
 		InstantChargeText: Die, monster!
 	}
 
@@ -3447,7 +3447,7 @@ Items: {
 
 	ChlorophyteGreathammer: {
 		DisplayName: Chlorophyte Greataxe
-		Tooltip: ""
+		Tooltip: Rapidly cleaves
 	}
 }
 
@@ -4158,6 +4158,13 @@ UI: {
 		BuffDuration: "{0} second buff duration"
 		HorizonLaceShieldStacks: Grants 3 guards when fully charged
 		DamageOfDefense: Deals {0}% of defense as opposing damage
+		Deflect: "{0} click to deflect enemies and projectiles"
+		GreathammerDeflect: "{0} click to deflect, stunning enemies and reflecting projectiles"
+		DeflectGrants: Successful deflects cost {0} {^0:guard;guards} and grant {0} {^0:slam;slams}
+		SlamChargeToThrow: Charge to throw, {0} click to slam while charging
+		MissingGuards: Not enough guards!
+		MissingSlams: Not enough slams!
+		MissingGuardsAndSlams: Not enough guards or slams!
 	}
 
 	DanserItem: {

@@ -3410,11 +3410,7 @@ Items: {
 
 	VampireWarhammer: {
 		// DisplayName: Vampire Slayer
-		/* Tooltip:
-			'''
-			Blocking or fully charging throws a short-lived piercing cross that blocks
-			'Die, monster!'
-			''' */
+		// Tooltip: Guarding or fully charging throws a returning cross that blocks attackers
 		// InstantChargeText: Die, monster!
 	}
 
@@ -3448,7 +3444,7 @@ Items: {
 
 	ChlorophyteGreathammer: {
 		// DisplayName: Chlorophyte Greataxe
-		// Tooltip: ""
+		// Tooltip: Rapidly cleaves
 	}
 }
 
@@ -4179,6 +4175,13 @@ UI: {
 		BuffDuration: Длительность эффекта: {0} сек.
 		HorizonLaceShieldStacks: Даёт 3 оч. обороны при полном заряде
 		DamageOfDefense: Наносит противостоящий урон, равный {0}% от вашей защиты
+		// Deflect: "{0} click to deflect enemies and projectiles"
+		// GreathammerDeflect: "{0} click to deflect, stunning enemies and reflecting projectiles"
+		// DeflectGrants: Successful deflects cost {0} {^0:guard;guards} and grant {0} {^0:slam;slams}
+		// SlamChargeToThrow: Charge to throw, {0} click to slam while charging
+		// MissingGuards: Not enough guards!
+		// MissingSlams: Not enough slams!
+		// MissingGuardsAndSlams: Not enough guards or slams!
 	}
 
 	DanserItem: {

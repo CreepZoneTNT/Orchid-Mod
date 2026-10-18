@@ -830,12 +830,6 @@ namespace OrchidMod
 					GuardianSlam += nb2;
 					GuardianSlamRecharging = 0;
 					SoundEngine.PlaySound(SoundID.Item56, Player.Center);
-
-					while (nb > 0)
-					{
-						nb--;
-						OnUseSlam();
-					}
 				}
 				else return true;
 			}
@@ -894,12 +888,6 @@ namespace OrchidMod
 					GuardianGuard += nb2;
 					GuardianGuardRecharging = 0;
 					SoundEngine.PlaySound(SoundID.Item56, Player.Center);
-
-					while (nb > 0)
-					{
-						nb--;
-						OnUseGuard();
-					}
 				}
 				else return true;
 			}

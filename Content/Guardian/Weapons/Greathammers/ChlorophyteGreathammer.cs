@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using OrchidMod.Content.Guardian.Weapons.Warhammers;
+using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -7,12 +8,18 @@ namespace OrchidMod.Content.Guardian.Weapons.Greathammers
 {
 	public class ChlorophyteGreathammer : OrchidModGuardianGreathammer
 	{
+		public override void SetStaticDefaults()
+		{
+			ItemID.Sets.ShimmerTransformToItem[Type] = ModContent.ItemType<ChlorophyteWarhammer>();
+			ItemID.Sets.ShimmerTransformToItem[ModContent.ItemType<ChlorophyteWarhammer>()] = Type;
+		}
+
 		public override void SafeSetDefaults()
 		{
 			Item.width = 38;
 			Item.height = 36;
-			Item.value = Item.sellPrice(0, 0, 3, 50);
-			Item.rare = ItemRarityID.White;
+			Item.value = Item.sellPrice(0, 5, 52, 0);
+			Item.rare = ItemRarityID.Lime;
 			Item.knockBack = 5f;
 			Item.shootSpeed = 20f;
 			Item.useTime = 20;
@@ -60,6 +67,14 @@ namespace OrchidMod.Content.Guardian.Weapons.Greathammers
 				default:
 				return true;
 			}
+		}
+
+		public override void AddRecipes()
+		{
+			var recipe = CreateRecipe();
+			recipe.AddTile(TileID.MythrilAnvil);
+			recipe.AddIngredient(ItemID.ChlorophyteBar, 12);
+			recipe.Register();
 		}
 	}
 }

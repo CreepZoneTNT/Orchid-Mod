@@ -53,13 +53,5 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 				}
 			}
 		}
-
-		public override void AddRecipes()
-		{
-			var recipe = CreateRecipe();
-			recipe.AddTile(TileID.MythrilAnvil);
-			recipe.AddIngredient(ItemID.ChlorophyteBar, 12);
-			recipe.Register();
-		}
 	}
 }

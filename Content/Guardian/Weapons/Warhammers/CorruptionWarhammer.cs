@@ -36,13 +36,5 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 
 			return true;
 		}
-
-		public override void AddRecipes()
-		{
-			var recipe = CreateRecipe();
-			recipe.AddTile(TileID.Anvils);
-			recipe.AddIngredient(ItemID.DemoniteBar, 10);
-			recipe.Register();
-		}
 	}
 }

@@ -37,12 +37,12 @@ namespace OrchidMod.Content.Guardian.Armors.OreHelms
 		public override void UpdateArmorSet(Player player)
 		{
 			player.setBonus = Language.GetTextValue("ArmorSetBonus.Hallowed");
-			player.armorEffectDrawShadow = true;
 			player.onHitDodge = true;
 		}
 
 		public override void ArmorSetShadows(Player player)
 		{
+			player.armorEffectDrawShadow = true;
 			player.armorEffectDrawOutlines = true;
 		}
 

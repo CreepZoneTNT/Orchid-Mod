@@ -2,9 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using OrchidMod.Common;
 using OrchidMod.Common.Global.Items;
-using OrchidMod.Content.General.Prefixes;
 using OrchidMod.Content.Guardian.Buffs.Debuffs;
-using OrchidMod.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -59,38 +57,24 @@ namespace OrchidMod.Content.Guardian
 
 		//GRRRAAAA THESE HOOKS ARE USELESS I STILL NEED TO IMPLEMENT THEM!!! GRRRAAAAAA
 
-		/// <summary>Called upon landing any melee swing hit</summary>
-		public virtual void OnMeleeHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged, bool OffHand) { }
-		/// <summary>Called upon landing the first hit of a melee swing</summary>
-		public virtual void OnMeleeHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool FullyCharged, bool OffHand) { }
-		/// <summary>Called upon landing any throw hit</summary>
-		public virtual void OnThrowHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak, bool OffHand) { }
-		/// <summary>Called upon landing the first hit of a throw</summary>
-		public virtual void OnThrowHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit, bool Weak, bool OffHand) { }
-		/// <summary>Called upon landing any block hit</summary>
-		public virtual void OnBlockHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { }
-		/// <summary>Called upon landing the first hit of a block</summary>
-		public virtual void OnBlockHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit) { }
 		/// <summary>Called before default ModifyHit functionality. Return false to prevent normal multipliers like SwingDamage or reduced damage after penetration from applying.</summary>
-		public virtual bool ModifyHit(Player player, OrchidGuardian guardian, Projectile projectile, NPC target, ref HitModifiers modifiers, bool FullyCharged, bool Melee, bool Block, bool firstHit) => true;
+		public virtual bool ModifyHit(Player player, OrchidGuardian guardian, Projectile projectile, GuardianGreathammerAnchor anchor, NPC target, ref HitModifiers modifiers) => true;
 		/// <summary>Called at the end of the anchor's TileCollide(), after applying normal warhammer tilecollide behavior.</summary>
-		public virtual void OnThrowTileCollide(Player player, OrchidGuardian guardian, Projectile projectile, Vector2 oldVelocity, bool OffHand) { }
+		public virtual void OnThrowTileCollide(Player player, OrchidGuardian guardian, Projectile projectile, Vector2 oldVelocity) { }
 		/// <summary>Called on the first frame of a swing, FullyCharged is true if the guardian's hammer charge is full, FullyCharged is true if the guardian's hammer charge is full</summary>
-		public virtual void OnSwing(Player player, OrchidGuardian guardian, Projectile projectile, bool FullyCharged, bool OffHand) { }
+		public virtual void OnSwing(Player player, OrchidGuardian guardian, Projectile projectile, bool FullyCharged) { }
 		/// <summary>Called on the first frame of a throw</summary>
-		public virtual void OnThrow(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak, bool OffHand) { }
-		/// <summary>Called on the first frame of a block</summary>
-		public virtual void OnBlockThrow(Player player, OrchidGuardian guardian, Projectile projectile) { }
+		public virtual void OnThrow(Player player, OrchidGuardian guardian, Projectile projectile) { }
 		/// <summary>Called at the end of the anchor's Projectile AI()</summary>
-		public virtual void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile, bool OffHand) { }
+		public virtual void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile, GuardianGreathammerAnchor anchor) { }
 		/// <summary>Called before default throw AI. Return false to prevent the default AI from running.</summary>
-		/// <remarks>Remember to set <c>Projectile.friendly</c> and <c>OrchidModGuardianProjectile.ResetHitStatus()</c> if overriding default behavior.</remarks>
-		public virtual bool ThrowAI(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak, bool OffHand) => true;
+		/// <remarks>If returning false, use <c>anchor.ReturnFromThrow()</c> to return to held from thrown.</remarks>
+		public virtual bool ThrowAI(Player player, OrchidGuardian guardian, Projectile projectile, GuardianGreathammerAnchor anchor) => true;
 		/// <summary>Called before drawing the hammer. Return false to prevent the default draw code from running.</summary>
 		/// <remarks>The default draw code will use hammerTexture and drawRectangle (which defaults to null)</remarks>
-		public virtual bool PreDrawHammer(Player player, OrchidGuardian guardian, Projectile projectile, SpriteBatch spriteBatch, ref Color lightColor, ref Texture2D hammerTexture, ref Rectangle drawRectangle, bool OffHand) => true;
+		public virtual bool PreDrawHammer(Player player, OrchidGuardian guardian, Projectile projectile, SpriteBatch spriteBatch, ref Color lightColor, ref Texture2D hammerTexture, ref Rectangle drawRectangle) => true;
 		/// <summary>Called after drawing the hammer.</summary>
-		public virtual void PostDrawHammer(Player player, OrchidGuardian guardian, Projectile projectile, SpriteBatch spriteBatch, Color lightColor, Texture2D hammerTexture, Rectangle drawRectangle, bool OffHand) { }
+		public virtual void PostDrawHammer(Player player, OrchidGuardian guardian, Projectile projectile, SpriteBatch spriteBatch, Color lightColor, Texture2D hammerTexture, Rectangle drawRectangle) { }
 		/// <summary>Color applied to the hammer's glowmask when drawn. To automatically draw a glowmask for the hammer, add a HammerName_Glow texture file where the hammer texture is located.</summary>
 		public virtual Color GetHammerGlowmaskColor(Player player, OrchidGuardian guardian, Projectile projectile, Color lightColor, bool OffHand) => Color.White;
 		/// <summary>Called before the base Greathammer anchor plays any sound other than the full charge ding. Return false to prevent the sound, if playing your own.</summary>
@@ -113,8 +97,8 @@ namespace OrchidMod.Content.Guardian
 			Item.useAnimation = 30;
 			Item.useStyle = ItemUseStyleID.Swing;
 			Item.knockBack = 10f;
-			Item.shootSpeed = 16f;
-			Range = 30;
+			Item.shootSpeed = 24f;
+			Range = 20;
 			ThrowHitCooldown = -1;
 			GuardStacks = 1;
 			SlamStacks = 0;
@@ -234,6 +218,52 @@ namespace OrchidMod.Content.Guardian
 			if (projectile != null && projectile.ModProjectile is GuardianGreathammerAnchor anchor && anchor.IsIdle)
 				return true;
 			return false;
+		}
+
+		public override void ModifyTooltips(List<TooltipLine> tooltips)
+		{
+			var guardian = Main.LocalPlayer.GetModPlayer<OrchidGuardian>();
+			TooltipLine tt = tooltips.FirstOrDefault(x => x.Name == "Damage" && x.Mod == "Terraria");
+			if (tt != null)
+			{
+				string[] splitText = tt.Text.Split(' ');
+				string damageValue = splitText.First();
+				tt.Text = damageValue + " " + Language.GetTextValue(GetInstance<OrchidMod>().GetLocalizationKey("DamageClasses.GuardianDamageClass.DisplayName"));
+			}
+
+			int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Knockback"));
+			string click = GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
+
+			tooltips.Insert(index + 1, new TooltipLine(Mod, "Deflect", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.GreathammerDeflect", click)));
+
+			tooltips.Insert(index + 2, new TooltipLine(Mod, "DeflectGrants", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.DeflectGrants", GuardCost))
+			{
+				OverrideColor = new Color(175, 255, 175)
+			});
+
+			tooltips.Insert(index + 3, new TooltipLine(Mod, "Charge", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.SlamChargeToThrow", click))
+			{
+				OverrideColor = new Color(175, 255, 175)
+			});
+
+			if (GuardStacks > 0 || SlamStacks > 0)
+			{
+				string TooltipToGet = GetInstance<OrchidMod>().GetLocalizationKey("Misc.GuardianGrants");
+				switch(GuardStacks)
+				{
+					case > 0: TooltipToGet += "Guard"; break;
+				}
+				switch (SlamStacks)
+				{
+					case > 0: TooltipToGet += "Slam"; break;
+				}
+				if (GuardStacks == SlamStacks) TooltipToGet += "Same";
+
+				tooltips.Insert(index + 1, new TooltipLine(Mod, "GuardianGrants", Language.GetText(TooltipToGet).Format(GuardStacks, SlamStacks))
+				{
+					OverrideColor = new Color(175, 255, 175)
+				});
+			}
 		}
 	}
 }

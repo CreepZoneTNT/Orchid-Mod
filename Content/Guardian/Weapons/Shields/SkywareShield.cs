@@ -12,8 +12,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 		public override void SafeSetDefaults()
 		{
 			Item.value = Item.sellPrice(0, 1, 0, 0);
-			Item.width = 30;
-			Item.height = 38;
+			Item.width = 34;
+			Item.height = 42;
 			Item.noUseGraphic = true;
 			Item.UseSound = SoundID.Item9;
 			Item.knockBack = 7f;
@@ -24,6 +24,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			distance = 45f;
 			slamDistance = 65f;
 			blockDuration = 120;
+			shouldFlip = true;
 		}
 
 		public override void Slam(Player player, OrchidGuardian guardian, Projectile shield, bool WeakSlam)

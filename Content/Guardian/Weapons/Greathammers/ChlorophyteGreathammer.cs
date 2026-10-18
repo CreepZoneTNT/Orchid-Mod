@@ -1,28 +1,56 @@
-﻿using Terraria;
+﻿using OrchidMod.Content.Guardian.Weapons.Warhammers;
+using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace OrchidMod.Content.Guardian.Weapons.Greathammers
 {
 	public class ChlorophyteGreathammer : OrchidModGuardianGreathammer
 	{
+		public override void SetStaticDefaults()
+		{
+			ItemID.Sets.ShimmerTransformToItem[Type] = ModContent.ItemType<ChlorophyteWarhammer>();
+			ItemID.Sets.ShimmerTransformToItem[ModContent.ItemType<ChlorophyteWarhammer>()] = Type;
+		}
+
 		public override void SafeSetDefaults()
 		{
 			Item.width = 38;
 			Item.height = 36;
-			Item.value = Item.sellPrice(0, 0, 3, 50);
-			Item.rare = ItemRarityID.White;
+			Item.value = Item.sellPrice(0, 5, 52, 0);
+			Item.rare = ItemRarityID.Lime;
 			Item.knockBack = 5f;
 			Item.shootSpeed = 20f;
-			Item.useTime = 32;
+			Item.useTime = 20;
 			Item.damage = 349;
-			GuardStacks = 1;
+			GuardStacks = 2;
+			SlamChargeGain = 0.5f;
+			WaitChargeGain = 0.5f;
 			Range = 30;
 			AuraScale = 1.1f;
 			AuraPrimary = new(0, 80, 0, 60);
 			AuraSecondary = new(10, 40, 10, 60);
 			ThrowDamage = 0.4f;
 			ThrowHitCooldown = 8;
+		}
+
+		public override bool ModifyHit(Player player, OrchidGuardian guardian, Projectile projectile, GuardianGreathammerAnchor anchor, NPC target, ref NPC.HitModifiers modifiers)
+		{
+			if (anchor.IsThrown && anchor.Anim > -80)
+			{
+				projectile.velocity *= 0.5f;
+			}
+			return true;
+		}
+
+		public override void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile, GuardianGreathammerAnchor anchor)
+		{
+			if (anchor.IsSlamming && anchor.Anim <= 25)
+			{
+				//double swing recovery speed
+				anchor.Anim -= SlamSpeed * player.GetTotalAttackSpeed(DamageClass.Melee);
+			}
 		}
 
 		public override bool PreSound(Player player, OrchidGuardian guardian, Projectile projectile, bool justThrown)
@@ -39,6 +67,14 @@ namespace OrchidMod.Content.Guardian.Weapons.Greathammers
 				default:
 				return true;
 			}
+		}
+
+		public override void AddRecipes()
+		{
+			var recipe = CreateRecipe();
+			recipe.AddTile(TileID.MythrilAnvil);
+			recipe.AddIngredient(ItemID.ChlorophyteBar, 12);
+			recipe.Register();
 		}
 	}
 }

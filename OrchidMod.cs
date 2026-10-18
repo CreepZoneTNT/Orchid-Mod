@@ -245,6 +245,21 @@ namespace OrchidMod
 					}
 					break;
 
+				case OrchidModMessageType.GUARDIANSYNCCHARGE:
+					OrchidGuardian guardian = Main.player[reader.ReadInt32()].GetModPlayer<OrchidGuardian>();
+					guardian.GuardianItemCharge = reader.ReadSingle();
+
+					if (Main.netMode == NetmodeID.Server)
+					{
+						var packet = GetPacket();
+						packet.Write((byte)OrchidModMessageType.GUARDIANSYNCCHARGE);
+						packet.Write(guardian.Player.whoAmI);
+						packet.Write(guardian.GuardianItemCharge);
+						packet.Send(ignoreClient: guardian.Player.whoAmI);
+					}
+
+					break;
+
 				default:
 					Logger.WarnFormat("OrchidMod: Unknown Message type: {0}", msgType);
 					break;

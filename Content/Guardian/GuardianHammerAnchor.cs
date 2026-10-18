@@ -750,6 +750,8 @@ namespace OrchidMod.Content.Guardian
 						{
 							guardian.GuardianItemCharge = 210f;
 						}
+
+						guardian.SyncGuardianItemCharge();
 					}
 				}
 				HammerItem.OnMeleeHit(player, guardian, target, Projectile, hit.Knockback, hit.Crit, fullyCharged, OffHand);

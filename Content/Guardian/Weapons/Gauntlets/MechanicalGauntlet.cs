@@ -30,6 +30,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Gauntlets
 		}
 
 		bool hover;
+		bool charged;
 
 		public override void HoldItemFrame(Player player)
 		{
@@ -56,17 +57,26 @@ namespace OrchidMod.Content.Guardian.Weapons.Gauntlets
 
 		public override void ExtraAIGauntlet(Player player, OrchidGuardian guardian, Projectile projectile, bool offHandGauntlet)
 		{
-			if (projectile.ModProjectile is GuardianGauntletAnchor anchor && !anchor.OffHandGauntlet)
+			if (projectile.ModProjectile is GuardianGauntletAnchor anchor && !offHandGauntlet)
 			{
 				//checking for Ding determines whether it is a natural full charge or an instant one, since instant charges do not ding
 				if (player.GetModPlayer<OrchidGuardian>().GuardianCounterTime > 0 ||  anchor.Ding)
 				{
 					Dust dust = Dust.NewDustPerfect(projectile.Center + new Vector2(5, -3 * player.direction).RotatedBy(projectile.rotation), DustID.TheDestroyer, Vector2.Zero);
 					dust.noGravity = true;
+					if (!charged)
+					{
+						for (int i = 0; i < 10; i++)
+						{
+							Dust.NewDustPerfect(projectile.Center + new Vector2(0, 7 * player.direction).RotatedBy(projectile.rotation), DustID.Torch, (new Vector2(0, player.direction * (1 + Main.rand.NextFloat())) + Main.rand.NextVector2Circular(0.5f, 1.5f)).RotatedBy(projectile.rotation), Scale: 2.5f).noGravity = true;
+						}
+					}
+					charged = true;
 				}
+				else charged = false;
 				if (hover)
 				{
-					Dust.NewDustPerfect(projectile.Center + new Vector2(1, 7).RotatedBy(projectile.rotation), DustID.Torch, new Vector2(-player.direction, player.gravDir * 2f + player.velocity.Y) + Main.rand.NextVector2Circular(1f, 0.5f), Scale: player.velocity.Y < 2f * player.gravDir ? 2f : 1.25f).noGravity = true;
+					Dust.NewDustPerfect(projectile.Center + new Vector2(-3, 7 * player.direction).RotatedBy(projectile.rotation), DustID.Torch, new Vector2(-player.direction, player.gravDir * 2f + player.velocity.Y) + Main.rand.NextVector2Circular(1f, 0.5f), Scale: player.velocity.Y < 2f * player.gravDir ? 2f : 1.25f).noGravity = true;
 				}
 			}
 		}

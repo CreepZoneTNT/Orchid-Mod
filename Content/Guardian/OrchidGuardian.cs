@@ -16,6 +16,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using System.Linq;
 using OrchidMod.Content.Guardian.Accessories;
+using OrchidMod.Common;
 
 namespace OrchidMod
 {
@@ -1410,6 +1411,19 @@ namespace OrchidMod
 			if (GuardianItemCharge < 135f) return 2;
 			if (GuardianItemCharge < 180f) return 3;
 			return 4;
+		}
+
+		/// <summary>Attempts to send a packet syncing GuardianItemCharge on the server and other clients. Does nothing unless called by the local client as a multiplayer client.</summary>
+		public void SyncGuardianItemCharge()
+		{
+			if (Main.netMode == NetmodeID.MultiplayerClient && Player.whoAmI == Main.myPlayer)
+			{
+				var packet = OrchidMod.Instance.GetPacket();
+				packet.Write((byte)OrchidModMessageType.GUARDIANSYNCCHARGE);
+				packet.Write(Player.whoAmI);
+				packet.Write(GuardianItemCharge);
+				packet.Send();
+			}
 		}
 	}
 }

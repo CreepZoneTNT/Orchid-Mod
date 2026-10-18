@@ -138,7 +138,7 @@ namespace OrchidMod.Common.ModSystems
 			}
 
 			bool altEnabled = WorldGen.drunkWorldGen || WorldGen.remixWorldGen;
-			bool altOnly = altEnabled && !WorldGen.notTheBees && !WorldGen.noTrapsWorldGen;
+			bool altOnly = WorldGen.remixWorldGen && !WorldGen.notTheBees && !WorldGen.drunkWorldGen;
 
 			Rectangle range = new(0, (int)GenVars.rockLayer, (int)(Main.maxTilesX * 0.4f), (int)(Main.UnderworldLayer - GenVars.rockLayer));
 			if (altEnabled || WorldGen.notTheBees)

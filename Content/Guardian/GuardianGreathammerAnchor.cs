@@ -627,6 +627,7 @@ namespace OrchidMod.Content.Guardian
 				{
 					guardian.GuardianItemCharge += 90f * HammerItem.SlamChargeGain;
 					if (guardian.GuardianItemCharge > 180f) guardian.GuardianItemCharge = 210f;
+					guardian.SyncGuardianItemCharge();
 				}
 				else if (IsThrown)
 				{

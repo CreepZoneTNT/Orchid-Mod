@@ -17,6 +17,7 @@ using Terraria.ModLoader;
 using System.Linq;
 using OrchidMod.Content.Guardian.Accessories;
 using OrchidMod.Common;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace OrchidMod
 {
@@ -517,9 +518,23 @@ namespace OrchidMod
 			{
 				if (Main.myPlayer == Player.whoAmI)
 				{
+					/*
 					if (GuardianDebugVisuals == 1) CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "Enabled shield and deflect check", true);
 					if (GuardianDebugVisuals == 1) CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "Enabled attackinfo display", true);
 					if (GuardianDebugVisuals == 1) CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "Enabled greathammer hand placement visual", true);
+					*/
+					if (GuardianDebugVisuals == 1)
+					{
+						Main.NewText("Enabled shield and deflect check", 175, 255, 175);
+						Main.NewText("Enabled attackinfo display", 175, 255, 175);
+						Main.NewText("Enabled greathammer hand placement visual", 175, 255, 175);
+						Main.NewText("Hide the Guardian Test accessory to disable test visuals", 255, 128, 255);
+					}
+					else
+					{
+						Main.NewText("Disabled guardian test visuals", 255, 92, 92);
+					}
+
 				}
 				OldGuardianDebugVisuals = GuardianDebugVisuals;
 			}
@@ -1370,19 +1385,31 @@ namespace OrchidMod
 		{
 			if (MissingGuardsUI != guards || MissingSlamsUI != slams)
 			{
-				if (playSound) SoundEngine.PlaySound(SoundID.NPCHit42);
+				if (playSound) SoundEngine.PlaySound(SoundID.NPCHit42.WithVolumeScale(0.25f).WithPitchOffset(Main.rand.NextFloat(-0.2f, 0.2f)));
 				if (spawnText)
 				{
+					Rectangle rectangle = Player.Hitbox;
+					rectangle.Y -= 32;
+					int textWhoAmI = -1;
+					Color color = new Color(255, 92, 92);
 					if (guards > GuardianGuard && slams > GuardianSlam)
-						CombatText.NewText(Player.Hitbox, Color.Red, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingGuardsAndSlams"), false, true);
+						textWhoAmI = CombatText.NewText(rectangle, color, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingGuardsAndSlams"), false, false);
 					else if (guards > GuardianGuard)
-						CombatText.NewText(Player.Hitbox, Color.Red, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingGuards"), false, true);
+						textWhoAmI = CombatText.NewText(rectangle, color, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingGuards"), false, false);
 					else if (slams > GuardianSlam)
-						CombatText.NewText(Player.Hitbox, Color.Red, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingSlams"), false, true);
+						textWhoAmI = CombatText.NewText(rectangle, color, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingSlams"), false, false);
 					else //what is the player even being warned for
 					{
 						SoundEngine.PlaySound(SoundID.Item150);
-						CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "you're playing it wrong give me the controller");
+						textWhoAmI = CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "you're playing it wrong give me the controller");
+					}
+
+					if (textWhoAmI >= 0 && textWhoAmI < 100)
+					{
+						CombatText combattext = Main.combatText[textWhoAmI];
+						combattext.dot = true;
+						combattext.velocity.Y = -2.5f;
+						combattext.lifeTime = 25;
 					}
 				}
 			}

@@ -69,6 +69,8 @@ namespace OrchidMod.Content.Guardian.Projectiles.Quarterstaves
 			{ // charge on jab projectile hit
 				Projectile.ai[1] = 0;
 				guardian.GuardianItemCharge += 30f * player.GetTotalAttackSpeed(DamageClass.Melee);
+				if (guardian.GuardianItemCharge > 180f) guardian.GuardianItemCharge = 180f;
+				guardian.SyncGuardianItemCharge();
 			}
 		}
 	}

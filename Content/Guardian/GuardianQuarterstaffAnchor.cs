@@ -284,7 +284,7 @@ namespace OrchidMod.Content.Guardian
 					Projectile.friendly = false;
 					if (guardian.GuardianItemCharge < 180f)
 					{ // Increase guardian charge
-						guardian.GuardianItemCharge += 30f / guardianItem.Item.useTime * owner.GetTotalAttackSpeed(DamageClass.Melee) * guardianItem.ChargeRate;
+						guardian.GuardianItemCharge += 30f / guardianItem.Item.useTime * owner.GetTotalAttackSpeed(DamageClass.Melee) * guardian.GetWeaponChargeRate(guardianItem, guardianItem.ChargeRate);
 						if (guardian.GuardianItemCharge > 180f) guardian.GuardianItemCharge = 180f;
 					}
 
@@ -746,7 +746,7 @@ namespace OrchidMod.Content.Guardian
 				rotationoffset = -MathHelper.PiOver2;
 			}
 
-			if (guardianItem.PreDrawQuarterstaff(spriteBatch, Projectile, player, ref lightColor))
+			if (guardianItem.PreDrawQuarterstaff(spriteBatch, Projectile, player, ref lightColor, effect))
 			{
 				Rectangle frame = QuarterstaffTexture.Frame(1, guardianItem.QuarterstaffFrames, 0, QuarterstaffAnimFrame % guardianItem.QuarterstaffFrames);
 				
@@ -774,7 +774,7 @@ namespace OrchidMod.Content.Guardian
 					spriteBatch.Draw(QuarterstaffTextureGlow, drawPosition, frame, glowColor, Projectile.rotation + rotationoffset, QuarterstaffTextureGlow.Size() * 0.5f, Projectile.scale, effect, 0f);
 				}
 			}
-			guardianItem.PostDrawQuarterstaff(spriteBatch, Projectile, player, lightColor);
+			guardianItem.PostDrawQuarterstaff(spriteBatch, Projectile, player, lightColor, effect);
 
 			return false;
 		}

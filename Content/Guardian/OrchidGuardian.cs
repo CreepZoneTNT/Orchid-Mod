@@ -20,6 +20,7 @@ using System.Linq;
 using OrchidMod.Content.Guardian.Accessories;
 using OrchidMod.Common;
 using Terraria.Graphics.Shaders;
+using Terraria.Utilities;
 
 namespace OrchidMod.Content.Guardian
 {
@@ -34,8 +35,28 @@ namespace OrchidMod.Content.Guardian
 		public bool PaviseInputSwap => OrchidMod.OrchidClientConfig.GuardianSwapPaviseInputs;
 		
 		public SoundStyle DingSound => OrchidMod.OrchidClientConfig.GuardianAltChargeSounds ? SoundID.DD2_BetsyFireballShot : SoundID.MaxMana;
-		public PlayerDeathReason VoidDeath => PlayerDeathReason.ByCustomReason(NetworkText.FromKey(Mod.GetLocalizationKey("Items.ThoriumGuardianVoidHead.Death"), Player.name));
 		
+		public PlayerDeathReason VoidDeath
+		{
+			get
+			{
+				string path(string suffix) => Mod.GetLocalizationKey("Items.ThoriumGuardianVoidHead.Death." + suffix);
+				WeightedRandom<string> deathTexts = new(Main.rand);
+				deathTexts.Add(path("Common1"), 20);
+				deathTexts.Add(path("Common2"), 20);
+				deathTexts.Add(path("Common3"), 20);
+				deathTexts.Add(path("Common4"), 20);
+				deathTexts.Add(path("Common5"), 20);
+				deathTexts.Add(path("Common6"), 20);
+				deathTexts.Add(path("Common7"), 20);
+				deathTexts.Add(path("Common8"), 20);
+				deathTexts.Add(path("Rare1"), 4);
+				deathTexts.Add(path("Rare2"), 1);
+            
+				return PlayerDeathReason.ByCustomReason(NetworkText.FromKey(deathTexts.Get(), Player.name));
+			}
+		}
+
 		public bool CrossModGodMode;
 
 		// Misc & Static fields
@@ -64,6 +85,7 @@ namespace OrchidMod.Content.Guardian
 		public float GuardianParryDuration = 1f; // Parry Duration multiplier (gauntlets, misc)
 		public float GuardianMeleeSpeed = 1f; // Edited via reforges. It multiplies the player MeleeSpeed in postupdate
 		public float GuardianWeaponScale = 1f; // Multiplies pavise scale
+		public float GuardianChargeSpeed = 1f; // Multiplies weapon charge speed without necessarily affecting MeleeSpeed 
 
 		// Set effects, accessories, misc
 
@@ -146,6 +168,8 @@ namespace OrchidMod.Content.Guardian
 		/// <summary> Makes the GuardianCounter indicator flash Horizon colors instead of red. </summary>
 		public bool GuardianCounterHorizon;
 		public int GuardianShieldSpikeReflect = 5; // Shgield spikes only fire a projectile if this is >0
+		/// <summary>Stores a copy of <see cref="GuardianItemCharge"/>, in case .</summary>
+		public float CachedGuardianItemCharge = 0f;
 		public List<BlockedEnemy> GuardianBlockedEnemies = new List<BlockedEnemy>();
 		/// <summary>Enemies deflected by the player's last <c>DoDeflect</c>. Cleared and repopulated when <c>DoDeflect</c> is called.</summary>
 		public List<NPC> DeflectedEnemies = new List<NPC>();
@@ -381,7 +405,9 @@ namespace OrchidMod.Content.Guardian
 						dust.scale = Main.rand.NextFloat(3f) + 1.5f;
 						dust.fadeIn = 1f;
 					}
-				}}
+				}
+				
+			}
 		}
 
 		public override void PostUpdate()
@@ -450,9 +476,14 @@ namespace OrchidMod.Content.Guardian
 				bool hpDangerZone = Player.statLife / (float)Player.statLifeMax2 < 0.5f;
 
 				if (GuardianGuard <= 0 && !Main.dedServ && Player.miscCounterNormalized * (hpDangerZone ? 6 : 4) % 1 == 0)
-					SoundEngine.PlaySound(SoundID.Item15 with { Volume = hpDangerZone ? 2f : 1.5f, Pitch = hpDangerZone ? 0.2f : 0f, MaxInstances = 5 }, Player.Center );
+					SoundEngine.PlaySound(SoundID.Item15 with { Volume = hpDangerZone ? 2f : 1.5f, Pitch = hpDangerZone ? 0.2f : 0f, MaxInstances = 5 }, Player.Center);
+
+				if (Player.HeldItem.ModItem is OrchidModGuardianParryItem guardianItem && CachedGuardianItemCharge > 0)
+				{
+					float ratio = CachedGuardianItemCharge / (30f / Player.HeldItem.useTime * Player.GetTotalAttackSpeed(DamageClass.Melee));
+					GuardianChargeSpeed = 1 + GetWeaponChargeRate(guardianItem, GuardianChargeSpeed + ratio);
+				}
 			}
-			
 		}
 
 		public override void ProcessTriggers(TriggersSet triggersSet)
@@ -531,6 +562,13 @@ namespace OrchidMod.Content.Guardian
 			{
 				ChargeHoldTimer = 0;
 			}
+
+			if (GuardianItemCharge > CachedGuardianItemCharge)
+				CachedGuardianItemCharge = 0;
+			if (CachedGuardianItemCharge > 179f)
+				CachedGuardianItemCharge = 179f;
+			else if (CachedGuardianItemCharge < 0)
+				CachedGuardianItemCharge = 0;
 
 			if (Player.HeldItem.ModItem is OrchidModGuardianGauntlet)
 			{
@@ -621,6 +659,7 @@ namespace OrchidMod.Content.Guardian
 			GuardianParryDuration = 1f;
 			GuardianMeleeSpeed = 1f;
 			GuardianWeaponScale = 1f;
+			GuardianChargeSpeed = 1f;
 			ParryInvincibilityBonus = 0;
 			GuardianChain = 0f;
 			GuardianStaffRocket = 0;
@@ -871,7 +910,15 @@ namespace OrchidMod.Content.Guardian
 					
 					if (UseGuard(1, true))
 					{
-						if (Player.HeldItem.ModItem is OrchidModGuardianParryItem) DoParryItemParry(entity);
+						if (Player.HeldItem.ModItem is OrchidModGuardianParryItem)
+						{
+							DoParryItemParry(entity);
+							if (GuardianItemCharge > 0)
+							{
+								CachedGuardianItemCharge = GuardianItemCharge;
+								GuardianItemCharge = 0;
+							}
+						}
 						else modPlayer.SetDodgeImmuneTime();
 
 						SoundEngine.PlaySound(SoundID.Item52 with {Volume = 0.5f}, Player.Center);
@@ -900,7 +947,6 @@ namespace OrchidMod.Content.Guardian
 						CombatText.NewText(Player.getRect(), Color.DarkMagenta, Language.GetTextValue(Mod.GetLocalizationKey("UI.GuardianItem.Interrupted")), dot: true);
 
 						UseGuard();
-						if (GuardianItemCharge > 0) GuardianItemCharge = 0;
 						
 						return;
 					}
@@ -1618,6 +1664,8 @@ namespace OrchidMod.Content.Guardian
 		
 		public float GetParryDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianParryDuration;
 		public float GetBlockDuration(Item item, int baseDuration) => baseDuration * item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * GuardianBlockDuration;
+		
+		public float GetWeaponChargeRate(OrchidModGuardianItem guardianItem, float baseRate = 1f) => baseRate + ((GuardianChargeSpeed - 1) * guardianItem.BonusChargeRateMultiplier);
 
 		/// <summary>Returns the primary mouse input for "gauntlet-like" weapons: <c>Main.mouseLeft</c> by default, or <c>Main.mouseRight</c> if swapped in the config.</summary>
 		/// <param name="tap">If <c>Main.mouseLeftRelease</c>/<c>Main.mouseRightRelease</c> should be considered as part of the input.</param>

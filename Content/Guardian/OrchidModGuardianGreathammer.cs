@@ -84,7 +84,13 @@ namespace OrchidMod.Content.Guardian
 		/// <summary>Draws extra UI elements on the GuardianUIState while held.</summary>
 		public virtual void WarhammerPostDrawUI(SpriteBatch spriteBatch, Player player, ref Color lightColor, Projectile projectile) { }
 
-		public override int? AnchorType => ModContent.ProjectileType<GuardianHammerAnchor>();
+		public override int AnchorType => ModContent.ProjectileType<GuardianHammerAnchor>();
+		
+		public override void SetStaticDefaults()
+		{
+			ItemID.Sets.ItemsThatAllowRepeatedRightClick[Type] = true;
+			SafeSetStaticDefaults();
+		}
 		public sealed override void SetDefaults()
 		{
 			Item.DamageType = GetInstance<GuardianDamageClass>();
@@ -154,7 +160,7 @@ namespace OrchidMod.Content.Guardian
 				OrchidGuardian guardian = player.GetModPlayer<OrchidGuardian>();
 				bool chargeInput = Main.mouseLeft;
 				bool swingInput = Main.mouseRight;
-				if (GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs)
+				if (GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
 				{
 					chargeInput = Main.mouseRight;
 					swingInput = Main.mouseLeft;
@@ -232,7 +238,7 @@ namespace OrchidMod.Content.Guardian
 			}
 
 			int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Knockback"));
-			string click = GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
+			string click = GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs ? Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.LeftClick") : Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.RightClick");
 
 			tooltips.Insert(index + 1, new TooltipLine(Mod, "Deflect", Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.GreathammerDeflect", click)));
 

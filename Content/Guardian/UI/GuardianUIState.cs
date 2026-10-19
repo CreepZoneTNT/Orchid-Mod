@@ -218,14 +218,14 @@ namespace OrchidMod.Content.Guardian.UI
 					spriteBatch.Draw(texture, drawpos, null, check ? fgColor : bgColor, 0f, Vector2.Zero, 1f, effect, 0f);
 					
 					Vector2 drawposHighlight = new Vector2(position.X - offSet - 2 + 18 * i, position.Y - 2);
+					if (voidCheck) drawposHighlight += voidShake;
 					if (i < modPlayer.MissingGuardsUI)
 					{
 						float flash = 0.5f + (float)Math.Cos(modPlayer.MissingResourcesTimer * 0.28) * 0.5f;
 						spriteBatch.Draw(textureBlockBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * (1 - flash), 0f, Vector2.Zero, 1f, effect, 0f);
-						spriteBatch.Draw(texture, drawpos, null, check ? Color.White : new Color(1f, flash, flash), 0f, Vector2.Zero, 1f, effect, 0f);
+						spriteBatch.Draw(texture, drawpos, null, check ? fgColor : (voidCheck ? new Color(255, 58, 228) : Color.White).Multiply(new Color(1f, flash, flash)), 0f, Vector2.Zero, 1f, effect, 0f);
 					}
-					else spriteBatch.Draw(texture, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
-					if (voidCheck) drawposHighlight += voidShake;
+					else spriteBatch.Draw(texture, drawpos, null, check ? fgColor : bgColor, 0f, Vector2.Zero, 1f, effect, 0f);
 					
 					if (modPlayer.GuardCostUI > i)
 					{

@@ -267,7 +267,7 @@ namespace OrchidMod.Content.Guardian
 					{
 						bool swingInput = Main.mouseRight;
 						bool chargeInput = Main.mouseLeft;
-						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs)
+						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
 						{
 							swingInput = Main.mouseLeft;
 							chargeInput = Main.mouseRight;

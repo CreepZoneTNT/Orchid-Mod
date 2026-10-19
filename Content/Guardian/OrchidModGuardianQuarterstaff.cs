@@ -40,8 +40,8 @@ namespace OrchidMod.Content.Guardian
 		public virtual void ExtraAIQuarterstaffCharging(Player player, OrchidGuardian guardian, Projectile projectile) { } // Called while chargins
 		public virtual void ExtraAIQuarterstaffCounterattacking(Player player, OrchidGuardian guardian, Projectile projectile) { } // Called while counterattacking
 		public virtual void ExtraAIQuarterstaffIdle(Player player, OrchidGuardian guardian, Projectile projectile) { } // Called while idle
-		public virtual void PostDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, Color lightColor) { } // Called after the item is done being drawn
-		public virtual bool PreDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, ref Color lightColor) { return true; } // Return false to prevent normal draw code
+		public virtual void PostDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, Color lightColor, SpriteEffects effects) { } // Called after the item is done being drawn
+		public virtual bool PreDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, ref Color lightColor, SpriteEffects effects) { return true; } // Return false to prevent normal draw code
 		public virtual Color GetQuarterstaffGlowmaskColor(Player player, OrchidGuardian guardian, Projectile projectile, Color lightColor) => Color.White;
 		public virtual Color GetColor(bool offHand) => Color.White;
 

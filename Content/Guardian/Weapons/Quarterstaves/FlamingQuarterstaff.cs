@@ -24,7 +24,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 
 		public override bool SafeCanHitNPC(Player player, Projectile anchor, NPC target) => Collision.CanHit(player, target);
 		
-		public override void PostDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, Color lightColor)
+		public override void PostDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, Color lightColor, SpriteEffects effects)
 		{
 			Vector2 pos = projectile.Center - Vector2.UnitX.RotatedBy(projectile.rotation + MathHelper.Pi * 0.75f) * 32;
 			if (!player.wet || Main.tile[(int)pos.X / 16, (int)pos.Y / 16].CheckingLiquid)

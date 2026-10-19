@@ -27,7 +27,7 @@ namespace OrchidMod.Common.ModObjects
 		
 		/// <summary>Shorthand for the <see cref="Owner"/>'s OrchidPlayer instance.</summary>
 		public OrchidPlayer ModPlayer => Main.player[Projectile.owner].OrchidPlayer();
-		public static bool IsValidTarget(NPC npc, bool includecritter = false) => npc.active && !npc.dontTakeDamage && !npc.friendly && (includecritter || !npc.CountsAsACritter);
+		public static bool IsValidTarget(NPC npc, bool includecritter = false) => npc.active && npc.life > 0 && !npc.dontTakeDamage && !npc.friendly && (includecritter || !npc.CountsAsACritter);
 
 		public sealed override bool PreAI()
 		{

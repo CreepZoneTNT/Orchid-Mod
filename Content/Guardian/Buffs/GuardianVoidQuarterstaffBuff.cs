@@ -1,6 +1,7 @@
 using Terraria;
 using Terraria.ModLoader;
 using OrchidMod.Content.Guardian.Weapons.Quarterstaves;
+using OrchidMod.Utilities;
 
 namespace OrchidMod.Content.Guardian.Buffs
 {
@@ -14,7 +15,7 @@ namespace OrchidMod.Content.Guardian.Buffs
 
 		public override void Update(Player player, ref int buffIndex)
 		{
-			if (player.HeldItem != null && player.HeldItem.ModItem is ThoriumVoidQuarterstaff) player.GetAttackSpeed(DamageClass.Melee) += 2f;
+			if (player.HeldItem != null && player.HeldItem.ModItem is ThoriumVoidQuarterstaff) player.Guardian().GuardianChargeSpeed += 1.5f;
 		}
 	}
 }

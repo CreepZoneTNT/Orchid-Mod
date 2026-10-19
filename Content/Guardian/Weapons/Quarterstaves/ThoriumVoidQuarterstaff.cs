@@ -1,18 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using OrchidMod.Assets;
 using OrchidMod.Common.Attributes;
 using OrchidMod.Common.ModObjects;
 using OrchidMod.Common;
 using OrchidMod.Utilities;
 using OrchidMod.Content.Guardian.Buffs;
+using OrchidMod.Content.Guardian.Projectiles.Quarterstaves;
+using ReLogic.Content;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.Audio;
-using static Terraria.Player;
 
 
 namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
@@ -20,15 +21,21 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 	[CrossmodContent("ThoriumMod")]
 	public class ThoriumVoidQuarterstaff : OrchidModGuardianQuarterstaff
 	{
-
 		public static Texture2D TextureLine;
 		public static Texture2D TextureLineBlur;
 		public static Texture2D TextureRing;
-		public override void SetStaticDefaults()
+		public static Texture2D StaffTextureAura;
+
+		public int HitNPCIndex = -1;
+		
+		public override void SafeSetStaticDefaults()
 		{
 			TextureLine ??= ModContent.Request<Texture2D>("OrchidMod/Content/Guardian/Projectiles/Misc/GuardianHorizonLanceProj", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
 			TextureLineBlur ??= ModContent.Request<Texture2D>("OrchidMod/Content/Guardian/Projectiles/Misc/GuardianHorizonLanceProj_Blur", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
-			TextureRing ??= ModContent.Request<Texture2D>("OrchidMod/Content/Guardian/StandardAuraProjectile", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+			TextureRing ??= OrchidAssets.GetExtraTexture(20, AssetRequestMode.ImmediateLoad).Value;
+			StaffTextureAura ??= ModContent.Request<Texture2D>(QuarterstaffTexture + "_Aura", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+			
+			ItemID.Sets.GamepadWholeScreenUseRange[Type] = true;
 		}
 
 		public override void SafeSetDefaults()
@@ -47,22 +54,12 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			JabSpeed = 1.0f;
 			SwingSpeed = 1.2f;
 			CounterSpeed = 1.0f;
+			ChargeRate = 0.5f;
 		}
 
 		public override void SafeHoldItem(Player player)
 		{
-			if (player.HasBuff(ModContent.BuffType<GuardianVoidQuarterstaffBuff>())) 
-			{
-				JabSpeed = 0.3333f;
-				SwingSpeed = 0.4f;
-				CounterSpeed = 0.3333f;
-
-			}
-			else {
-				JabSpeed = 1.0f;
-				SwingSpeed = 1.2f;
-				CounterSpeed = 1.0f;
-			}
+			// ChargeRate = player.HasBuff(ModContent.BuffType<GuardianVoidQuarterstaffBuff>()) ? 2f : 0.5f;
 		}
 
 		public override void ExtraAIQuarterstaff(Player player, OrchidGuardian guardian, Projectile projectile)
@@ -90,17 +87,16 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 
 		public override void OnAttack(Player player, OrchidGuardian guardian, Projectile projectile, bool jabAttack, bool counterAttack) 
 		{ 
-			if (OrchidMod.ThoriumMod != null && !jabAttack && !counterAttack) 
+			if (OrchidMod.ThoriumMod != null && !jabAttack && !counterAttack)
 			{
+				Vector2 oldCenter = projectile.Center;
 				projectile.scale *= 1.25f;
 				projectile.width = (int)(projectile.width * 1.25f);
-				projectile.height = (int)(projectile.height * 1.25f);	
+				projectile.height = (int)(projectile.height * 1.25f);
+				projectile.Center = oldCenter;
 
         		Vector2 tipPosition = projectile.Center - Vector2.UnitY.RotatedBy(projectile.rotation + MathHelper.PiOver4) * projectile.width * 0.5f;
 				if (player.direction == 1) tipPosition.X -= 12;
-
-				Vector2 velocity = Vector2.UnitY.RotatedBy((player.Center - Main.MouseWorld).ToRotation() + MathHelper.PiOver2);
-				
 
 				int dustType = OrchidMod.ThoriumMod.Find<ModDust>("VoidHeartDust").Type;
 
@@ -108,30 +104,21 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 					Dust.NewDustDirect(player.Center, 24, 24, dustType, Scale: 3f);
 				}
 
-				int distance = 0;
-				for (int i = 0; i < 600; i++) 
-				{
-					Vector2 point = player.Center + velocity * i;
-					if (i > 40 && i % 20 == 0 && Main.rand.NextBool(10))
-					{
-						Dust dust = Dust.NewDustPerfect(point, dustType);
-						dust.noGravity = true;
-					}
-					distance++;
-
-					NPC hitEnemy = Main.npc.FirstOrDefault(npc => npc.active && npc.whoAmI < Main.maxNPCs && !npc.friendly && Collision.CheckAABBvAABBCollision(point, player.Hitbox.Size(), npc.position, npc.Hitbox.Size()));
-					Tile hitTile = Framing.GetTileSafely((int)(point.X / 16f), (int)(point.Y / 16));
-					if (hitEnemy != null || (hitTile.HasTile && Main.tileSolid[hitTile.TileType] && !Main.tileSolidTop[hitTile.TileType])) 
-						break;
-				}
+				Vector2 target = CalcFirstThingInLine(player, 600, 1f, out float width, out NPC hitNPC);
 				
-				if (IsLocalPlayer(player))
-				{
-					Main.SetCameraLerp(0.1f, 10);
-				}
+				if (IsLocalPlayer(player)) Main.SetCameraLerp(0.1f, 10);
 
 				player.RemoveAllGrapplingHooks();
-				player.Center += velocity * (distance - 20);
+
+				Vector2 oldPosition = player.Center;
+				Vector2 oldProjCenter = projectile.Center;
+				
+				Vector2 segment = Vector2.Normalize(target - player.Center);
+				Vector2 finalPosition = target - player.Size * 0.5f + segment * width;
+				if (hitNPC != null) finalPosition = hitNPC.CircularizeHitbox().ClosestPointInCircle(player.MountedCenter);
+				player.DoQueenSlimeHookTeleport(finalPosition.Floor());
+				projectile.Center += (player.position - oldPosition);
+				projectile.netUpdate = true;
 
 				projectile.localAI[0] = 10;
 			
@@ -182,12 +169,12 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 						player.velocity.X = launchPower * (float)Math.Cos(MathHelper.ToRadians(launchAngle));
 
 					if (player.HasBuff(ModContent.BuffType<GuardianVoidQuarterstaffBuff>()))
-						for (int i = 0; i < 2; i++) SpawnVoidDaggers(player, target, guardian.GetGuardianDamage(Item.damage * 0.012f));
+						for (int i = 0; i < 3; i++) SpawnVoidBlobs(player, target, guardian.GetGuardianDamage(Item.damage * 0.5f));
 				} 
 				else 
 				{
 					for (int i = 0; i < (player.HasBuff(ModContent.BuffType<GuardianVoidQuarterstaffBuff>()) ? 6 : 4); i++) 
-						SpawnVoidDaggers(player, target, guardian.GetGuardianDamage(Item.damage * 0.012f));
+						SpawnVoidBlobs(player, target, guardian.GetGuardianDamage(Item.damage * 0.5f));
 				}
 			}
 		}
@@ -202,50 +189,96 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 		// 	return false;
 		// }
 
-		int offSet = 0;
-		public override void PostDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, Color lightColor)
+		public override bool PreDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, ref Color lightColor, SpriteEffects effects)
 		{
-			if (player == Main.LocalPlayer && player.GetModPlayer<OrchidGuardian>().GuardianItemCharge >= 180f && projectile.ai[0] is 0 or 1) {
-				spriteBatch.End(out SpriteBatchSnapshot spriteBatchSnapshot);
-				spriteBatch.Begin(spriteBatchSnapshot with { BlendState = BlendState.Additive });
-
-				if (++offSet >= 80) offSet = 0;
-
-				NPC hitNPC = CalcFirstThingInLine(player, 600, out List<Vector2> samplePoints, out Vector2 finalPoint);
+			if (player.HasBuff<GuardianVoidQuarterstaffBuff>())
+			{
+				Vector2 drawPos = (projectile.Center + player.getGFXOffY()).Floor() - Main.screenPosition;
 				
-				for (int i = 0; i < samplePoints.Count; i++) 
+				float rotationoffset = -MathHelper.PiOver4 + MathHelper.PiOver4 * player.direction;
+				if (StaffTextureAura != null)
 				{
-					Vector2 reticlePoint = samplePoints[i];
-					if (hitNPC != null) reticlePoint = player.Center + (player.Center.DirectionTo(hitNPC.Center) * 4 * (i + 10));
+					spriteBatch.End(out SpriteBatchSnapshot snapshot);
+					spriteBatch.Begin(snapshot with { BlendState = BlendState.Additive, RasterizerState = RasterizerState.CullNone });
 
-					Color drawColor = Color.Lerp(Color.Purple, Color.Magenta, (((i + offSet) % 80)/80f));
-					// if (hitNPC != null) drawColor = Color.Lerp(Color.DarkBlue, Color.Aqua, (((i + offSet) % 80)/80f));
-
-					Vector2 drawPositionLine = Vector2.Transform(reticlePoint - Main.screenPosition, Main.GameViewMatrix.EffectMatrix);
-
-					spriteBatch.Draw(TextureLineBlur, drawPositionLine, null, drawColor * 0.8f, (reticlePoint - player.Center).ToRotation(), TextureLineBlur.Size() * 0.5f, 0.2f, SpriteEffects.None, 0f);
-					spriteBatch.Draw(TextureLine, drawPositionLine, null, drawColor, (reticlePoint - player.Center).ToRotation(), TextureLine.Size() * 0.5f, 0.05f, SpriteEffects.None, 0f);
-
-					if (i == samplePoints.Count - 1) {
-						if (hitNPC != null) 
-						{
-							float maxDimension = Math.Max(hitNPC.width / 2f, hitNPC.height / 2f);
-							Vector2 drawPositionOutlineAura = Vector2.Transform(hitNPC.Center - Main.screenPosition, Main.GameViewMatrix.EffectMatrix);
-							spriteBatch.Draw(TextureRing, drawPositionOutlineAura, null, drawColor, 0f, TextureRing.Size() * 0.5f, 0.007f * maxDimension, SpriteEffects.None, 0f);
-						}
-						else {
-							Vector2 drawPositionReticle = Vector2.Transform(finalPoint - Main.screenPosition, Main.GameViewMatrix.EffectMatrix);
-							spriteBatch.Draw(TextureRing, drawPositionReticle, null, drawColor, 0f, TextureRing.Size() * 0.5f, 0.05f, SpriteEffects.None, 0f);
-						}
-						break;
+					for (int i = -1; i < 2; i++)
+					{
+						Color color = Color.Lerp(Color.Purple, Color.Magenta, (player.miscCounter + 30f * (i + 1)  % 60) / 60f) * (0.6f + 0.2f * (Math.Abs(i) + 1));
+						Vector2 shift = Vector2.UnitX.RotatedBy((player.miscCounterNormalized) * 3f * MathHelper.TwoPi) * Utils.Turn01ToCyclic010(player.miscCounterNormalized * 4f % 4) * 4f * projectile.scale * i;
+						Main.EntitySpriteDraw(StaffTextureAura, drawPos + shift, null, color, projectile.rotation + rotationoffset, StaffTextureAura.Size() * 0.5f, projectile.scale * 1.02f, effects);
 					}
 					
+					spriteBatch.End();
+					spriteBatch.Begin(snapshot);
+				}
+			}
+			return true;
+		}
+
+		int offSet = 0;
+		private Vector2 finalPoint;
+		private float width;
+		private NPC hitNPC;
+
+		private int oldMiscCounter;
+		public override void PostDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, Color lightColor, SpriteEffects effects)
+		{
+			if (player == Main.LocalPlayer && player.GetModPlayer<OrchidGuardian>().GuardianItemCharge >= 180f && projectile.ai[0] is 0 or 1)
+			{
+				OrchidPlayer modPlayer = player.OrchidPlayer();
+				OrchidGuardian guardian = player.Guardian();
+				
+				spriteBatch.End(out SpriteBatchSnapshot snapshot);
+				spriteBatch.Begin(snapshot with { BlendState = BlendState.Additive, RasterizerState = RasterizerState.CullNone });
+
+				float miscCountAngle = player.miscCounterNormalized * MathHelper.TwoPi;
+
+				Vector2 drawPositionRing = Vector2.Transform(player.VisualMountedCenter() - Main.screenPosition, Main.GameViewMatrix.EffectMatrix);
+				
+				spriteBatch.Draw(TextureRing, drawPositionRing , null, new Color(120, 0, 181) * 0.5f, miscCountAngle, TextureRing.Size() * 0.5f, 0.28f + 0.007f * MathF.Sin(player.miscCounterNormalized * MathHelper.TwoPi), SpriteEffects.None, 0f);
+				spriteBatch.Draw(TextureRing, drawPositionRing, null, Color.Lerp(new Color(255, 58, 228), new Color(57, 0, 86), player.miscCounter % 60) * 0.5f, -miscCountAngle, TextureRing.Size() * 0.5f, 0.28f + 0.014f * MathF.Cos(player.miscCounterNormalized * MathHelper.TwoPi * 2.01f), SpriteEffects.None, 0f);
+
+				finalPoint = CalcFirstThingInLine(player, 400, 1.5f, out width, out hitNPC);
+
+				Vector2 chainDirection = finalPoint - player.VisualMountedCenter();
+				Vector2 segment = Vector2.Normalize(chainDirection) * TextureLine.Height * 0.3f;
+				
+				int nbSegments = 0;
+
+				while(chainDirection.Length() > (segment * nbSegments).Length()) nbSegments++;
+
+				int nbSegmentsMax = nbSegments;
+				
+				if (++offSet >= 80) offSet = 0;
+				while (nbSegments > 0)
+				{
+					Color drawColor = Color.Lerp(Color.Purple, Color.Magenta, (player.miscCounter - 2 * offSet % 80) % 150 / 150f);
+
+					if (nbSegments == nbSegmentsMax)
+					{
+						Vector2 drawPositionReticle = Vector2.Transform(finalPoint - Main.screenPosition, Main.GameViewMatrix.EffectMatrix);
+						spriteBatch.Draw(TextureRing, drawPositionReticle, null, drawColor, player.miscCounterNormalized * MathHelper.TwoPi, TextureRing.Size() * 0.5f, 0.007f * width, SpriteEffects.None, 0f);
+					}
+					
+					nbSegments--;
+					chainDirection -= segment;
+					
+					Vector2 reticlePoint = player.Center + chainDirection;
+					Vector2 drawPositionLine = Vector2.Transform(reticlePoint - Main.screenPosition, Main.GameViewMatrix.EffectMatrix);
+					
+					if (hitNPC != null && nbSegments > nbSegmentsMax - (int)(width * 0.25f)) continue;
+					
+					spriteBatch.Draw(TextureLineBlur, drawPositionLine, null, drawColor * 0.8f, segment.ToRotation(), TextureLineBlur.Size() * 0.5f, 0.2f, SpriteEffects.None, 0f);
+					spriteBatch.Draw(TextureLine, drawPositionLine, null, drawColor, segment.ToRotation(), TextureLine.Size() * 0.5f, 0.05f, SpriteEffects.None, 0f);
+
+					if (nbSegments <= 10f) return;
 				}
 
 				spriteBatch.End();
-				spriteBatch.Begin(spriteBatchSnapshot);
+				spriteBatch.Begin(snapshot);
 			}
 			
+			oldMiscCounter = (int)Main.timeForVisualEffects;
 		}
 
 		public override void AddRecipes()
@@ -271,49 +304,62 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			}
 		}
 
-		public static NPC CalcFirstThingInLine(Player player, int maxSteps, out List<Vector2> samplePoints, out Vector2 finalPoint)
+		public static Vector2 CalcFirstThingInLine(Player player, int maxSteps, float stepLength, out float width, out NPC hitNPC)
 		{
-			NPC hitNPC = null;
-			samplePoints = [];
-			finalPoint = Vector2.Zero;
+			hitNPC = null;
+			width = 7.143f;
+			
+			Vector2 finalPoint = player.VisualMountedCenter();
 
-			Vector2 velocity = player.Center.DirectionTo(Main.MouseWorld);
+			if (player.whoAmI != Main.myPlayer || Main.dedServ) return finalPoint;
+			
+
+			Vector2 velocity = player.Center.DirectionTo(Main.MouseWorld) * stepLength;
 
 			for (int i = 0; i < maxSteps; i++) 
 			{
-				Vector2 point = player.Center + velocity * i;
-				if (i > 40 && i % 4 == 0) samplePoints.Add(point);
+				Vector2 point = finalPoint + velocity;
 
-				hitNPC = Main.npc.FirstOrDefault(npc => npc.active && npc.whoAmI < Main.maxNPCs && !npc.friendly && Collision.CheckAABBvAABBCollision(point, player.Hitbox.Size(), npc.position, npc.Hitbox.Size()));
-				if (hitNPC != null && !hitNPC.dontTakeDamage) 
+				hitNPC = Main.npc.FirstOrDefault(npc => OrchidModProjectile.IsValidTarget(npc) && npc.CircularizeHitbox(2f).HasPointInCircle(point));
+				if (hitNPC != null)
 				{
-					finalPoint = point;
-					break;
+					width = hitNPC.GetLargestDimension() * 0.5f;
+					return hitNPC.Center;
 				}
 
-				Tile hitTile = Framing.GetTileSafely((int)(point.X / 16f), (int)(point.Y / 16));
-				if (hitTile.HasTile && Main.tileSolid[hitTile.TileType] && !Main.tileSolidTop[hitTile.TileType]) 
+				Tile hitTile = Framing.GetTileSafely(point);
+				if (hitTile.HasTile && Main.tileSolid[hitTile.TileType] && !Main.tileSolidTop[hitTile.TileType])
 				{
-					finalPoint = point;
-					break;
-				} 
+					finalPoint -= velocity;
+					
+					Vector2 intendedVelocity = player.velocity * 0.05f;
+					Vector2 addedVelocity = Vector2.Zero;
 
-				finalPoint = point;
+					for (int j = 0; j < 20; j++)
+						addedVelocity += Collision.TileCollision(finalPoint - player.Size * 0.4f + addedVelocity, intendedVelocity, (int)(player.width * 0.8f), (int)(player.height * 0.8f), false, false, (int)player.gravDir);
+
+					return finalPoint + addedVelocity;
+				}
+
+				finalPoint += velocity;
 			}
 
-			return hitNPC;
+			return finalPoint;
 		}
 
-		public void SpawnVoidDaggers(Player player, NPC target, int damage) 
+		public void SpawnVoidBlobs(Player player, NPC target, int damage) 
 		{
-			var thoriumMod = OrchidMod.ThoriumMod;
-			if (thoriumMod == null) return;
-			int projType = thoriumMod.Find<ModProjectile>("WrithingSheathPro").Type;
-			float maxDimension = Math.Max(target.width / 2f, target.height / 2f);
-			
-			Vector2 direction =  Vector2.UnitX.RotatedBy(Main.rand.NextFloat(-MathHelper.Pi * 12.5f / 9f, MathHelper.Pi * 12.5f / 9f));
-			Projectile proj = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), target.Center + direction * (maxDimension + 60), Vector2.Zero, projType, damage, 4f, Main.myPlayer, target.whoAmI);
-			proj.DamageType = ModContent.GetInstance<GuardianDamageClass>();
+			// var thoriumMod = OrchidMod.ThoriumMod;
+			// if (thoriumMod == null) return;
+			// int projType = thoriumMod.Find<ModProjectile>("WrithingSheathPro").Type;
+			// float maxDimension = Math.Max(target.width / 2f, target.height / 2f);
+			//
+			int projType = ModContent.ProjectileType<ThoriumVoidQuarterstaffProjectile>();
+			Vector2 direction = Main.rand.NextVector2Unit();
+			// Projectile proj = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), target.Center + direction * (maxDimension + 60), Vector2.Zero, projType, damage, 4f, Main.myPlayer, target.whoAmI);
+			// proj.DamageType = ModContent.GetInstance<GuardianDamageClass>();
+
+			Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center + player.velocity + direction * target.GetLargestDimension() * 0.5f, direction * 20f, projType, damage, Item.knockBack * 0.25f, ai1: target.whoAmI);
 		}
 	}
 }

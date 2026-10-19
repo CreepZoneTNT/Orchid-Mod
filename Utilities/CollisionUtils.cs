@@ -25,7 +25,7 @@ public struct Circle(Vector2 origin, float radius)
 	{
 		if (point.DistanceSQ(circle.Origin) <= circle.Radius * circle.Radius)
 			return point;
-		return circle.Origin.DirectionTo(point) * circle.Radius;
+		return circle.Origin + circle.Origin.DirectionTo(point) * circle.Radius;
 	}
 	
 	public static Circle CircularizeHitbox(Entity entity, float lenience = 1, bool useEntity1LargestDim = true)
@@ -46,6 +46,18 @@ public struct Circle(Vector2 origin, float radius)
 
 public static partial class OrchidUtils
 {
+	public static Vector2 getGFXOffY(this Player player) => Vector2.UnitY * player.gfxOffY;
+		
+	public static Vector2 VisualCenter(this Player player, bool floor = true)
+	{
+		Vector2 pos = player.Center + player.getGFXOffY();
+		return floor ? pos.Floor() : pos;
+	}
+	public static Vector2 VisualMountedCenter(this Player player, bool floor = true)
+	{
+		Vector2 pos = player.MountedCenter + player.getGFXOffY();
+		return floor ? pos.Floor() : pos;
+	}
 	
 	public static int GetLargestDimension(this Entity entity) => Math.Max(entity.width, entity.height);
 	public static int GetSmallestDimension(this Entity entity) => Math.Min(entity.width, entity.height);

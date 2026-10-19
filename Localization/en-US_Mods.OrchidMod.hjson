@@ -255,7 +255,7 @@ Buffs: {
 
 	GuardianVoidQuarterstaffBuff: {
 		DisplayName: Void Rush
-		Description: 150% increased Flux Ripper attack speed
+		Description: 150% increased Flux Ripper charge speed
 	}
 
 	GuardianDreadGauntletBuff: {
@@ -3289,6 +3289,7 @@ Items: {
 			'''
 			Slam to warp to an enemy in line of sight, increasing melee speed dramatically
 			Hold UP or DOWN to control knockback trajectory
+			Releases seeking void blobs on charged hits and counterattacks
 			'''
 	}
 
@@ -3360,7 +3361,19 @@ Items: {
 			Damage taken above 50% max life will spare you with 10 health
 			Below 50% is instant death
 			'''
-		Death: "{0} could not control the Void energy"
+
+		Death: {
+			Common1: "{0} could not control the Void energy any longer"
+			Common2: "{0} was forced to use alternative payment"
+			Common3: "{0}'s soul got transmuted into Guards to shield their now-lifeless body"
+			Common4: "{0} experienced instant death"
+			Common5: "{0} was sent to Coznix's House by Void Sentinel"
+			Common6: "{0} was digested by their armor"
+			Common7: "{0} was used up"
+			Common8: "{0} could no longer hold up their end of the deal"
+			Rare1: "{0} experienced [c:960000/instant death]"
+			Rare2: "{0} had a skill issue"
+		}
 	}
 
 	ThoriumGuardianVoidChest: {
@@ -3922,6 +3935,8 @@ Projectiles: {
 	ThoriumPharaohQuarterstaffProjectile.DisplayName: Pharaoh Sand
 	GuardianGreathammerAnchor.DisplayName: Guardian Greathammer Anchor
 	GreathammerDeflectedProjectile.DisplayName: Greathammer Deflected Projectile
+	ThoriumNagaQuarterstaffProjectileAlt.DisplayName: Thorium Naga Quarterstaff Projectile Alt
+	ThoriumVoidQuarterstaffProjectile.DisplayName: Void
 }
 
 Configs: {
@@ -4072,13 +4087,13 @@ Configs: {
 			Label: Enable Shapeshifter Content
 			Tooltip: Allows shapeshifter items to be obtainable
 		}
+
 		GuardianThoriumThorsHammerConversion: {
 			Label: Thor's Hammer Recipe
 			Tooltip: Re-enables the original Thor's Hammer: Opposing recipe using any of the other Thor's Hammer variants
 		}
 	}
-		
-		
+
 	KatarDistanceUnits: {
 		Tooltip: ""
 
@@ -4218,8 +4233,6 @@ UI: {
 		ChargeToJab: Charge to swing, {0} to slam while charging
 		ChargeToJabKatar: Charge to jab, {0} to slam while charging
 		ChargeToDash: Charge to dash, {0} to jab while charging
-		ChargeToPunchLanternShield: Charge with {0} to punch
-		ChargeToParryLanternShield: "{0} to parry at the cost of 1 slam, charge to block"
 		ParryDuration: "{0} second parry duration"
 		ParryDistance: "{0}{1} parry dash distance"
 		BlockDuration: "{0} second block duration"
@@ -4254,19 +4267,6 @@ UI: {
 		MissingGuards: Not enough guards!
 		MissingSlams: Not enough slams!
 		MissingGuardsAndSlams: Not enough guards or slams!
-		
-		ActionTemplates: {
-		    Single: "{0} to {1}"
-		    
-		}
-		
-		ActionKeywords: {
-		    Swing: swing
-		    Jab: jab
-		    Parry: parry
-		    Block: block
-		    Deflect: deflect
-		}
 
 		ParryDistanceDescriptor: {
 			AbsurdlyFar: Absurdly long

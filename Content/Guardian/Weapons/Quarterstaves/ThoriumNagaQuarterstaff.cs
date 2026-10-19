@@ -219,13 +219,12 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
             return true;
         }
 
-        public override bool PreDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, ref Color lightColor)
+        public override bool PreDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, ref Color lightColor, SpriteEffects effects)
         {
 	        Texture2D lungeTexture = ModContent.Request<Texture2D>(Texture + "_Lunge").Value;
 	        if (waterAttack == 1)
 	        {
 		        Vector2 tipPosition = projectile.Center - Vector2.UnitY.RotatedBy(projectile.rotation + MathHelper.PiOver4) * projectile.width * 0.5f + player.velocity;
-		        SpriteEffects effects = projectile.spriteDirection < 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 		        
 		        spriteBatch.End(out SpriteBatchSnapshot snapshot);
 		        spriteBatch.Begin(snapshot with { BlendState = BlendState.Additive });

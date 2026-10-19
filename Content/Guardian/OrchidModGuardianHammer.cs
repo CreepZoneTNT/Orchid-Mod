@@ -120,6 +120,12 @@ namespace OrchidMod.Content.Guardian
 		public virtual void WarhammerPostDrawUI(SpriteBatch spriteBatch, Player player, ref Color lightColor, Projectile projectile) { }
 
 		public override int AnchorType => ModContent.ProjectileType<GuardianHammerAnchor>();
+		
+		public override void SetStaticDefaults()
+		{
+			ItemID.Sets.ItemsThatAllowRepeatedRightClick[Type] = true;
+			SafeSetStaticDefaults();
+		}
 		public sealed override void SetDefaults()
 		{
 			Item.DamageType = GetInstance<GuardianDamageClass>();

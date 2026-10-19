@@ -176,7 +176,7 @@ namespace OrchidMod.Content.Guardian
 						ResetSize();
 					}
 
-					if (guardian.GuardianStaffRocket > 0 && guardian.GuardianStaffRocketCooldown <= 0 && Main.mouseLeft && Main.mouseLeftRelease && IsLocalOwner && guardian.UseSlam(1, true)) 
+					if (guardian.GuardianStaffRocket > 0 && guardian.GuardianStaffRocketCooldown <= 0 && guardian.GetGauntletPunchInput(true) && IsLocalOwner && guardian.UseSlam(1, true)) 
 					{ // Staff Rocket dash
 					  // spawning a projectile makes it easy to sync the effects & direction of the dash
 						int projectileType = ModContent.ProjectileType<StaffRocketProjectile>();
@@ -259,12 +259,7 @@ namespace OrchidMod.Content.Guardian
 
 						if (IsLocalOwner)
 						{
-							bool blockInput = Main.mouseRight;
-
-							if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
-							{
-								blockInput = Main.mouseRight;
-							}
+							bool blockInput = guardian.GetGauntletBlockInput(false);
 
 							if (blockInput && guardian.UseGuard(1, true))
 							{
@@ -312,14 +307,8 @@ namespace OrchidMod.Content.Guardian
 					{
 						
 
-						bool jabInput = Main.mouseRight;
-						bool chargeInput = Main.mouseLeft;
-
-						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
-						{
-							jabInput = Main.mouseLeft;
-							chargeInput = Main.mouseRight;
-						}
+						bool jabInput = guardian.GetGauntletBlockInput(false);
+						bool chargeInput = guardian.GetGauntletPunchInput(false);
 
 						if (!chargeInput)
 						{

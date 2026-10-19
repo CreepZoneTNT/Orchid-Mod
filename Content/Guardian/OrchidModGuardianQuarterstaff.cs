@@ -83,6 +83,13 @@ namespace OrchidMod.Content.Guardian
 		public virtual void QuarterstaffPostDrawUI(SpriteBatch spriteBatch, Player player, ref Color lightColor, Projectile projectile) { }
 
 		public override int AnchorType => ModContent.ProjectileType<GuardianQuarterstaffAnchor>();
+		
+		public override void SetStaticDefaults()
+		{
+			ItemID.Sets.ItemsThatAllowRepeatedRightClick[Type] = true;
+			SafeSetStaticDefaults();
+		}
+		
 		public sealed override void SetDefaults()
 		{
 			Item.DamageType = ModContent.GetInstance<GuardianDamageClass>();
@@ -130,14 +137,8 @@ namespace OrchidMod.Content.Guardian
 					var proj = Main.projectile.First(i => i.active && i.owner == player.whoAmI && i.type == AnchorType);
 					if (proj != null && proj.ModProjectile is GuardianQuarterstaffAnchor anchor)
 					{
-						bool shouldBlock = Main.mouseRight && Main.mouseRightRelease;
-						bool shouldCharge = Main.mouseLeft;
-						
-						if (ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletInputs)
-						{
-							shouldBlock = Main.mouseLeft && Main.mouseLeftRelease;
-							shouldCharge = Main.mouseRight;
-						}
+						bool shouldBlock = guardian.GetGauntletBlockInput(true);
+						bool shouldCharge = guardian.GetGauntletPunchInput(false);
 
 						if (shouldBlock && !shouldCharge && guardian.UseGuard(1, true) && proj.ai[0] <= 0f && proj.ai[2] == 0f)
 						{

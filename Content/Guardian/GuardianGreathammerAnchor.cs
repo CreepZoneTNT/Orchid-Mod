@@ -314,17 +314,20 @@ namespace OrchidMod.Content.Guardian
 							}
 							guardian.GuardianItemCharge = 0;
 						}
-						else if (swingInput && guardian.UseSlam())
+						else if (swingInput && guardian.UseSlam(checkOnly: true, warn: true))
 						{
-							Item item = HammerItem.Item;
-							Projectile.damage = guardian.GetGuardianDamage(item.damage * HammerItem.SlamDamage);
-							Projectile.CritChance = guardian.GetGuardianCrit(item.crit);
-							Projectile.knockBack = item.knockBack;
-							//not set to friendly until animation reaches the attack
-							ChangeState(Slamming, 40);
-							Projectile.ResetLocalNPCHitImmunity();
-							ResetHitStatus(true);
-							guardian.OnAttack(AttackID.GreathammerSlam);
+							if (guardian.UseSlam())
+							{
+								Item item = HammerItem.Item;
+								Projectile.damage = guardian.GetGuardianDamage(item.damage * HammerItem.SlamDamage);
+								Projectile.CritChance = guardian.GetGuardianCrit(item.crit);
+								Projectile.knockBack = item.knockBack;
+								//not set to friendly until animation reaches the attack
+								ChangeState(Slamming, 40);
+								Projectile.ResetLocalNPCHitImmunity();
+								ResetHitStatus(true);
+								guardian.OnAttack(AttackID.GreathammerSlam);
+							}
 						}
 						else
 						{

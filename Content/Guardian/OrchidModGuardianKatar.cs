@@ -39,7 +39,7 @@ namespace OrchidMod.Content.Guardian
 		/// <summary> Called as the players begins a katar dash. </summary>
 		public virtual void OnDashKatar(Player player, OrchidGuardian guardian, Projectile anchor) { }
 		/// <summary> Called every frame by Katar jab projectiles. Return false to prevent normal projectile AI from running (which simply slows down the projectile). </summary>
-		public virtual bool PreGuard(Player player, OrchidGuardian guardian, Projectile anchor) { return guardian.UseGuard(1); }
+		public virtual bool PreGuard(Player player, OrchidGuardian guardian, Projectile anchor) { return guardian.UseGuard(1, warn: true); }
 		/// <summary> Called every frame by Katar jab projectiles. Return false to prevent normal projectile AI from running (which simply slows down the projectile). </summary>
 		public virtual bool ProjectileAI(Player player, Projectile projectile, bool charged) => true;
 		/// <summary> Called at the end of the Anchor Projectile AI update. </summary>
@@ -145,27 +145,7 @@ namespace OrchidMod.Content.Guardian
 		bool shouldPunch => punchTimer > 0;
 		bool shouldGuard;
 
-		public override bool CanUseItem(Player player)
-		{
-			if (player.whoAmI == Main.myPlayer && !player.cursed)
-			{
-				OrchidGuardian guardian = player.GetModPlayer<OrchidGuardian>();
-				var projectileType = ModContent.ProjectileType<GuardianKatarAnchor>();
-				int[] anchors = GetAnchors(player);
-				if (anchors != null)
-				{
-					bool swap = ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs;
-					bool punchHold = swap ? Main.mouseRight : Main.mouseLeft;
-					bool punchTap = swap ? Main.mouseRightRelease : Main.mouseLeftRelease;
-					bool guardHold = swap ? Main.mouseLeft : Main.mouseRight;
-					bool guardTap = swap ? Main.mouseLeftRelease : Main.mouseRightRelease;
-
-					if (punchHold && punchTap && guardian.GuardianItemCharge <= 0) punchTimer = 6;
-					if (guardHold && guardTap && !guardian.GuardianParry) shouldGuard = true;
-				}
-			}
-			return false;
-		}
+		public override bool CanUseItem(Player player) => false;
 
 		public void DoBufferedKatarInputs(Player player)
 		{
@@ -179,11 +159,15 @@ namespace OrchidMod.Content.Guardian
 				bool guardHold = swap ? Main.mouseLeft : Main.mouseRight;
 				bool guardTap = swap ? Main.mouseLeftRelease : Main.mouseRightRelease;
 
+				if (punchHold && punchTap && guardian.GuardianItemCharge <= 0) punchTimer = 6;
+
 				if (guardian.GuardianItemCharge > 0) punchTimer = 0;
 				if (shouldPunch && !punchHold) punchTimer--;
 				if (!guardHold || guardian.GuardianParry) shouldGuard = false;
-				
-				if (shouldPunch || shouldGuard)
+				shouldGuard = guardHold && guardTap && !guardian.GuardianParry;
+
+
+				if (shouldPunch || shouldGuard && !player.cursed)
 				{
 					Projectile projectileMain = Main.projectile[anchors[1]];
 					if (shouldGuard)

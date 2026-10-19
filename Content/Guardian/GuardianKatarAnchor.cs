@@ -366,12 +366,19 @@ namespace OrchidMod.Content.Guardian
 						if (!OffHandKatar)
 						{
 							guardianItem.ChargeJabCostUI(owner, guardian, Projectile);
-							if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? Main.mouseLeft : Main.mouseRight) && owner.whoAmI == Main.myPlayer && guardianItem.ChargeJabCost(owner, guardian, Projectile, true))
+							if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? Main.mouseLeft : Main.mouseRight) && owner.whoAmI == Main.myPlayer)
 							{
-								guardianItem.ChargeJabCost(owner, guardian, Projectile, false);
-								Projectile.ai[0] = -1f; // not fully charged
-								Projectile.ai[1] = Vector2.Normalize(Main.MouseWorld - owner.MountedCenter).ToRotation() - MathHelper.PiOver2;
-								Projectile.netUpdate = true;
+								if (guardianItem.ChargeJabCost(owner, guardian, Projectile, true))
+								{
+									guardianItem.ChargeJabCost(owner, guardian, Projectile, false);
+									Projectile.ai[0] = -1f; // not fully charged
+									Projectile.ai[1] = Vector2.Normalize(Main.MouseWorld - owner.MountedCenter).ToRotation() - MathHelper.PiOver2;
+									Projectile.netUpdate = true;
+								}
+								else
+								{
+									guardian.WarnMissingResources(0, 1, playSound: false);
+								}
 							}
 							else if ((ModContent.GetInstance<OrchidClientConfig>().GuardianSwapGauntletImputs ? !Main.mouseRight : !Main.mouseLeft) && owner.whoAmI == Main.myPlayer)
 							{

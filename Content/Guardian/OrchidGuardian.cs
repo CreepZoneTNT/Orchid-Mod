@@ -111,6 +111,7 @@ namespace OrchidMod
 		public bool OverThresholdSlams => GuardianSlam + GuardianSlamRecharging > GuardianSlamMax * GuardianRegenThreshold;
 		public int GuardianDisplayUI = 0; // Guardian UI is displayed if > 0
 		public float GuardianItemCharge = 0f; // Player Warhammer Throw Charge, max is 180f
+		/// <summary> Player is currently parrying.</summary>
 		public bool GuardianParry = false; // Player is currently parrying
 		public bool GuardianParryBuffer = false; // Player is currently parrying (1 frame buffer)
 		/// <summary> Cooldown in frames between starting a new punch charge since starting the last one. Can begin a punch when 0 or lower, goes down to -10. Half of the gauntlet's punch animation time is added when a charge is started. </summary>
@@ -811,8 +812,10 @@ namespace OrchidMod
 			}
 		}
 
-		public bool UseSlam(int nb = 1, bool checkOnly = false, bool showUICost = false)
+		public bool UseSlam(int nb = 1, bool checkOnly = false, bool showUICost = false, bool warn = false)
 		{
+			if (nb <= 0) return true;
+
 			if (showUICost)
 			{
 				SlamCostUI = nb;
@@ -866,11 +869,18 @@ namespace OrchidMod
 				}
 				return true;
 			}
+			else if (warn)
+			{
+				WarnMissingResources(0, nb, playSound: false);
+			}
+
 			return false;
 		}
 
-		public bool UseGuard(int nb = 1, bool checkOnly = false, bool showUICost = false)
+		public bool UseGuard(int nb = 1, bool checkOnly = false, bool showUICost = false, bool warn = false)
 		{
+			if (nb <= 0) return true;
+
 			if (showUICost)
 			{
 				GuardCostUI = nb;
@@ -923,6 +933,10 @@ namespace OrchidMod
 					}
 				}
 				return true;
+			}
+			else if (warn)
+			{
+				WarnMissingResources(nb, 0, playSound: false);
 			}
 			return false;
 		}
@@ -1381,11 +1395,18 @@ namespace OrchidMod
 		}
 
 		/// <summary>Highlights that the player is missing resources. The number of guards or slams specified will flash red for the time specified, and text will optionally be displayed for which one the player doesn't have enough of.</summary>
-		public void WarnMissingResources(int guards, int slams, int time = 45, bool playSound = true, bool spawnText = true)
+		public void WarnMissingResources(int guards, int slams, int time = 45, bool playSound = true, bool spawnText = true, bool allowSpam = false)
 		{
+			if (MissingResourcesTimer > 0 && !allowSpam)
+			{ // can't spam WarnMissingResources unless allowSpam is set to true, allowing for an easy way to have the resource flash on input release
+				if (guards > 0 && MissingGuardsUI > 0 && slams > 0 && MissingSlamsUI > 0) return;
+				else if (guards > 0 && MissingGuardsUI > 0) return;
+				else if (slams > 0 && MissingSlamsUI > 0) return;
+			}
+
 			if (MissingGuardsUI != guards || MissingSlamsUI != slams)
 			{
-				if (playSound) SoundEngine.PlaySound(SoundID.NPCHit42.WithVolumeScale(0.25f).WithPitchOffset(Main.rand.NextFloat(-0.2f, 0.2f)));
+				if (playSound && MissingResourcesTimer <= 0) SoundEngine.PlaySound(SoundID.NPCHit42.WithVolumeScale(0.4f).WithPitchOffset(Main.rand.NextFloat(-0.3f, 0.3f))); // MissingResourcesTimer <= 0 prevents audio spam
 				if (spawnText)
 				{
 					Rectangle rectangle = Player.Hitbox;

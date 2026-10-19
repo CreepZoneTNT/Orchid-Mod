@@ -1190,13 +1190,13 @@ namespace OrchidMod
 				if (Player.honeyCombItem != null && !Player.honeyCombItem.IsAir)
 				{ // adapted from Player.cs
 					int nbBees = 1;
-					if (Main.rand.Next(3) == 0)
+					if (Main.rand.NextBool(3))
 						nbBees++;
 
-					if (Main.rand.Next(3) == 0)
+					if (Main.rand.NextBool(3))
 						nbBees++;
 
-					if (Player.strongBees && Main.rand.Next(3) == 0)
+					if (Player.strongBees && Main.rand.NextBool(3))
 						nbBees++;
 
 					float beeDamage = 13f;
@@ -1266,7 +1266,7 @@ namespace OrchidMod
 			}
 		}
 
-		/// <summary> Should be called when the player performs any action with a guardian weapon. Uses <c>GuardianAttackInfo</c> to determine attack context. </summary>
+		/// <summary> Should be called when the player performs any action with a guardian weapon. Uses <c>GuardianAttackInfo</c> to determine attack context. See <c>AttackID</c> for a set of predefined attacks. </summary>
 		public void OnAttack(GuardianAttackInfo info, OrchidModGuardianItem guardianItem = null)
 		{
 			if (GuardianCounter && info.Slam && GuardianCounterTime > 0)
@@ -1334,7 +1334,7 @@ namespace OrchidMod
 			foreach (NPC npc in Main.npc.Where(T => T.active && NPCInRange(T) && EnemyPredicate(T)))
 			{
 				if (item != null && !item.OnDeflectNPC(Player, this, npc, anchor)) continue;
-				if (dmg > 0)
+				if (dmg > 0 && !npc.dontTakeDamage)
 				{
 					NPCKillAttempt isKill = new(npc);
 					Player.ApplyDamageToNPC(npc, dmg, 0, npc.Center.X > from.X ? 1 : -1, Main.rand.Next(100) < crit, ModContent.GetInstance<GuardianDamageClass>(), true);

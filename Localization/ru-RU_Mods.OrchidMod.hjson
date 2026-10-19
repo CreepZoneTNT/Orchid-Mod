@@ -3451,7 +3451,7 @@ Items: {
 	}
 
 	ChlorophyteGreathammer: {
-		// DisplayName: Chlorophyte Greataxe
+		// DisplayName: Chlorophyte Cleaver
 		// Tooltip: Rapidly cleaves
 	}
 }

@@ -18,7 +18,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Gauntlets
 			Item.width = 42;
 			Item.height = 38;
 			Item.knockBack = 10f;
-			Item.damage = 100;
+			Item.damage = 128;
 			Item.value = Item.sellPrice(0, 0, 50, 0);
 			Item.rare = ItemRarityID.Orange;
 			Item.useTime = 20;
@@ -37,74 +37,45 @@ namespace OrchidMod.Content.Guardian.Weapons.Gauntlets
 		{
 			if (charged && guardian.UseGuard(1, true))
 			{
-				bool deflect = false;
-				bool instantExplode = true;
-				Vector2 strikeVelocity = Vector2.UnitY.RotatedBy((Main.MouseWorld - player.MountedCenter).ToRotation() - MathHelper.PiOver2) * 8;
+				Vector2 strikeVelocity = Vector2.UnitX.RotatedBy((Main.MouseWorld - player.MountedCenter).ToRotation()) * 8;
 				Vector2 strikeEndPosition = projectile.Center + strikeVelocity * 10;
-				int punchDamage = guardian.GetGuardianDamage(Item.damage);
-				int highestDeflectedDamage = 0;
-				for (int i = 0; i < Main.maxProjectiles; i++)
+				Rectangle area = new((int)projectile.Center.X, (int)projectile.Center.Y, (int)strikeEndPosition.X, (int)strikeEndPosition.Y);
+				if (area.Width < area.X) (area.X, area.Width) = (area.Width, area.X);
+				if (area.Height < area.Y) (area.Y, area.Height) = (area.Height, area.Y);
+				area.Width -= area.X;
+				area.Height -= area.Y;
+				area.Inflate(10, 10);
+				if (guardian.DoDeflect(area, out bool caughtProjectile, out bool killedNPC, EnemyPredicate: new Predicate<NPC>(T => !T.friendly && (T.lifeMax < 2 || (T.velocity - player.velocity).Length() > 6f)), lenience: 1f))
 				{
-					Projectile deflectProj = Main.projectile[i];
-					if(deflectProj.active && deflectProj.hostile && deflectProj.damage > 0 && Collision.CheckAABBvLineCollision(deflectProj.position + deflectProj.velocity - new Vector2(16), new Vector2(deflectProj.width + 32, deflectProj.height + 32), projectile.Center, strikeEndPosition))
+					guardian.DoParryItemParry(null);
+					int punchDamage = guardian.GetGuardianDamage(Item.damage);
+					if (guardian.DeflectedEnemies.Count > 0)
 					{
-						if (!deflect && guardian.UseGuard())
+						guardian.GuardianGuardRecharging += 0.5f; //we hit at least one npc with a slam, so get half a guard
+						foreach (NPC target in guardian.DeflectedEnemies) //DoDeflect supports dealing damage as part of the deflect, but we want to manually control the damage and don't have access to DeflectItem methods because this is a ParryItem
 						{
-							deflect = true;
-							guardian.OnBlockProjectileFirst(projectile, deflectProj);
-						}
-						if (deflect)
-						{
-							instantExplode = false;
-							guardian.OnBlockProjectile(projectile, deflectProj);
-							if (deflectProj.damage > highestDeflectedDamage) highestDeflectedDamage = deflectProj.damage;
-							deflectProj.Kill();
-						}
-					}
-				}
-				for (int i = 0; i < Main.maxNPCs; i++)
-				{
-					NPC deflectEnemy = Main.npc[i];
-					if (deflectEnemy.active && !deflectEnemy.friendly && Collision.CheckAABBvLineCollision(deflectEnemy.position + deflectEnemy.velocity - new Vector2(16), new Vector2(deflectEnemy.width + 32, deflectEnemy.height + 32), projectile.Center, strikeEndPosition) && (deflectEnemy.lifeMax < 2 || (deflectEnemy.velocity - player.velocity).Length() > 6f))
-					{
-						if (!deflect && guardian.UseGuard())
-						{
-							deflect = true;
-							guardian.OnBlockNPCFirst(projectile, deflectEnemy);
-						}
-						if (deflect)
-						{
-							guardian.OnBlockNPC(projectile, deflectEnemy);
-							if (deflectEnemy.damage > highestDeflectedDamage) highestDeflectedDamage = deflectEnemy.damage;
-							if (!deflectEnemy.dontTakeDamage)
+							if (!target.dontTakeDamage)
 							{
-								NPC.HitInfo info = deflectEnemy.CalculateHitInfo(punchDamage, strikeVelocity.X > 1 ? 1 : -1, false, 1f, ModContent.GetInstance<GuardianDamageClass>());
-								if (info.Damage >= deflectEnemy.life) instantExplode = false; 
-								deflectEnemy.StrikeNPC(info);
+								NPC.HitInfo info = target.CalculateHitInfo(punchDamage, strikeVelocity.X > 1 ? 1 : -1, Main.rand.Next(100) < player.GetWeaponCrit(Item), 1f, ModContent.GetInstance<GuardianDamageClass>());
+								if (info.Damage >= target.life) killedNPC = true; //at least one npc was killed, so projectile retains full damage
+								else info.Damage /= 2; //npc wasn't killed, so deal half damage
+								target.StrikeNPC(info);
 							}
 						}
 					}
-				}
-				if (deflect)
-				{
-					//SoundEngine.PlaySound(SoundID.Item106.WithPitchOffset(0.2f), player.Center);
-					//SoundEngine.PlaySound(SoundID.Item72, player.Center);
-					//player.GetModPlayer<OrchidPlayer>().PlayerImmunity = player.immuneTime = InvincibilityDuration;
-					//player.immune = true;
-					guardian.DoParryItemParry(null);
-					Projectile counterProj = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), projectile.Center + strikeVelocity * 4, Vector2.Zero, ModContent.ProjectileType<ThoriumGraniteGauntletProjectile>(), Math.Clamp(highestDeflectedDamage, punchDamage, 1000), Item.knockBack, projectile.owner);
-					counterProj.CritChance = (int)(player.GetCritChance<GuardianDamageClass>() + player.GetCritChance<GenericDamageClass>() + Item.crit);
+					Projectile counterProj = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), projectile.Center + strikeVelocity * 4, Vector2.Zero, ModContent.ProjectileType<ThoriumGraniteGauntletProjectile>(), punchDamage, Item.knockBack, projectile.owner);
+					counterProj.CritChance = player.GetWeaponCrit(Item);
 					counterProj.rotation = Main.rand.NextFloat(MathHelper.TwoPi);
-					if (!instantExplode)
+					if (caughtProjectile || killedNPC) //projectile plays full animation, travels and deals full damage
 					{
-						counterProj.damage = (int)(counterProj.damage * 1.5f);
-						SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(0.4f), player.Center);
+						counterProj.damage *= 2;
+						SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(0.3f), player.Center);
 					}
-					else
+					else //projectile instantly explodes for half damage
 					{
 						counterProj.ai[0] = 1;
 						counterProj.timeLeft -= 4;
-						SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(0.6f), player.Center);
+						SoundEngine.PlaySound(SoundID.Item37.WithPitchOffset(0.7f), player.Center);
 					}
 					return false;
 				}

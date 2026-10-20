@@ -370,6 +370,18 @@ namespace OrchidMod.Content.Guardian
 				}
 				if (IsSlamming)
 				{
+					if (guardian.GuardianItemCharge < 210f)
+					{
+						guardian.GuardianItemCharge += 30f / HammerItem.Item.useTime * HammerItem.WaitChargeGain * player.GetTotalAttackSpeed(DamageClass.Melee);
+						if (guardian.GuardianItemCharge > 210) guardian.GuardianItemCharge = 210;
+					}
+					if (!Ding && guardian.GuardianItemCharge >= 180)
+					{
+						Ding = true;
+						if (ModContent.GetInstance<OrchidClientConfig>().GuardianAltChargeSounds) SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot, player.Center);
+						else SoundEngine.PlaySound(SoundID.MaxMana, player.Center);
+					}
+
 					Anim -= HammerItem.SlamSpeed * player.GetTotalAttackSpeed(DamageClass.Melee);
 					switch (Anim)
 					{
@@ -628,7 +640,8 @@ namespace OrchidMod.Content.Guardian
 			{
 				if (IsSlamming && guardian.GuardianItemCharge < 210f)
 				{
-					guardian.GuardianItemCharge += 90f * HammerItem.SlamChargeGain;
+					guardian.GuardianItemCharge += 60f * HammerItem.SlamChargeGain;
+
 					if (guardian.GuardianItemCharge > 180f) guardian.GuardianItemCharge = 210f;
 					guardian.SyncGuardianItemCharge();
 				}

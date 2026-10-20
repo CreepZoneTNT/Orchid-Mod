@@ -179,7 +179,22 @@ namespace OrchidMod.Content.Guardian
 						if (guardian.UseGuard(GuardCost, true) && guardian.DoDeflect(hitbox, out bool caughtProjectile, out bool killedNPC, this, anchor, lenience: 5f))
 						{
 							guardian.UseGuard(GuardCost);
-							guardian.AddSlam(GuardCost);
+							int toAdd = GuardCost;
+
+							// Meteorite armor set. It's a bit unclean, but i can't put this anywhere else (?)
+							if (guardian.GuardianMeteorite)
+							{
+								for (int i = 0; i < GuardCost; i++)
+								{
+									if (Main.rand.NextBool())
+									{
+										toAdd++;
+									}
+								}
+							}
+
+							guardian.AddSlam(toAdd);
+
 							anchor.ChangeState(3, 30, updateDelay: true);
 							SoundEngine.PlaySound(SoundID.Item52, player.Center);
 							guardian.OnAttack(AttackID.GreathammerDeflect);

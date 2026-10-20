@@ -629,7 +629,7 @@ namespace OrchidMod.Content.Guardian
 					float charge = guardian.GuardianItemCharge / 180f;
 					float chargeToGain = 0.5f * HammerItem.SlamChargeGain;
 					if (charge + chargeToGain > 1)
-						modifiers.SourceDamage *= charge + chargeToGain;
+						modifiers.SourceDamage *= charge + chargeToGain * HammerItem.ThrowDamage;
 				}
 			}
 		}

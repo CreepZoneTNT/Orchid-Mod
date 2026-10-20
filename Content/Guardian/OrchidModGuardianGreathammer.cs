@@ -40,7 +40,7 @@ namespace OrchidMod.Content.Guardian
 		public float BashDamage;
 		/// <summary>Multiplier for the item damage dealt to enemies hit by a slam. Defaults to 1f</summary>
 		public float SlamDamage;
-		/// <summary>Multiplier for the item damage dealt to enemies hit by a throw. Defaults to 1f</summary>
+		/// <summary>Multiplier for the item damage dealt to enemies hit by a throw. Defaults to 1.5f</summary>
 		public float ThrowDamage;
 		/// <summary>Time in frames before throw velocity reaches 0 and the hammer begins returning. Throw velocity loss is calculated dynamically, so it will slow faster with a lower time, and vice versa. Use `Item.ShootSpeed` to control base throw velocity. Defaults to 20.</summary>
 		public int Range;
@@ -110,7 +110,7 @@ namespace OrchidMod.Content.Guardian
 			GuardCost = 2;
 			BashDamage = 0.25f;
 			SlamDamage = 1f;
-			ThrowDamage = 1f;
+			ThrowDamage = 1.5f;
 			DeflectDamage = 1f;
 			SlamSpeed = 1f;
 			ReturnSpeed = 1f;

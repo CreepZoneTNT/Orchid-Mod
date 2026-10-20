@@ -22,7 +22,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Greathammers
 			Item.knockBack = 5f;
 			Item.shootSpeed = 14f;
 			Item.useTime = 40;
-			Item.damage = 108;
+			Item.damage = 96;
 			GuardStacks = 1;
 			SlamSpeed = 0.9f;
 			Range = 25;

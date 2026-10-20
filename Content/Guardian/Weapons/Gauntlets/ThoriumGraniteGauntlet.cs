@@ -45,8 +45,9 @@ namespace OrchidMod.Content.Guardian.Weapons.Gauntlets
 				area.Width -= area.X;
 				area.Height -= area.Y;
 				area.Inflate(10, 10);
-				if (guardian.DoDeflect(area, out bool caughtProjectile, out bool killedNPC, EnemyPredicate: new Predicate<NPC>(T => !T.friendly && (T.lifeMax < 2 || (T.velocity - player.velocity).Length() > 6f)), lenience: 1f))
+				if (guardian.DoDeflect(area, out bool caughtProjectile, out bool killedNPC, anchor: projectile.ModProjectile, EnemyPredicate: new Predicate<NPC>(T => !T.friendly && (T.lifeMax < 2 || (T.velocity - player.velocity).Length() > 6f)), lenience: 1f))
 				{
+					guardian.UseGuard(1);
 					guardian.DoParryItemParry(null);
 					int punchDamage = guardian.GetGuardianDamage(Item.damage);
 					if (guardian.DeflectedEnemies.Count > 0)

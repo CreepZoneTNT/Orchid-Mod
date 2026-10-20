@@ -1378,7 +1378,7 @@ namespace OrchidMod
 			else ProjInRange = new Predicate<Projectile>(T => (T.Hitbox.Intersects(targetArea) || (lenience > 0 && Collision.CheckAABBvLineCollision(targetArea.TopLeft(), targetArea.Size(), T.Hitbox.ClosestPointInRect(from), T.Hitbox.ClosestPointInRect(from) + T.velocity * lenience))) && (T.Hitbox.ClosestPointInRect(from).Distance(from) <= range || (lenience > 0 && from.ClosestPointOnLine(T.Hitbox.ClosestPointInRect(from), T.Hitbox.ClosestPointInRect(from) + T.velocity * lenience).Distance(from) <= range)));
 			foreach (Projectile proj in Main.projectile.Where(T => T.active && !ProjectilesBlockBlacklist.Contains(T.type) && ProjInRange(T) && ProjPredicate(T)))
 			{
-				if (proj.ModProjectile == anchor)
+				if (anchor != null && proj.ModProjectile == anchor)
 				{
 					Main.NewText("A deflect weapon's anchor just attempted to deflect itself. Please report which weapon caused this and when!");
 					continue;

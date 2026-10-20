@@ -3454,6 +3454,11 @@ Items: {
 		// DisplayName: Chlorophyte Cleaver
 		// Tooltip: Rapidly cleaves
 	}
+
+	MahoganyGreathammer: {
+		// DisplayName: Mahogany Greathammer
+		// Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -3645,6 +3650,7 @@ Prefixes: {
 		AddDuration: "{0:+0;-0}% к длительности {1}"
 		AddDurationParry: парирования
 		AddDurationBlock: блока
+		// AddDurationDeflectStun: stun
 		AddSize: "{0:+0;-0}% к размеру"
 		AddSpeed: "{0:+0;-0}% к скорости"
 	}

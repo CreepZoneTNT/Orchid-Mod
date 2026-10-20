@@ -23,7 +23,7 @@ namespace OrchidMod.Content.Guardian
 		public int HitCount = 0;
 		public float AuraIntensity = 0;
 		public bool AuraFlip = false;
-		int trailing = 0;
+		// int trailing = 0; // commented because unused
 
 		public bool Ding = false;
 		public bool NeedNetUpdate = false;

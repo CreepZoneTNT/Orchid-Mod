@@ -19,13 +19,5 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			slamDistance = 35f;
 			blockDuration = 60;
 		}
-
-		public override void AddRecipes()
-		{
-			var recipe = CreateRecipe();
-			recipe.AddTile(TileID.WorkBenches);
-			recipe.AddIngredient(ItemID.RichMahogany, 10);
-			recipe.Register();
-		}
 	}
 }

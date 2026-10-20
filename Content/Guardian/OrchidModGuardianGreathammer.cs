@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using OrchidMod.Common;
 using OrchidMod.Common.Global.Items;
+using OrchidMod.Content.General.Prefixes;
 using OrchidMod.Content.Guardian.Buffs.Debuffs;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,8 @@ namespace OrchidMod.Content.Guardian
 		public int GuardStacks;
 		/// <summary>Number of guards consumed on a successful deflect. The player will be granted an equal number of slams.</summary>
 		public int GuardCost;
+		/// <summary>Duration of deflect stuns applied to hit enemies. Defaults to 120 (2 seconds). Use OrchidModGuardianGreathammer.GetStunDuration() when attempting to get the stun duration to apply.</summary>
+		public int StunDuration;
 		/// <summary>Multiplier for the speed of the greathammer when returning after a throw. Multiplier is relative to ShootSpeed. Defaults to 1f.</summary>
 		public float ReturnSpeed;
 		/// <summary>Multiplier for the speed of the slam animation. Defaults to 1f.</summary>
@@ -80,6 +83,8 @@ namespace OrchidMod.Content.Guardian
 		/// <summary>Called before the base Greathammer anchor plays any sound other than the full charge ding. Return false to prevent the sound, if playing your own.</summary>
 		/// <remarks>Use <c>projectile.ai[0]</c> to determine the context of the sound. <c>2</c> is slamming, <c>3</c> and <c>4</c> are successful and failed deflects, <c>5</c> is throwing or after being thrown, and <c>-1</c> is catching. <c>justThrown</c> will be flagged for the hammer's initial throw sound.</remarks>
 		public virtual bool PreSound(Player player, OrchidGuardian guardian, Projectile projectile, bool justThrown) => true;
+		/// <summary>Gets the stun duration for this specific warhammer, taking external modifiers into account (such as reforges).</summary>
+		public virtual int GetStunDuration(Player player, OrchidGuardian guardian) => (int)(StunDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianDeflectStunDuration);
 		
 		/// <summary>Draws extra UI elements on the GuardianUIState while held.</summary>
 		public virtual void WarhammerPostDrawUI(SpriteBatch spriteBatch, Player player, ref Color lightColor, Projectile projectile) { }
@@ -115,6 +120,7 @@ namespace OrchidMod.Content.Guardian
 			AuraScale = 1f;
 			DrawOffset = new(-8, 8);
 			HammerFrames = 1;
+			StunDuration = 120;
 
 			OrchidGlobalItemPerEntity orchidItem = Item.GetGlobalItem<OrchidGlobalItemPerEntity>();
 			orchidItem.guardianWeapon = true;
@@ -182,7 +188,7 @@ namespace OrchidMod.Content.Guardian
 							{
 								foreach (NPC npc in guardian.DeflectedEnemies)
 								{
-									npc.AddBuff(BuffType<GreathammerStunDebuff>(), 120);
+									npc.AddBuff(BuffType<GreathammerStunDebuff>(), GetStunDuration(player, guardian));
 								}
 							}
 						}
@@ -207,6 +213,11 @@ namespace OrchidMod.Content.Guardian
 				Projectile deflectProj = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center + vel * 4, vel, ProjectileType<GreathammerDeflectedProjectile>(), guardian.GetGuardianDamage(Item.damage), Item.knockBack, player.whoAmI);
 				deflectProj.CritChance = guardian.GetGuardianCrit(Item.crit);
 				if (PreSound(player, guardian, projectile, false)) SoundEngine.PlaySound(SoundID.DD2_SkyDragonsFuryShot, player.Center);
+
+				if (deflectProj.ModProjectile is GreathammerDeflectedProjectile greathammerDeflectedProjectile)
+				{
+					greathammerDeflectedProjectile.Greathammer = this;
+				}
 			}
 			return true;
 		}

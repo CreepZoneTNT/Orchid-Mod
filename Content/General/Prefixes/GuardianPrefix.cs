@@ -156,6 +156,10 @@ namespace OrchidMod.Content.General.Prefixes
 				{
 					block = Language.GetTextValue("Mods.OrchidMod.Prefixes.Effects.AddDurationBlock");
 				}
+				if (item.ModItem is OrchidModGuardianGreathammer)
+				{
+					block = Language.GetTextValue("Mods.OrchidMod.Prefixes.Effects.AddDurationDeflectStun");
+				}
 
 				// I have no clue how to do this in a clean way
 				int index = -1;

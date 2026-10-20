@@ -675,6 +675,7 @@ namespace OrchidMod.Content.Guardian
 						{
 							guardian.GuardianItemCharge += 60f * guardianItem.JabChargeGain * player.GetTotalAttackSpeed(DamageClass.Melee);
 							if (guardian.GuardianItemCharge > 180f) guardian.GuardianItemCharge = 180f;
+							guardian.SyncGuardianItemCharge();
 						}
 					}
 					guardianItem.OnHit(player, guardian, target, Projectile, hit, true, false);

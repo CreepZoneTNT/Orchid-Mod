@@ -187,7 +187,7 @@ namespace OrchidMod.Content.Guardian
 		public override bool? UseItem(Player player)
 		{
 			var guardian = player.GetModPlayer<OrchidGuardian>();
-			bool validRMBInput = !CannotBlock && Main.mouseRight && Main.mouseRightRelease && ((SlamBlockCost > 0 && guardian.UseSlam(SlamBlockCost, true)) || (GuardBlockCost > 0 && guardian.UseGuard(GuardBlockCost, true)));
+			bool validRMBInput = !CannotBlock && Main.mouseRight && Main.mouseRightRelease && guardian.UseSlam(SlamBlockCost, true) && guardian.UseGuard(GuardBlockCost, true);
 
 			if (validRMBInput || Main.mouseLeft)
 			{ // If the player does a valid RMB input (the weapon can block) or a mouseleft input - so we don't create a proejctile for nothing in edge cases
@@ -260,7 +260,17 @@ namespace OrchidMod.Content.Guardian
 			}
 
 			var guardian = player.GetModPlayer<OrchidGuardian>();
-			bool validRMBInput = anchors == null && !CannotBlock && Main.mouseRight && Main.mouseRightRelease && ((SlamBlockCost > 0 && guardian.UseSlam(SlamBlockCost, true)) || (GuardBlockCost > 0 && guardian.UseGuard(GuardBlockCost, true)));
+
+			bool validRMBInput = false;
+			if (anchors == null && !CannotBlock && Main.mouseRight && Main.mouseRightRelease)
+			{
+				validRMBInput = guardian.UseSlam(SlamBlockCost, true) && guardian.UseGuard(GuardBlockCost, true);
+
+				if (!validRMBInput)
+				{
+					guardian.WarnMissingResources(GuardBlockCost, SlamBlockCost, playSound: false);
+				}
+			}
 
 			if ((player.ownedProjectileCounts[projType] > 0 && (offHandCheck || !validRMBInput)) || (!(Main.mouseRight && Main.mouseRightRelease && player.GetModPlayer<OrchidGuardian>().UseGuard(1, true)) && !Main.mouseLeft)) return false;
 

@@ -40,7 +40,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 
 		void BoneBurst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, Vector2 hitVelocity, bool Weak)
 		{
-			Projectile.perIDStaticNPCImmunity[ModContent.ProjectileType<DesertWarhammerProjectile>()][target.whoAmI] = Main.GameUpdateCount + 30;
+			Projectile.perIDStaticNPCImmunity[ModContent.ProjectileType<DesertWarhammerProjectile>()][target.whoAmI] = Main.GameUpdateCount + (Weak ? 30u : 20u);
 			int type = ModContent.ProjectileType<DesertWarhammerProjectile>();
 			for (int i = Weak ? 2 : 0; i < 3; i++)
 			{

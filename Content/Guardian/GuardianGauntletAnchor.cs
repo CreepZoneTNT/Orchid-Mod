@@ -28,13 +28,13 @@ namespace OrchidMod.Content.Guardian
 
 		public int SelectedItem { get; set; } = -1;
 		public Item GauntletItem => Main.player[Projectile.owner].inventory[SelectedItem];
-		public bool Blocking => Projectile.ai[0] > 0 && !Charging;
+		public bool Guarding => Projectile.ai[0] > 0 && !Charging;
 		public bool Slamming => Projectile.ai[0] < 0;
 		public bool Charging => Projectile.ai[2] > 0;
 
 		public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
 		{
-			if (!OffHandGauntlet || Blocking) overPlayers.Add(index);
+			if (!OffHandGauntlet || Guarding) overPlayers.Add(index);
 		}
 
 		// ...
@@ -128,14 +128,14 @@ namespace OrchidMod.Content.Guardian
 					}
 				}
 
-				if (Blocking)
+				if (Guarding)
 				{
 					guardian.GuardianParry = true;
 					guardian.GuardianParryBuffer = true;
 
 					Projectile.Center = owner.MountedCenter.Floor() + new Vector2(4 * owner.direction, 0);
 					if (OffHandGauntlet) Projectile.position.X += 6 * owner.direction;
-					Projectile.rotation = 0f;
+					Projectile.rotation = owner.direction == 1 ? 0f : MathHelper.Pi;
 
 					Projectile.ai[0]--;
 
@@ -159,7 +159,7 @@ namespace OrchidMod.Content.Guardian
 								{
 									if (Main.projectile[i].active && Main.projectile[i].owner == Projectile.owner && Main.projectile[i].ModProjectile is GuardianGauntletAnchor mainhand)
 									{
-										if (mainhand.Blocking)
+										if (mainhand.Guarding)
 										{
 											Main.projectile[i].ai[0] = 0f;
 											break;
@@ -191,9 +191,9 @@ namespace OrchidMod.Content.Guardian
 
 					if (!IsLocalOwner)
 					{ // Rotates the player in the direction of the punch for other clients
-						Vector2 puchDir = (Projectile.ai[1] + MathHelper.PiOver2).ToRotationVector2();
-						if (puchDir.X > 0 && owner.direction != 1) owner.ChangeDir(1);
-						else if (puchDir.X < 0 && owner.direction != -1) owner.ChangeDir(-1);
+						Vector2 punchDir = (Projectile.ai[1] + MathHelper.PiOver2).ToRotationVector2();
+						if (punchDir.X > 0 && owner.direction != 1) owner.ChangeDir(1);
+						else if (punchDir.X < 0 && owner.direction != -1) owner.ChangeDir(-1);
 					}
 					else if (Projectile.localAI[1] == SlamTime)
 					{ // Slam just started, make projectile
@@ -248,7 +248,7 @@ namespace OrchidMod.Content.Guardian
 						Projectile.ai[0] = 0;
 						Projectile.ai[1] = 0;
 
-						if (owner.direction == -1) Projectile.rotation += MathHelper.Pi; // weird issue fix, gauntlets flips for 1 frame at the end of a punch when facing left
+						//if (owner.direction == -1) Projectile.rotation += MathHelper.Pi; // weird issue fix, gauntlets flips for 1 frame at the end of a punch when facing left
 					}
 				}
 				else
@@ -302,11 +302,13 @@ namespace OrchidMod.Content.Guardian
 						{
 							Projectile.position.X -= 2 * owner.direction;
 							Projectile.position.Y -= 2;
-							Projectile.rotation = MathHelper.PiOver2 + MathHelper.PiOver4 * owner.direction * 0.5f;
+							Projectile.rotation = owner.direction == 1 ? MathHelper.PiOver4 * 2.5f : MathHelper.PiOver4 * 1.5f;
+							//Projectile.rotation = MathHelper.PiOver2 + MathHelper.PiOver4 * owner.direction * 0.5f;
 						}
 						else
 						{
-							Projectile.rotation = MathHelper.Pi - MathHelper.PiOver4 * owner.direction;
+							Projectile.rotation = owner.direction == 1 ? MathHelper.PiOver4 * 3f : MathHelper.PiOver4 * 1f;
+							//Projectile.rotation = MathHelper.Pi - MathHelper.PiOver4 * owner.direction;
 						}
 					}
 				}
@@ -379,7 +381,7 @@ namespace OrchidMod.Content.Guardian
 					var effectArm = player.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
 					Texture2D textureArm = guardianItem.GetArmTexture(out Rectangle? drawRectangleArm);
 					float armRotation = player.compositeFrontArm.rotation + MathHelper.PiOver2 * (player.direction == -1 ? 1.5f : 0.5f);
-					if (Blocking) armRotation += MathHelper.PiOver4 * -0.5f * player.direction;
+					if (Guarding) armRotation += MathHelper.PiOver4 * -0.5f * player.direction;
 					Vector2 armPosition = Vector2.Transform(player.Center.Floor() + new Vector2(6 * -player.direction, -2.5f) - Main.screenPosition + Vector2.UnitY * player.gfxOffY, Main.GameViewMatrix.EffectMatrix);
 					Vector2 originArm = drawRectangleArm == null ? textureArm.Size() * 0.5f : drawRectangleArm.GetValueOrDefault().Size() * 0.5f;
 					spriteBatch.Draw(textureArm, armPosition, drawRectangleArm, color, armRotation, originArm, Projectile.scale, effectArm, 0f);
@@ -396,12 +398,12 @@ namespace OrchidMod.Content.Guardian
 
 				Texture2D texture = guardianItem.GetGauntletTexture(player, Projectile, OffHandGauntlet, out Rectangle? drawRectangle, GauntletAnimFrame);
 
-				var effect = SpriteEffects.None;
-				if (player.direction != 1)
+				var effect = player.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
+				/*if (player.direction != 1)
 				{
-					if (player.velocity.X != 0 && !Blocking || (player.GetModPlayer<OrchidGuardian>().GuardianItemCharge > 0 && Projectile.ai[2] != 0) || Slamming) effect = SpriteEffects.FlipVertically;
+					if (player.velocity.X != 0 && !Guarding || (player.GetModPlayer<OrchidGuardian>().GuardianItemCharge > 0 && Projectile.ai[2] != 0) || Slamming) effect = SpriteEffects.FlipVertically;
 					else effect = SpriteEffects.FlipHorizontally;
-				}
+				}*/
 
 				float drawRotation = Projectile.rotation;
 				Vector2 posproj = Projectile.Center;
@@ -413,12 +415,12 @@ namespace OrchidMod.Content.Guardian
 					{
 						effect = SpriteEffects.None;
 					}
-					else if (effect == SpriteEffects.FlipHorizontally)
+					/*if (effect == SpriteEffects.FlipHorizontally)
 					{
 						effect = SpriteEffects.None;
 						drawRotation += MathHelper.Pi;
-					}
-					else if (effect == SpriteEffects.None)
+					}*/
+					else
 					{
 						effect = SpriteEffects.FlipVertically;
 					}

@@ -397,6 +397,7 @@ namespace OrchidMod.Content.Guardian
 						else
 						{
 							Projectile.ai[0] = 0f;
+							guardian.WarnMissingResources(1, 0);
 						}
 
 						guardian.GuardianItemCharge = 0f;

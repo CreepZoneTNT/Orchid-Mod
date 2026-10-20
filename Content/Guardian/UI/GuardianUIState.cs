@@ -222,12 +222,12 @@ namespace OrchidMod.Content.Guardian.UI
 					if (i < modPlayer.MissingGuardsUI)
 					{
 						float flash = 0.5f + (float)Math.Cos(modPlayer.MissingResourcesTimer * 0.28) * 0.5f;
-						spriteBatch.Draw(textureBlockBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * (1 - flash), 0f, Vector2.Zero, 1f, effect, 0f);
+						spriteBatch.Draw(textureBlockBarHighlight, drawposHighlight, null, (check ? new Color(255, 92, 92) * 0.8f : new Color(169, 60, 60)) * (1 - flash), 0f, Vector2.Zero, 1f, effect, 0f);
 						spriteBatch.Draw(texture, drawpos, null, check ? fgColor : (voidCheck ? new Color(255, 58, 228) : Color.White).Multiply(new Color(1f, flash, flash)), 0f, Vector2.Zero, 1f, effect, 0f);
 					}
 					else spriteBatch.Draw(texture, drawpos, null, check ? fgColor : bgColor, 0f, Vector2.Zero, 1f, effect, 0f);
 					
-					if (modPlayer.GuardCostUI > i)
+					if (modPlayer.GuardCostUI > i && modPlayer.MissingGuardsUI <= i)
 					{
 						spriteBatch.Draw(textureBlockBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * 0.8f, 0f, Vector2.Zero, 1f, effect, 0f);
 					}
@@ -258,11 +258,11 @@ namespace OrchidMod.Content.Guardian.UI
 					if (i < modPlayer.MissingSlamsUI)
 					{
 						float flash = 0.5f + (float)Math.Cos(modPlayer.MissingResourcesTimer * 0.28) * 0.5f;
-						spriteBatch.Draw(textureSlamBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * (1 - flash), 0f, Vector2.Zero, 1f, effect, 0f);
+						spriteBatch.Draw(textureSlamBarHighlight, drawposHighlight, null, (check ? new Color(255, 92, 92) * 0.8f : new Color(169, 60, 60)) * (1 - flash), 0f, Vector2.Zero, 1f, effect, 0f);
 						spriteBatch.Draw(texture, drawpos, null, check ? Color.White : new Color(1f, flash, flash), 0f, Vector2.Zero, 1f, effect, 0f);
 					}
 					else spriteBatch.Draw(texture, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
-					if (modPlayer.SlamCostUI > i)
+					if (modPlayer.SlamCostUI > i && modPlayer.MissingSlamsUI <= i)
 					{
 						spriteBatch.Draw(textureSlamBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * 0.8f, 0f, Vector2.Zero, 1f, effect, 0f);
 					}

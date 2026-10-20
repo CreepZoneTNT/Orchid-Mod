@@ -104,7 +104,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Misc
 							shouldCharge = Main.mouseRight && Main.mouseRightRelease;
 						}
 
-						if (shouldBlock && !shouldCharge && guardian.UseGuard(1, true) && proj.ai[0] <= 0f && proj.ai[2] == 0f)
+						if (shouldBlock && !shouldCharge && guardian.UseGuard(1, true, warn:true) && proj.ai[0] <= 0f && proj.ai[2] == 0f)
 						{
 							player.immuneTime = 0;
 							player.immune = false;

@@ -21,6 +21,7 @@ using OrchidMod.Content.Guardian.Accessories;
 using OrchidMod.Common;
 using Terraria.Graphics.Shaders;
 using Terraria.Utilities;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace OrchidMod.Content.Guardian
 {
@@ -145,6 +146,7 @@ namespace OrchidMod.Content.Guardian
 		public bool OverThresholdSlams => GuardianSlam + GuardianSlamRecharging > GuardianSlamMax * GuardianRegenThreshold;
 		public int GuardianDisplayUI = 0; // Guardian UI is displayed if > 0
 		public float GuardianItemCharge = 0f; // Player Warhammer Throw Charge, max is 180f
+		/// <summary> Player is currently parrying.</summary>
 		public bool GuardianParry = false; // Player is currently parrying
 		public bool GuardianParryBuffer = false; // Player is currently parrying (1 frame buffer)
 		/// <summary> Cooldown in frames between starting a new punch charge since starting the last one. Can begin a punch when 0 or lower, goes down to -10. Half of the gauntlet's punch animation time is added when a charge is started. </summary>
@@ -690,9 +692,23 @@ namespace OrchidMod.Content.Guardian
 			{
 				if (Main.myPlayer == Player.whoAmI)
 				{
+					/*
 					if (GuardianDebugVisuals == 1) CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "Enabled shield and deflect check", true);
 					if (GuardianDebugVisuals == 1) CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "Enabled attackinfo display", true);
 					if (GuardianDebugVisuals == 1) CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "Enabled greathammer hand placement visual", true);
+					*/
+					if (GuardianDebugVisuals == 1)
+					{
+						Main.NewText("Enabled shield and deflect check", 175, 255, 175);
+						Main.NewText("Enabled attackinfo display", 175, 255, 175);
+						Main.NewText("Enabled greathammer hand placement visual", 175, 255, 175);
+						Main.NewText("Hide the Guardian Test accessory to disable test visuals", 255, 128, 255);
+					}
+					else
+					{
+						Main.NewText("Disabled guardian test visuals", 255, 92, 92);
+					}
+
 				}
 				OldGuardianDebugVisuals = GuardianDebugVisuals;
 			}
@@ -1044,8 +1060,10 @@ namespace OrchidMod.Content.Guardian
 			}
 		}
 
-		public bool UseSlam(int nb = 1, bool checkOnly = false, bool showUICost = false)
+		public bool UseSlam(int nb = 1, bool checkOnly = false, bool showUICost = false, bool warn = false)
 		{
+			if (nb <= 0) return true;
+
 			if (showUICost)
 			{
 				SlamCostUI = nb;
@@ -1099,11 +1117,18 @@ namespace OrchidMod.Content.Guardian
 				}
 				return true;
 			}
+			else if (warn)
+			{
+				WarnMissingResources(0, nb, playSound: false);
+			}
+
 			return false;
 		}
 
-		public bool UseGuard(int nb = 1, bool checkOnly = false, bool showUICost = false)
+		public bool UseGuard(int nb = 1, bool checkOnly = false, bool showUICost = false, bool warn = false)
 		{
+			if (nb <= 0) return true;
+
 			if (showUICost)
 			{
 				GuardCostUI = nb;
@@ -1156,6 +1181,10 @@ namespace OrchidMod.Content.Guardian
 					}
 				}
 				return true;
+			}
+			else if (warn)
+			{
+				WarnMissingResources(nb, 0, playSound: false);
 			}
 			return false;
 		}
@@ -1438,13 +1467,13 @@ namespace OrchidMod.Content.Guardian
 				if (Player.honeyCombItem != null && !Player.honeyCombItem.IsAir)
 				{ // adapted from Player.cs
 					int nbBees = 1;
-					if (Main.rand.Next(3) == 0)
+					if (Main.rand.NextBool(3))
 						nbBees++;
 
-					if (Main.rand.Next(3) == 0)
+					if (Main.rand.NextBool(3))
 						nbBees++;
 
-					if (Player.strongBees && Main.rand.Next(3) == 0)
+					if (Player.strongBees && Main.rand.NextBool(3))
 						nbBees++;
 
 					float beeDamage = 13f;
@@ -1514,7 +1543,7 @@ namespace OrchidMod.Content.Guardian
 			}
 		}
 
-		/// <summary> Should be called when the player performs any action with a guardian weapon. Uses <c>GuardianAttackInfo</c> to determine attack context. </summary>
+		/// <summary> Should be called when the player performs any action with a guardian weapon. Uses <c>GuardianAttackInfo</c> to determine attack context. See <c>AttackID</c> for a set of predefined attacks. </summary>
 		public void OnAttack(GuardianAttackInfo info, OrchidModGuardianItem guardianItem = null)
 		{
 			if (GuardianCounter && info.Slam && GuardianCounterTime > 0)
@@ -1582,7 +1611,7 @@ namespace OrchidMod.Content.Guardian
 			foreach (NPC npc in Main.npc.Where(T => T.active && NPCInRange(T) && EnemyPredicate(T)))
 			{
 				if (item != null && !item.OnDeflectNPC(Player, this, npc, anchor)) continue;
-				if (dmg > 0)
+				if (dmg > 0 && !npc.dontTakeDamage)
 				{
 					NPCKillAttempt isKill = new(npc);
 					Player.ApplyDamageToNPC(npc, dmg, 0, npc.Center.X > from.X ? 1 : -1, Main.rand.Next(100) < crit, ModContent.GetInstance<GuardianDamageClass>(), true);
@@ -1597,7 +1626,7 @@ namespace OrchidMod.Content.Guardian
 			else ProjInRange = new Predicate<Projectile>(T => (T.Hitbox.Intersects(targetArea) || (lenience > 0 && Collision.CheckAABBvLineCollision(targetArea.TopLeft(), targetArea.Size(), T.Hitbox.ClosestPointInRect(from), T.Hitbox.ClosestPointInRect(from) + T.velocity * lenience))) && (T.Hitbox.ClosestPointInRect(from).Distance(from) <= range || (lenience > 0 && from.ClosestPointOnLine(T.Hitbox.ClosestPointInRect(from), T.Hitbox.ClosestPointInRect(from) + T.velocity * lenience).Distance(from) <= range)));
 			foreach (Projectile proj in Main.projectile.Where(T => T.active && !ProjectilesBlockBlacklist.Contains(T.type) && ProjInRange(T) && ProjPredicate(T)))
 			{
-				if (proj.ModProjectile == anchor)
+				if (anchor != null && proj.ModProjectile == anchor)
 				{
 					Main.NewText("A deflect weapon's anchor just attempted to deflect itself. Please report which weapon caused this and when!");
 					continue;
@@ -1614,23 +1643,42 @@ namespace OrchidMod.Content.Guardian
 		}
 
 		/// <summary>Highlights that the player is missing resources. The number of guards or slams specified will flash red for the time specified, and text will optionally be displayed for which one the player doesn't have enough of.</summary>
-		public void WarnMissingResources(int guards, int slams, int time = 45, bool playSound = true, bool spawnText = true)
+		public void WarnMissingResources(int guards, int slams, int time = 45, bool playSound = true, bool spawnText = true, bool allowSpam = false)
 		{
+			if (MissingResourcesTimer > 0 && !allowSpam)
+			{ // can't spam WarnMissingResources unless allowSpam is set to true, allowing for an easy way to have the resource flash on input release
+				if (guards > 0 && MissingGuardsUI > 0 && slams > 0 && MissingSlamsUI > 0) return;
+				else if (guards > 0 && MissingGuardsUI > 0) return;
+				else if (slams > 0 && MissingSlamsUI > 0) return;
+			}
+
 			if (MissingGuardsUI != guards || MissingSlamsUI != slams)
 			{
-				if (playSound) SoundEngine.PlaySound(SoundID.NPCHit42);
+				if (playSound && MissingResourcesTimer <= 0) SoundEngine.PlaySound(SoundID.NPCHit42.WithVolumeScale(0.4f).WithPitchOffset(Main.rand.NextFloat(-0.3f, 0.3f))); // MissingResourcesTimer <= 0 prevents audio spam
 				if (spawnText)
 				{
+					Rectangle rectangle = Player.Hitbox;
+					rectangle.Y -= 32;
+					int textWhoAmI = -1;
+					Color color = new Color(255, 92, 92);
 					if (guards > GuardianGuard && slams > GuardianSlam)
-						CombatText.NewText(Player.Hitbox, Color.Red, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingGuardsAndSlams"), false, true);
+						textWhoAmI = CombatText.NewText(rectangle, color, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingGuardsAndSlams"), false, false);
 					else if (guards > GuardianGuard)
-						CombatText.NewText(Player.Hitbox, Color.Red, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingGuards"), false, true);
+						textWhoAmI = CombatText.NewText(rectangle, color, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingGuards"), false, false);
 					else if (slams > GuardianSlam)
-						CombatText.NewText(Player.Hitbox, Color.Red, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingSlams"), false, true);
+						textWhoAmI = CombatText.NewText(rectangle, color, Language.GetTextValue("Mods.OrchidMod.UI.GuardianItem.MissingSlams"), false, false);
 					else //what is the player even being warned for
 					{
 						SoundEngine.PlaySound(SoundID.Item150);
-						CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "you're playing it wrong give me the controller");
+						textWhoAmI = CombatText.NewText(Player.Hitbox, new Color(1f, 0f, 1f), "you're playing it wrong give me the controller");
+					}
+
+					if (textWhoAmI >= 0 && textWhoAmI < 100)
+					{
+						CombatText combattext = Main.combatText[textWhoAmI];
+						combattext.dot = true;
+						combattext.velocity.Y = -2.5f;
+						combattext.lifeTime = 25;
 					}
 				}
 			}

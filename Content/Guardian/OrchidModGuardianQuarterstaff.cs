@@ -140,7 +140,7 @@ namespace OrchidMod.Content.Guardian
 						bool shouldBlock = guardian.GetGauntletBlockInput(true);
 						bool shouldCharge = guardian.GetGauntletPunchInput(false);
 
-						if (shouldBlock && !shouldCharge && guardian.UseGuard(1, true) && proj.ai[0] <= 0f && proj.ai[2] == 0f)
+						if (shouldBlock && !shouldCharge && guardian.UseGuard(1, true, warn: true) && proj.ai[0] <= 0f && proj.ai[2] == 0f)
 						{
 							player.immuneTime = 0;
 							player.immune = false;

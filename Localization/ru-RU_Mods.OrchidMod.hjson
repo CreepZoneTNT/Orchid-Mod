@@ -2735,6 +2735,14 @@ Items: {
 			«Всё новое — хорошо забытое старое»
 			«Отлично подходит для подражания внешности разработчиков Orchid!»
 			'''
+		# reference to how hallowed mask's tooltip was written wrong
+		// SetBonusMelee: 19% increased melee and movement haste
+		// SetBonusRanged: 25% chance to not consume ammo
+		// SetBonusMagic: 20% reduced mana usage
+		# reference to old summoner tooltip formatting not displaying the amount of minions
+		// SetBonusSummon: Increases your max number of minions and sentries
+		# reference to old guardian tooltip formatting. see item file
+		// SetBonusGuardian: Increases guardian resources generation by 40%
 	}
 
 	GuardianAncientHallowedHead: {
@@ -3464,7 +3472,7 @@ Items: {
 	}
 
 	ChlorophyteGreathammer: {
-		// DisplayName: Chlorophyte Greataxe
+		// DisplayName: Chlorophyte Cleaver
 		// Tooltip: Rapidly cleaves
 	}
 }

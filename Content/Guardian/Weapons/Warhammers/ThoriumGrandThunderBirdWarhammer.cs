@@ -48,7 +48,9 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 
 		public override void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile, bool OffHand)
 		{
-			Vector2 pos = projectile.ai[1] > 0 ? projectile.Center : player.Center; 
+			GuardianHammerAnchor guardProj = projectile.ModProjectile as GuardianHammerAnchor;
+
+			Vector2 pos = projectile.ai[1] > 0 || guardProj.BlockDuration > 0 ? projectile.Center : player.Center; 
 			Targets = new List<int>();
 			List<float> targetDists = new List<float> {120f};
 			foreach (NPC npc in Main.npc)
@@ -77,7 +79,6 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 				}
 			}
 
-			GuardianHammerAnchor guardProj = projectile.ModProjectile as GuardianHammerAnchor;
 			bool canTether = !guardProj.WeakHit && (projectile.ai[1] <= 0 || (guardProj.Strong && guardProj.NotHitYet));
 			if (canTether)
 			{
@@ -101,7 +102,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 			
 				if (Targets.Count > 0)
 				{
-					if (projectile.ai[1] == 0 && guardian.GuardianItemCharge is > 0 and < 210f)
+					if (projectile.ai[1] == 0 && guardProj.BlockDuration == 0 && guardian.GuardianItemCharge is > 0 and < 210f)
 					{
 						guardian.GuardianItemCharge += 7.5f * Targets.Count / Item.useTime * player.GetTotalAttackSpeed(DamageClass.Melee);
 						if (guardian.GuardianItemCharge > 210f)
@@ -150,6 +151,15 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 								zapDust.noGravity = true;
 								zapDust.velocity *= 0.25f;
 							}
+						}
+					}
+
+					if (guardProj.BlockDuration > 0 && guardProj.BlockDuration % 45 == 25)
+					{
+						ShockTargets(projectile, player);
+						if (OrchidMod.ThoriumMod != null)
+						{
+							SoundEngine.PlaySound(ThoriumCloudSpawn.WithPitchOffset(0.4f - 0.1f * Targets.Count).WithVolumeScale(0.15f + 0.05f * Targets.Count), projectile.Center);
 						}
 					}
 				}
@@ -242,6 +252,11 @@ namespace OrchidMod.Content.Guardian.Weapons.Warhammers
 			{
 				SoundEngine.PlaySound(ThoriumZapNoise.WithPitchOffset(-0.1f).WithVolumeScale(0.25f), projectile.Center);
 			}
+		}
+
+		public override void OnBlockHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, float knockback, bool crit)
+		{
+			target.AddBuff(ModContent.BuffType<ThoriumGrandThunderBirdWarhammerDebuff>(), 300);
 		}
 
 		public override void OnThrow(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak, bool OffHand)

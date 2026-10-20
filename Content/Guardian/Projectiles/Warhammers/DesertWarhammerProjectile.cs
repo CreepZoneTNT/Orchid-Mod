@@ -78,7 +78,7 @@ namespace OrchidMod.Content.Guardian.Projectiles.Warhammers
 			if (Projectile.penetrate < 2) return true;
 			Projectile.penetrate--;
 			if (Projectile.velocity.X != oldVelocity.X)
-				Projectile.velocity.X *= -oldVelocity.X;
+				Projectile.velocity.X = -oldVelocity.X;
 			if (Projectile.velocity.Y != oldVelocity.Y)
 				Projectile.velocity.Y = Math.Max(-oldVelocity.Y,-5);
 			SoundEngine.PlaySound(Projectile.frame != 5 ? SoundID.DD2_SkeletonHurt.WithPitchOffset(Main.rand.NextFloat(0.6f)).WithVolumeScale(0.2f) : SoundID.Item106.WithPitchOffset(1f).WithVolumeScale(0.2f), Projectile.Center);

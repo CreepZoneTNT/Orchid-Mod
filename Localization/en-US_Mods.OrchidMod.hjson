@@ -1931,7 +1931,7 @@ Items: {
 			5% increased opposing damage
 			Increases maximum guards by 1
 			'''
-		SetBonus: 50% chance for blocks and parries to grant an additional slam
+		SetBonus: 50% chance for successful guards to grant an additional slam
 	}
 
 	GuardianMeteoriteLegs: {

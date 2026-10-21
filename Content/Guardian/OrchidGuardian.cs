@@ -72,18 +72,26 @@ namespace OrchidMod.Content.Guardian
 		public float GuardianGuardRecharge = 1f;
 		/// <summary> Natural slam generation multiplier. The player will naturally generate this many slams every 10 seconds.</summary>
 		public float GuardianSlamRecharge = 1f;
-		public int GuardianGuardMax = 3; // Max guard charges
-		public int GuardianSlamMax = 3; // Max slam charges
+		/// <summary> Max guard charges. Defaults to 3.</summary>
+		public int GuardianGuardMax = 3;
+		/// <summary> Max slam charges. Defaults to 3.</summary>
+		public int GuardianSlamMax = 3;
 		/// <summary> The ratio of guards and slams out of the player's maximum that can naturally be regenerated before the regeneration penalty takes effect. Default is 0.5.</summary>
 		public float GuardianRegenThreshold = 0.5f;
 		public int GuardianBonusRune = 0; // Bonus projectiles spawned by runes
-		public int ParryInvincibilityBonus = 0; // Bonus in frames added to the length of parry iframes
+		/// <summary> Bonus in frames added to the length of parry iframes. Defaults to 0.</summary>
+		public int ParryInvincibilityBonus = 0;
 		public float GuardianRuneTimer = 1f; // Rune duration multiplier
 		public float GuardianStandardTimer = 1f; // Standard duration multiplier
 		public float GuardianStandardRange = 1f;
-		public float GuardianSlamDistance = 1f; // Slam Distance multiplier
-		public float GuardianBlockDuration = 1f; // Block Duration multiplier (pavises)
-		public float GuardianParryDuration = 1f; // Parry Duration multiplier (gauntlets, misc)
+		/// <summary> Slam Distance multiplier. Defaults to 1f.</summary>
+		public float GuardianSlamDistance = 1f;
+		/// <summary> Block Duration multiplier (pavises). Defaults to 1f.</summary>
+		public float GuardianBlockDuration = 1f;
+		/// <summary> Parry Duration multiplier (gauntlets, misc). Defaults to 1f.</summary>
+		public float GuardianParryDuration = 1f;
+		/// <summary> Deflect Stun Duration multiplier (greathammers). Defaults to 1f.</summary>
+		public float GuardianDeflectStunDuration = 1f;
 		public float GuardianMeleeSpeed = 1f; // Edited via reforges. It multiplies the player MeleeSpeed in postupdate
 		public float GuardianWeaponScale = 1f; // Multiplies pavise scale
 		public float GuardianChargeSpeed = 1f; // Multiplies weapon charge speed without necessarily affecting MeleeSpeed 
@@ -659,6 +667,7 @@ namespace OrchidMod.Content.Guardian
 			GuardianSlamDistance = 1f;
 			GuardianBlockDuration = 1f;
 			GuardianParryDuration = 1f;
+			GuardianDeflectStunDuration = 1f;
 			GuardianMeleeSpeed = 1f;
 			GuardianWeaponScale = 1f;
 			GuardianChargeSpeed = 1f;

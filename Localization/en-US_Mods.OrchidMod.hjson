@@ -1941,7 +1941,7 @@ Items: {
 			5% increased opposing damage
 			Increases maximum guards by 1
 			'''
-		SetBonus: 50% chance for blocks and parries to grant an additional slam
+		SetBonus: 50% chance for successful guards to grant an additional slam
 	}
 
 	GuardianMeteoriteLegs: {
@@ -3480,6 +3480,11 @@ Items: {
 		DisplayName: Chlorophyte Cleaver
 		Tooltip: Rapidly cleaves
 	}
+
+	MahoganyGreathammer: {
+		DisplayName: Mahogany Greathammer
+		Tooltip: ""
+	}
 }
 
 NPCs: {
@@ -3672,6 +3677,7 @@ Prefixes: {
 		AddDuration: "{0:+0;-0}% {1} duration"
 		AddDurationParry: parry
 		AddDurationBlock: block
+		AddDurationDeflectStun: stun
 		AddSize: "{0:+0;-0}% size"
 		AddSpeed: "{0:+0;-0}% speed"
 	}

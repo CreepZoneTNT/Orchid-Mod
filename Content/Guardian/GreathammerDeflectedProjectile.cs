@@ -11,6 +11,7 @@ namespace OrchidMod.Content.Guardian
 	public class GreathammerDeflectedProjectile : OrchidModGuardianProjectile
 	{
 		private static Texture2D TextureMain;
+		public OrchidModGuardianGreathammer Greathammer;
 
 		public override void Load()
 		{
@@ -27,6 +28,7 @@ namespace OrchidMod.Content.Guardian
 			Projectile.usesLocalNPCImmunity = true;
 			Projectile.localNPCHitCooldown = -1;
 			Projectile.extraUpdates = 1;
+			Greathammer = null;
 		}
 
 		public override void AI()
@@ -71,7 +73,11 @@ namespace OrchidMod.Content.Guardian
 				Projectile.ai[0] = 1;
 				SoundEngine.PlaySound(SoundID.Item110.WithPitchOffset(-0.3f), Projectile.Center);
 			}
-			target.AddBuff(ModContent.BuffType<GreathammerStunDebuff>(), 120);
+
+			if (Greathammer != null)
+			{
+				target.AddBuff(ModContent.BuffType<GreathammerStunDebuff>(), Greathammer.GetStunDuration(player, guardian));
+			}
 		}
 
 		public override void ModifyDamageHitbox(ref Rectangle hitbox)

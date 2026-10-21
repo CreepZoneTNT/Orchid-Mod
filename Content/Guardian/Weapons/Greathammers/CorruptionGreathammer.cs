@@ -21,10 +21,10 @@ namespace OrchidMod.Content.Guardian.Weapons.Greathammers
 			Item.rare = ItemRarityID.Blue;
 			Item.knockBack = 5f;
 			Item.shootSpeed = 14f;
-			Item.useTime = 32;
-			Item.damage = 108;
+			Item.useTime = 40;
+			Item.damage = 96;
 			GuardStacks = 1;
-			SlamSpeed = 0.8f;
+			SlamSpeed = 0.9f;
 			Range = 25;
 			AuraScale = 0.9f;
 			AuraPrimary = new(50, 90, 0, 60);

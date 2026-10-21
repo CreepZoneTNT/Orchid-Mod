@@ -1345,7 +1345,7 @@ namespace OrchidMod
 			int dmg = GetGuardianDamage(damage ?? item?.Item.damage * item?.DeflectDamage ?? 0);
 			int crit = GetGuardianCrit(item?.Item.crit ?? 0);
 			DeflectedEnemies.Clear();
-			EnemyPredicate ??= new Predicate<NPC>(T => !T.friendly);
+			EnemyPredicate ??= new Predicate<NPC>(T => !T.friendly && !T.CountsAsACritter);
 			ProjPredicate ??= new Predicate<Projectile>(T => T.hostile);
 			if (item != null && !item.PreDeflect(ref targetArea, ref success, ref caughtProjectile, ref killedNPC, anchor, ref EnemyPredicate, ref ProjPredicate, ref range, ref lenience, ref from, ref dmg))
 				return false;

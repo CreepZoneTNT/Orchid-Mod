@@ -16,11 +16,18 @@ namespace OrchidMod.Content.Guardian
 	{
 		public static OrchidGuardian Guardian(Player player = null) => player.Guardian();
 		
-		protected Projectile SpawnAnchor<T>(Player player, out T anchor, int damage = 0, float knockback = 0) where T : OrchidModGuardianAnchor
+		protected Projectile SpawnAnchor<AnchorType>(Player player, out AnchorType anchor, int damage = 0, float knockback = 0, Action<AnchorType> onSpawn = null) where AnchorType : OrchidModGuardianAnchor
 		{
-			Projectile projectile = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<T>(), damage, knockback, player.whoAmI);
-			anchor = projectile.ModProjectile as T;
-			return projectile;
+			anchor = null;
+			Projectile projectile = Projectile.NewProjectileDirect(Item.GetSource_FromThis(), player.Center, Vector2.Zero, ModContent.ProjectileType<AnchorType>(), damage, knockback, player.whoAmI);
+			if (projectile.ModProjectile is AnchorType modProj)
+			{
+				anchor = modProj;
+				onSpawn?.Invoke(modProj);
+				return projectile;
+			}
+			projectile.Kill();
+			return null;
 		}
 		
 		public bool IsLocalPlayer(Player player) => player.whoAmI == Main.myPlayer;

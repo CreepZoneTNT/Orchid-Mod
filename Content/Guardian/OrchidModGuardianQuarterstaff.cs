@@ -216,11 +216,24 @@ namespace OrchidMod.Content.Guardian
 				{
 					if (projectile.owner == player.whoAmI && projectile.type == AnchorType) projectile.Kill();
 				}
-
-				Projectile proj = SpawnAnchor(player, out GuardianQuarterstaffAnchor quarterstaff);
-				if (quarterstaff is not null)
-					quarterstaff.OnChangeSelectedItem(player);
-				else proj.Kill();
+				
+				// var index = Projectile.NewProjectile(Item.GetSource_FromThis(), player.Center.X, player.Center.Y, 0f, 0f, AnchorType, 0, 0f, player.whoAmI);
+				// var proj = Main.projectile[index];
+				// if (proj.ModProjectile is not GuardianQuarterstaffAnchor quarterstaff)
+				// {
+				// 	proj.Kill();
+				// }
+				// else
+				// {
+				// 	quarterstaff.OnChangeSelectedItem(player);
+				// }
+				
+				SpawnAnchor<GuardianQuarterstaffAnchor>(player, out _, onSpawn: anchor => anchor.OnChangeSelectedItem(player));
+				
+				// Projectile proj = SpawnAnchor(player, out GuardianQuarterstaffAnchor quarterstaff);
+				// if (quarterstaff is not null)
+				// 	quarterstaff.OnChangeSelectedItem(player);
+				// else proj.Kill();
 			}
 			else
 			{

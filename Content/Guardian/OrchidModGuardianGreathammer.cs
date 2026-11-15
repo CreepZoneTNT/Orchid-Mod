@@ -94,7 +94,7 @@ namespace OrchidMod.Content.Guardian
 		public virtual int GetStunDuration(Player player, OrchidGuardian guardian) => (int)(StunDuration * Item.GetGlobalItem<GuardianPrefixItem>().GetBlockDuration() * guardian.GuardianDeflectStunDuration);
 		
 		/// <summary>Draws extra UI elements on the GuardianUIState while held.</summary>
-		public virtual void WarhammerPostDrawUI(SpriteBatch spriteBatch, Player player, ref Color lightColor, Projectile projectile) { }
+		public virtual void GreathammerPostDrawUI(SpriteBatch spriteBatch, Player player, ref Color lightColor, Projectile projectile) { }
 		/// <summary>Called at the end of HoldItem if an anchor exists.</summary>
 		public virtual void SafeHoldItem(Player player, OrchidGuardian guardian, Projectile anchor) { }
 

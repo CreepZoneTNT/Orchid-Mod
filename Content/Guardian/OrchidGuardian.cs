@@ -1794,5 +1794,18 @@ namespace OrchidMod.Content.Guardian
 				return tap != null ? Main.mouseLeft && (tap == false || Main.mouseLeftRelease) : Main.mouseLeftRelease;
 			return tap != null ? Main.mouseRight && (tap == false || Main.mouseRightRelease) : Main.mouseRightRelease;
 		}
+
+		public static bool GuardianThoriumKeysRegistered(out ModKeybind thoriumArmorKey, out ModKeybind thoriumAccessoryKey)
+		{
+			thoriumArmorKey = thoriumAccessoryKey = null;
+			if (OrchidMod.ThoriumMod is not null && ThoriumArmorKey != null && ThoriumAccessoryKey != null)
+			{
+				thoriumArmorKey = ThoriumArmorKey;
+				thoriumAccessoryKey = ThoriumAccessoryKey;
+				return true;
+			}
+
+			return false;
+		}
 	}
 }

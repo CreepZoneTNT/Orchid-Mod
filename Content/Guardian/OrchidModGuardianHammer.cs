@@ -131,6 +131,8 @@ namespace OrchidMod.Content.Guardian
 		public virtual bool PreDrawHammer(Player player, OrchidGuardian guardian, Projectile projectile, SpriteBatch spriteBatch, ref Color lightColor, ref Texture2D hammerTexture, ref Rectangle drawRectangle, bool OffHand) => true;
 		/// <summary>Called after drawing the hammer.</summary>
 		public virtual void PostDrawHammer(Player player, OrchidGuardian guardian, Projectile projectile, SpriteBatch spriteBatch, Color lightColor, Texture2D hammerTexture, Rectangle drawRectangle, bool OffHand) { }
+		/// <summary>Called at the end of HoldItem if an anchor exists.</summary>
+		public virtual void SafeHoldItem(Player player) { }
 		/// <summary>Color applied to the hammer's glowmask when drawn. To automatically draw a glowmask for the hammer, add a HammerName_Glow texture file where the hammer texture is located.</summary>
 		public virtual Color GetHammerGlowmaskColor(Player player, OrchidGuardian guardian, Projectile projectile, Color lightColor, bool OffHand) => Color.White;
 		
@@ -199,6 +201,7 @@ namespace OrchidMod.Content.Guardian
 			var guardian = Guardian(player);
 			guardian.GuardianDisplayUI = 300;
 			if (player.ownedProjectileCounts[AnchorType] == 0 && guardian.GuardianItemCharge > 0) guardian.GuardianItemCharge = 0; // Failsafe
+			SafeHoldItem(player);
 		}
 
 		public override bool? UseItem(Player player)

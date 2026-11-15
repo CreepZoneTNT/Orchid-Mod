@@ -31,6 +31,7 @@ namespace OrchidMod.Content.Guardian
 
 		public int SelectedItem { get; set; } = -1;
 		public Item QuarterstaffItem => Main.player[Projectile.owner].inventory[SelectedItem];
+		public Item OldQuarterstaffItem;
 		public Texture2D QuarterstaffTexture;
 		public Texture2D QuarterstaffTextureGlow;
 		public int QuarterstaffAnimFrame = 0;
@@ -554,6 +555,8 @@ namespace OrchidMod.Content.Guardian
 
 				// Extra AI (can be overriden in item code)
 				guardianItem.ExtraAIQuarterstaff(owner, guardian, Projectile);
+
+				OldQuarterstaffItem = QuarterstaffItem;
 			}
 		}
 

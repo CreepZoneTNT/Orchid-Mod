@@ -240,10 +240,8 @@ namespace OrchidMod.Content.Guardian
 				var proj = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == AnchorType);
 				if (proj != null && proj.ModProjectile is GuardianQuarterstaffAnchor quarterstaff)
 				{
-					if (quarterstaff.SelectedItem != player.selectedItem)
-					{
+					if (quarterstaff.SelectedItem != player.selectedItem || quarterstaff.QuarterstaffItem.type != quarterstaff.OldQuarterstaffItem.type)
 						quarterstaff.OnChangeSelectedItem(player);
-					}
 				}
 			}
 			SafeHoldItem(player);

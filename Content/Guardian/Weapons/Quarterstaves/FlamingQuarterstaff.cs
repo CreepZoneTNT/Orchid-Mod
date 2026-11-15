@@ -20,10 +20,8 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 			Item.knockBack = 9f;
 			Item.damage = 35;
 		}
-
-		public override bool SafeCanHitNPC(Player player, Projectile anchor, NPC target) => Collision.CanHit(player, target);
-
-		protected override float TipOffset => 0.15f;
+		
+		protected override float TipOffset => 0.3667f;
 
 		public override void PostDrawQuarterstaff(SpriteBatch spriteBatch, Projectile projectile, Player player, Color lightColor, SpriteEffects effects)
 		{

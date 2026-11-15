@@ -6,7 +6,7 @@ using Terraria.DataStructures;
 
 namespace OrchidMod.Utilities;
 
-public struct Circle(Vector2 origin, float radius)
+public record struct Circle(Vector2 origin, float radius)
 {
 	public Vector2 Origin = origin;
 	public float Radius = radius;
@@ -90,13 +90,13 @@ public static partial class OrchidUtils
 		float distanceSquared = distanceX * distanceX + distanceY * distanceY;
 		return distanceSquared < circle.Radius * circle.Radius;
 	}
-	
-	public static bool CheckAABBvCircularCollision(Vector2 rectPosition, Vector2 rectDimensions, Vector2 circOrigin, float circRadius)
+	public static bool CheckAABBvCircularCollision(Point rectPosition, Point rectDimensions, Vector2 circOrigin, float circRadius)
 	{
-		Rectangle rectangle = new ((int)rectPosition.X, (int)rectPosition.Y, (int)rectDimensions.X, (int)rectDimensions.Y);
+		Rectangle rectangle = new (rectPosition.X, rectPosition.Y, rectDimensions.X, rectDimensions.Y);
 		Circle circle = new (circOrigin, circRadius);
 		return CheckAABBvCircularCollision(rectangle, circle);
 	}
+	public static bool CheckAABBvCircularCollision(Vector2 rectPosition, Vector2 rectDimensions, Vector2 circOrigin, float circRadius) => CheckAABBvCircularCollision(rectPosition.ToPoint(), rectDimensions.ToPoint(), circOrigin, circRadius);
 
 	public static Vector2 Scale(this Vector2 value, float factorX = 1f, float factorY = 1f) => new (value.X * factorX, value.Y * factorY);
 	public static void Scale(ref Vector2 original, out Vector2 result, float factorX = 1f, float factorY = 1f) => result = new Vector2(original.X * factorX, original.Y * factorY);

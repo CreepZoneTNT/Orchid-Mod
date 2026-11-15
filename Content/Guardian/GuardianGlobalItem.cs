@@ -4,6 +4,8 @@ using OrchidMod.Content.Guardian.Armors.OreHelms;
 using OrchidMod.Utilities;
 using System.Collections.Generic;
 using System.Linq;
+using OrchidMod.Common;
+using OrchidMod.Common.Global.Items;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -13,27 +15,44 @@ namespace OrchidMod.Content.Guardian
 {
 	internal class GuardianGlobalItem : GlobalItem
 	{
+		private static int ThoriumDDHelmID = -1;
+		private static int ThoriumDDChestID = -1;
+		private static int ThoriumDDLegsID = -1;
+
+		public override void SetStaticDefaults()
+		{
+			if (OrchidMod.ThoriumMod is { } thoriumMod)
+			{
+				ThoriumDDHelmID = thoriumMod.Find<ModItem>("DepthDiverHelmet").Type;
+				ThoriumDDChestID = thoriumMod.Find<ModItem>("DepthDiverChestplate").Type;
+				ThoriumDDLegsID = thoriumMod.Find<ModItem>("DepthDiverGreaves").Type;
+			}
+
+			if (ThoriumDDHelmID != -1 && ThoriumDDChestID != -1 && ThoriumDDLegsID != -1)
+			{
+				OrchidGlobalItem.tagsByItemTypeOverride.Add(ThoriumDDHelmID, ClassTags.Guardian);
+				OrchidGlobalItem.tagsByItemTypeOverride.Add(ThoriumDDChestID, ClassTags.Guardian);
+				OrchidGlobalItem.tagsByItemTypeOverride.Add(ThoriumDDLegsID, ClassTags.Guardian);
+			}
+		}
+
 		public override void UpdateEquip(Item item, Player player)
 		{
-			if (OrchidMod.ThoriumMod != null)
+			if (ThoriumDDHelmID != -1 && ThoriumDDChestID != -1 && ThoriumDDLegsID != -1)
 			{
 				OrchidGuardian modPlayer = player.Guardian();
 
-				if (item.type == OrchidMod.ThoriumMod.Find<ModItem>("DepthDiverHelmet").Type)
-				{
+				if (item.type == ThoriumDDHelmID)
 					modPlayer.GuardianGuardRecharge += 0.8f;
-				}
 
-				if (item.type == OrchidMod.ThoriumMod.Find<ModItem>("DepthDiverChestplate").Type)
+				if (item.type == ThoriumDDChestID)
 				{
 					player.aggro += 250;
 					modPlayer.GuardianGuardMax += 2;
 				}
 
-				if (item.type == OrchidMod.ThoriumMod.Find<ModItem>("DepthDiverGreaves").Type)
-				{
+				if (item.type == ThoriumDDLegsID)
 					modPlayer.GuardianGuardMax += 2;
-				}
 			}
 		}
 

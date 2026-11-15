@@ -11,12 +11,15 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using MonoMod.RuntimeDetour;
 using OrchidMod.Content.Guardian.Weapons.Warhammers;
+using Terraria.Audio;
 
 namespace OrchidMod.Common.Global.Items
 {
 	public partial class OrchidGlobalItem : GlobalItem, IPostSetupContent
 	{
 		private static readonly Dictionary<int, ClassTags> tagsByItemType = new();
+		/// <summary>Allows the application or modification of <c>ClassTags</c> to items after <see cref="ClassTagAttribute"/> is applied. Add new entries in <c>SetStaticDefaults</c>, since these get read in <c>PostSetupContent</c>.</summary>
+		public static Dictionary<int, ClassTags> tagsByItemTypeOverride = new();
 
 		// ...
 
@@ -44,6 +47,12 @@ namespace OrchidMod.Common.Global.Items
 
 				tagsByItemType.Add(modItem.Type, atr.Tag);
 			}
+
+			foreach (KeyValuePair<int, ClassTags> tagOverride in tagsByItemTypeOverride)
+			{
+				if (tagsByItemType.ContainsKey(tagOverride.Key) && tagOverride.Value.Equals(ClassTags.Without)) tagsByItemType.Remove(tagOverride.Key);
+				else tagsByItemType[tagOverride.Key] = tagOverride.Value;
+			}
 		}
 
 
@@ -63,6 +72,7 @@ namespace OrchidMod.Common.Global.Items
 		public override void Unload()
 		{
 			tagsByItemType.Clear();
+			tagsByItemTypeOverride.Clear();
 
 			_RightClickHook?.Dispose();
 			_RightClickHook = null;

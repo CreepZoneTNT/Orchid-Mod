@@ -360,7 +360,7 @@ namespace OrchidMod.Content.Guardian
 
 							if (owner.whoAmI == Main.myPlayer)
 							{
-								if (!Main.mouseLeft && !OffHand)								{
+								if (!guardian.GetGauntletPunchInput(false) && !OffHand)								{
 
 									if (guardian.GuardianItemCharge > 10f || hammerItem.CannotSwing)
 									{ // Hammer is charged enough to be thrown (or can't be thrown)
@@ -402,7 +402,7 @@ namespace OrchidMod.Content.Guardian
 										Projectile.netUpdate = true;
 									}
 								}
-								else if (Main.mouseRight && !hammerItem.CannotSwing && (!OffHand || (Main.projectile[hammerItem.GetAnchors(owner)[0]].ai[1] < 0f && Main.projectile[hammerItem.GetAnchors(owner)[0]].ai[1] >= -30f)))
+								else if (guardian.GetGauntletBlockInput(false) && !hammerItem.CannotSwing && (!OffHand || (Main.projectile[hammerItem.GetAnchors(owner)[0]].ai[1] < 0f && Main.projectile[hammerItem.GetAnchors(owner)[0]].ai[1] >= -30f)))
 								{
 									Projectile.ai[1] = -60f;
 									Projectile.netUpdate = true;
@@ -566,7 +566,7 @@ namespace OrchidMod.Content.Guardian
 							
 								guardian.SlamCostUI = 1;
 							
-								if (Main.mouseLeft && Ding && guardian.UseSlam(1, true))
+								if (guardian.GetGauntletPunchInput(false) && Ding && guardian.UseSlam(1, true))
 								{
 									SoundEngine.PlaySound(SoundID.MenuTick, Projectile.Center);
 									guardian.UseSlam(1);

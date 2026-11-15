@@ -204,9 +204,9 @@ namespace OrchidMod.Content.Guardian
 		public override bool? UseItem(Player player)
 		{
 			var guardian = Guardian(player);
-			bool validRMBInput = !CannotBlock && Main.mouseRight && Main.mouseRightRelease && guardian.UseSlam(SlamBlockCost, true) && guardian.UseGuard(GuardBlockCost, true);
+			bool validRMBInput = !CannotBlock && guardian.GetGauntletBlockInput(true) && guardian.UseSlam(SlamBlockCost, true) && guardian.UseGuard(GuardBlockCost, true);
 
-			if (validRMBInput || Main.mouseLeft)
+			if (validRMBInput || guardian.GetGauntletPunchInput(false))
 			{ // If the player does a valid RMB input (the weapon can block) or a mouseleft input - so we don't create a proejctile for nothing in edge cases
 				int damage = guardian.GetGuardianDamage(Item.damage);
 				Projectile projectile = SpawnAnchor<GuardianHammerAnchor>(player, out _, damage, Item.knockBack);
@@ -254,8 +254,9 @@ namespace OrchidMod.Content.Guardian
 		
 		public override bool CanUseItem(Player player)
 		{
-			var proj = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == AnchorType && i.ModProjectile is GuardianHammerAnchor warhammer && warhammer.BlockDuration > 0);
-			if (Main.mouseRight && Main.mouseRightRelease && proj != null && proj.ModProjectile is GuardianHammerAnchor warhammer)
+			var guardian = Guardian(player);
+			var proj = Main.projectile.FirstOrDefault(i => i.active && i.owner == player.whoAmI && i.type == AnchorType && i.ModProjectile is GuardianHammerAnchor {BlockDuration: > 0});
+			if (Guardian(player).GetGauntletBlockInput(true) && proj != null && proj.ModProjectile is GuardianHammerAnchor warhammer)
 			{ // recalls existing blocking warhammers when right clicking
 				warhammer.BlockDuration = -30; // -30 instead of -1 so they return faster
 				proj.netUpdate = true;
@@ -275,10 +276,9 @@ namespace OrchidMod.Content.Guardian
 				}
 			}
 
-			var guardian = Guardian(player);
 
 			bool validRMBInput = false;
-			if (anchors == null && !CannotBlock && Main.mouseRight && Main.mouseRightRelease)
+			if (anchors == null && !CannotBlock && guardian.GetGauntletBlockInput(true))
 			{
 				validRMBInput = guardian.UseSlam(SlamBlockCost, true) && guardian.UseGuard(GuardBlockCost, true);
 
@@ -288,9 +288,9 @@ namespace OrchidMod.Content.Guardian
 				}
 			}
 
-			if ((player.ownedProjectileCounts[AnchorType] > 0 && (offHandCheck || !validRMBInput)) || (!(Main.mouseRight && Main.mouseRightRelease && guardian.UseGuard(1, true)) && !Main.mouseLeft)) return false;
+			if ((player.ownedProjectileCounts[AnchorType] > 0 && (offHandCheck || !validRMBInput)) || (!(guardian.GetGauntletBlockInput(true) && guardian.UseGuard(1, true)) && !guardian.GetGauntletPunchInput(false))) return false;
 
-			if (validRMBInput || Main.mouseLeft)
+			if (validRMBInput || guardian.GetGauntletPunchInput(false))
 			{
 				return base.CanUseItem(player);
 			}
@@ -340,7 +340,7 @@ namespace OrchidMod.Content.Guardian
 			// }
 
 			int index = tooltips.FindIndex(ttip => ttip.Mod.Equals("Terraria") && ttip.Name.Equals("Knockback")) + 1;
-			string click = OrchidUtils.GetClickInfoTooltip();
+			string click = OrchidUtils.GetClickInfoTooltip(guardian.GauntletInputSwap);
 
 			if (GuardStacks > 0 || SlamStacks > 0)
 			{

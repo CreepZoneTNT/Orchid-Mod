@@ -89,6 +89,13 @@ namespace OrchidMod.Content.Guardian
 				}
 			}
 		}
+		
+		public override bool? CanHitNPC(NPC target)
+		{
+			if (GauntletItem.SafeCanHitNPC(Owner, Projectile, target))
+				return base.CanHitNPC(target);
+			return false;
+		}
 
 		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers, Player owner, OrchidGuardian guardian)
 		{

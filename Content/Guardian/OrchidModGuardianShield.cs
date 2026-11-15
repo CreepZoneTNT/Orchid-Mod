@@ -52,10 +52,7 @@ namespace OrchidMod.Content.Guardian
 
 		/// <summary>Called when a projectile collides with the shield during a block. Return <c>true</c> to destroy the projectile. Defaults to <c>true</c>.</summary>
 		/// <returns>Whether to destroy the projectile.</returns>
-		public virtual bool Block(Player player, OrchidGuardian guardian, Projectile shield, Projectile projectile)
-		{
-			return true;
-		}
+		public virtual bool Block(Player player, OrchidGuardian guardian, Projectile shield, Projectile projectile) => true;
 
 		/// <summary>Called when a projectile collides with the shield during a block, this should be used to spawn projectiles created by reflecting projectiles.</summary>
 		public virtual void Reflect(Player player, OrchidGuardian guardian, Projectile shield, Projectile projectile, ref int GuardianShieldSpikeReflect) {}
@@ -65,6 +62,9 @@ namespace OrchidMod.Content.Guardian
 
 		/// <summary>Called on the last frame of a block. Will spawn dust at the end of a block if it returns true</summary>
 		public virtual bool BlockEnd(Player player, OrchidGuardian guardian, Projectile shield) => true;
+		
+		/// <summary>Called during the anchor's <c>CanHitNPC</c> check. Defaults to true, which results in <c>base.CanHitNPC()</c> being called.</summary>
+		public virtual bool SafeCanHitNPC(Player player, Projectile anchor, NPC target) => Collision.CanHit(player, target);
 
 		public virtual void PaviseModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref HitModifiers modifiers, bool firstHit) {}
 

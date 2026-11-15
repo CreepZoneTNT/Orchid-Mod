@@ -71,6 +71,14 @@ namespace OrchidMod.Content.Guardian
 			Projectile.spriteDirection = 1;
 			UpdateHitbox();
 		}
+		
+
+		public override bool? CanHitNPC(NPC target)
+		{
+			if (ShieldItem.ModItem is OrchidModGuardianShield shield && shield.SafeCanHitNPC(Owner, Projectile, target))
+				return base.CanHitNPC(target);
+			return false;
+		}
 
 		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers, Player owner, OrchidGuardian guardian)
 		{

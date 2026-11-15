@@ -116,6 +116,8 @@ namespace OrchidMod.Content.Guardian
 		public virtual void OnThrow(Player player, OrchidGuardian guardian, Projectile projectile, bool Weak, bool OffHand) { }
 		/// <summary>Called on the first frame of a block</summary>
 		public virtual void OnBlockThrow(Player player, OrchidGuardian guardian, Projectile projectile) { }
+		/// <summary>Called during the anchor's <c>CanHitNPC</c> check. Defaults to true, which results in <c>base.CanHitNPC()</c> being called.</summary>
+		public virtual bool SafeCanHitNPC(Player player, Projectile anchor, NPC target) => Collision.CanHit(player, target);
 		/// <summary>Called at the end of the anchor's Projectile AI()</summary>
 		public virtual void ExtraAI(Player player, OrchidGuardian guardian, Projectile projectile, bool OffHand) { }
 		/// <summary>Called before default throw AI. Return false to prevent the default AI from running.</summary>

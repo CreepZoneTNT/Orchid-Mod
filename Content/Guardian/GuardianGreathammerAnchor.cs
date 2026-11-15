@@ -628,6 +628,14 @@ namespace OrchidMod.Content.Guardian
 				break;
 			}
 		}
+		
+
+		public override bool? CanHitNPC(NPC target)
+		{
+			if (HammerItem.SafeCanHitNPC(Owner, Projectile, target))
+				return base.CanHitNPC(target);
+			return false;
+		}
 
 		public override void SafeModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers, Player player, OrchidGuardian guardian)
 		{

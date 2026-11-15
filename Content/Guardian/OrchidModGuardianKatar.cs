@@ -30,6 +30,8 @@ namespace OrchidMod.Content.Guardian
 		public virtual void OnHit(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, HitInfo hit, bool fullyCharged) { }
 		/// <summary> Called upon hitting the first enemy of a given slam or a charged attack. Use this to trigger effects that should not happen multiple times when hitting multiple targets with one attack. </summary>
 		public virtual void OnHitFirst(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, HitInfo hit, bool fullyCharged) { }
+		/// <summary>Called during the anchor's <c>CanHitNPC</c> check. Defaults to true, which results in <c>base.CanHitNPC()</c> being called.</summary>
+		public virtual bool SafeCanHitNPC(Player player, Projectile anchor, NPC target) => Collision.CanHit(player, target);
 		/// <summary> Allows access to Projectile.ModifyHitNPC for katar jabs. </summary>
 		public virtual void KatarModifyHitNPC(Player player, OrchidGuardian guardian, NPC target, Projectile projectile, ref HitModifiers modifiers, bool fullyCharged) { }
 		/// <summary> Called right before a jab projectile is spawned. Return false to prevent normal jab projectiles from spawning. </summary>

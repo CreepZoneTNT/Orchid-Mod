@@ -6,6 +6,7 @@ using OrchidMod.Content.Shapeshifter.UI;
 using ReLogic.Content;
 using System.Collections.Generic;
 using System.IO;
+using OrchidMod.Common.ModObjects;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -283,7 +284,7 @@ namespace OrchidMod.Content.Shapeshifter
 					shapeshifter.ShapeshifterFastShapeshiftTimer = 300;
 				}
 
-				shapeshifter.ShapeshifterFastShapeshiftTimer -= 300;
+				if (!(owner.creativeGodMode || OrchidGodmodePlayer.GodModeEnabled)) shapeshifter.ShapeshifterFastShapeshiftTimer -= 300;
 
 				SoundStyle soundStyle = (SoundStyle)shapeshiftItem.Item.UseSound;
 				if (shapeshifter.ShapeshifterFastShapeshiftTimer < 0)

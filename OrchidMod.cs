@@ -135,6 +135,7 @@ namespace OrchidMod
 			ColoredDamageTypeModCalls();
 			RecipeBrowserModCalls();
 			// WikiThisModCalls();
+			HEROsModModCalls();
 		}
 
 		public override void HandlePacket(BinaryReader reader, int whoAmI)

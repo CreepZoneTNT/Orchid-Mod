@@ -10,6 +10,7 @@ using OrchidMod.Content.Alchemist.Misc;
 using OrchidMod.Content.Gambler;
 using System;
 using System.Reflection;
+using OrchidMod.Common.ModObjects;
 using OrchidMod.Utilities;
 using ReLogic.Content;
 using Terraria;
@@ -116,10 +117,7 @@ namespace OrchidMod
 								);
 
 
-								recipeBrowser.Call("AddItemCategory", "Alchemist", "Tools", classToolIconAlchemist, (Predicate<Item>)(item =>
-									{
-										return item.ModItem is PotionBag or ReactionItem or UIItem or UIItemKeys or OrchidModAlchemistScroll;
-									})
+								recipeBrowser.Call("AddItemCategory", "Alchemist", "Tools", classToolIconAlchemist, (Predicate<Item>)(item => item.ModItem is PotionBag or ReactionItem or UIItem or UIItemKeys or OrchidModAlchemistScroll)
 								);
 							}
 
@@ -145,6 +143,67 @@ namespace OrchidMod
 		{
 			if (!Main.dedServ && ModLoader.TryGetMod("WikiThis", out Mod wikiThis))			
 				wikiThis.Call("AddModURL", this, "https://terrariamods.wiki.gg/wiki/Orchid_Mod");
+		}
+		
+		private void HEROsModModCalls() 
+		{
+			var ServerConfig = ModContent.GetInstance<OrchidServerConfig>();
+			
+			if (!Main.dedServ && ModLoader.TryGetMod("HEROsMod", out Mod herosMod))
+			{
+				herosMod.Call("AddItemCategory", "Guardian", "Weapons", (Predicate<Item>)(item =>
+				{
+					if (!item.accessory && item.damage > 0)
+						return item.CountsAsClass<GuardianDamageClass>() || item.DamageType == ModContent.GetInstance<GuardianDamageClass>();
+					return false;
+				})
+			);
+
+				if (ServerConfig.EnableContentShapeshifter) 
+				{
+					herosMod.Call("AddItemCategory", "Shapeshifter", "Weapons", (Predicate<Item>)(item =>
+						{
+							if (!item.accessory && item.damage > 0)
+								return item.CountsAsClass<ShapeshifterDamageClass>() || item.DamageType == ModContent.GetInstance<ShapeshifterDamageClass>();
+							return false;
+						})
+					);
+				}
+
+				if (ServerConfig.EnableContentAlchemist) 
+				{
+					herosMod.Call("AddItemCategory", "Alchemist", "Weapons", (Predicate<Item>)(item =>
+						{
+							if (!item.accessory && item.damage > 0)
+								return item.CountsAsClass<AlchemistDamageClass>() || item.DamageType == ModContent.GetInstance<AlchemistDamageClass>();
+							return false;
+						})
+					);
+
+
+					herosMod.Call("AddItemCategory", "Alchemist", "Tools", (Predicate<Item>)(item => item.ModItem is PotionBag or ReactionItem or UIItem or UIItemKeys or OrchidModAlchemistScroll)
+					);
+				}
+
+				if (ServerConfig.EnableContentGambler) 
+				{
+					herosMod.Call("AddItemCategory", "Gambler", "Weapons", (Predicate<Item>)(item =>
+						{
+							if (!item.accessory && item.damage > 0)
+								return item.CountsAsClass<GamblerDamageClass>() || item.CountsAsClass<GamblerChipDamageClass>() || item.DamageType == ModContent.GetInstance<GamblerDamageClass>() || item.DamageType == ModContent.GetInstance<GamblerChipDamageClass>();
+							return false;
+						})
+					);
+				}
+				
+				herosMod.Call("RegisterGodModeCallback", (Action<bool>)GodModeCallback);
+			}
+		}
+
+		private static void GodModeCallback(bool enabled)
+		{
+			OrchidGodmodePlayer.HEROsModGodMode = enabled;
+			OrchidGodmodePlayer.GodModeEnabled |= OrchidGodmodePlayer.HEROsModGodMode;
 		}
 	}
 }

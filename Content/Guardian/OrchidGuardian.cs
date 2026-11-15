@@ -59,7 +59,7 @@ namespace OrchidMod.Content.Guardian
 			}
 		}
 
-		public bool CrossModGodMode;
+		public bool GodModeEnabled => Player.creativeGodMode || OrchidGodmodePlayer.GodModeEnabled;
 
 		// Misc & Static fields
 
@@ -155,13 +155,37 @@ namespace OrchidMod.Content.Guardian
 
 		// Dynamic gameplay and UI fields
 
-		public GuardianStandardStats GuardianStandardStats = new GuardianStandardStats(); // Used to receive stats from standards
-		public int GuardianGuard = 0; // Current Guard stacks
-		public int GuardianSlam = 0; // Current Slam Stacks
+		public GuardianStandardStats GuardianStandardStats = new(); // Used to receive stats from standards
+		
+		private int _guardStacks;
+		private int _slamStacks;
+		private float _guardRecharge;
+		private float _slamRecharge;
+		
+		/// <summary> Current amount of Guard stacks. </summary>
+		public int GuardianGuard
+		{
+			get => GodModeEnabled ? GuardianGuardMax : _guardStacks;
+			set => _guardStacks = value;
+		}
+		public int GuardianSlam
+		{
+			get => GodModeEnabled ? GuardianSlamMax : _slamStacks;
+			set => _slamStacks = value;
+		}
+
 		/// <summary> Current timer for guard stack regen or degen. Increments guards at 1 or higher, decrements at -1 or lower.</summary>
-		public float GuardianGuardRecharging = 0;
+		public float GuardianGuardRecharging
+		{
+			get => GodModeEnabled ? 0 : _guardRecharge;
+			set => _guardRecharge = value;
+		}
 		/// <summary> Current timer for slam stack regen or degen. Increments slams at 1 or higher, decrements at -1 or lower.</summary>
-		public float GuardianSlamRecharging = 0;
+		public float GuardianSlamRecharging
+		{
+			get => GodModeEnabled ? 0 : _slamRecharge;
+			set => _slamRecharge = value;
+		}
 		public bool OverThresholdGuards => GuardianGuard + GuardianGuardRecharging > GuardianGuardMax * GuardianRegenThreshold;
 		public bool OverThresholdSlams => GuardianSlam + GuardianSlamRecharging > GuardianSlamMax * GuardianRegenThreshold;
 		public int GuardianDisplayUI = 0; // Guardian UI is displayed if > 0
@@ -258,12 +282,6 @@ namespace OrchidMod.Content.Guardian
 			}
 		}
 		
-		public Mod CheatSheet;
-		public Mod HerosMod;
-		public Mod DragonLens;
-		public FieldInfo CSGodMode;
-		public FieldInfo HMGodMode;
-		public FieldInfo DLGodMode;
 		
 		public override void SetStaticDefaults()
 		{
@@ -320,43 +338,6 @@ namespace OrchidMod.Content.Guardian
 				}
 			}
 			
-			if (ModLoader.TryGetMod("CheatSheet", out Mod cheatSheet))
-			{
-				CheatSheet = cheatSheet;
-				// var godModeService = CheatSheet.Code.GetType("CheatSheet.Menus.GodMode");
-				// if (godModeService != null) CSGodMode ??= godModeService.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-				CSGodMode = CheatSheet.Code.GetType("CheatSheet.Menus.GodMode")?.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-				if (CSGodMode != null)
-				{
-					Console.Out.WriteLine("OrchidGuardian: CheatSheet detected");
-					Mod.Logger.Debug("OrchidGuardian: CheatSheet detected");
-				}
-			}
-			if (ModLoader.TryGetMod("HEROsMod", out Mod herosMod))
-			{
-				HerosMod = herosMod;
-				// var godModeService = HerosMod.Code.GetType("HEROsMod.HEROsModServices.GodModeService");
-				// if (godModeService != null) HMGodMode ??= godModeService.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-				HMGodMode = HerosMod.Code.GetType("HEROsMod.HEROsModServices.GodModeService")?.GetField("Enabled", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-				if (HMGodMode != null)
-				{
-					Console.Out.WriteLine("OrchidGuardian: HERO's Mod detected");
-					Mod.Logger.Debug("OrchidGuardian: HERO's Mod detected");
-				}
-
-			}
-			if (ModLoader.TryGetMod("DragonLens", out Mod dragonLens))
-			{
-				DragonLens = dragonLens;
-				// var godModeService = DragonLens.Code.GetType("DragonLens.Content.Tools.Gameplay.Godmode");
-				// if (godModeService != null) DLGodMode ??= godModeService.GetField("godMode", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-				DLGodMode = DragonLens.Code.GetType("DragonLens.Content.Tools.Gameplay.Godmode")?.GetField("godMode", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-				if (DLGodMode != null)
-				{
-					Console.Out.WriteLine("OrchidGuardian: DragonLens detected");
-					Mod.Logger.Debug("OrchidGuardian: DragonLens detected");
-				}
-			}
 			
 			if (ThoriumArmorKey != null && ThoriumAccessoryKey != null) 
 				Mod.Logger.Debug("Both Thorium hotkeys loaded!");
@@ -365,13 +346,6 @@ namespace OrchidMod.Content.Guardian
 
 		public override void Unload()
 		{
-			CheatSheet = null;
-			HerosMod = null;
-			DragonLens = null;
-			CSGodMode = null;
-			HMGodMode = null;
-			DLGodMode = null;
-
 			modPlayer = null;
 
 			ThoriumPlayer = null;
@@ -466,10 +440,10 @@ namespace OrchidMod.Content.Guardian
 				if (GuardianCrystalNinja && Player.dashDelay < 0) DoParryItemParry(null);
 
 				// Condition for when the player is in God Mode (intangible otherwise)
-				if (Player.creativeGodMode || CrossModGodMode) {
+				if (GodModeEnabled) {
 				
 					Entity entity = (Entity)Main.projectile?.FirstOrDefault(proj => proj.active && proj.hostile && proj.damage > 0 && Collision.CheckAABBvAABBCollision(Player.Center, Player.Hitbox.Size(), proj.Center, proj.Hitbox.Size()), null)
-					?? (Entity)Main.npc?.FirstOrDefault(npc => npc.active && (!npc.friendly && npc.damage > 0) && Collision.CheckAABBvAABBCollision(Player.Center, Player.Hitbox.Size(), npc.Center, npc.Hitbox.Size()));
+					?? Main.npc?.FirstOrDefault(npc => npc.active && !npc.friendly && npc.damage > 0 && Collision.CheckAABBvAABBCollision(Player.Center, Player.Hitbox.Size(), npc.Center, npc.Hitbox.Size()));
 
 					if (entity != null) DoParryItemParry(entity);
 				}
@@ -483,7 +457,7 @@ namespace OrchidMod.Content.Guardian
 					if ((npc.type == aggroDummy || npc.type == bossDummy) && Collision.CheckAABBvAABBCollision(Player.Center, Player.Hitbox.Size(), npc.Center, npc.Hitbox.Size())) 
 					{
 						dummy = npc;
-						if (Player.creativeGodMode || CrossModGodMode) return true;
+						if (GodModeEnabled) return true;
 						return !Main.npc.Any(n => n.active && (!n.friendly || n.boss) && !(npc.type == aggroDummy || npc.type == bossDummy) && n.Center.DistanceSQ(Player.Center) <= 1638400f);
 					}
 					return false;
@@ -536,12 +510,6 @@ namespace OrchidMod.Content.Guardian
 
 		public override void ResetEffects()
 		{
-		
-			bool csGodMode = CheatSheet != null && CSGodMode != null && CSGodMode?.GetValue(Player) is true;
-			bool hmGodMode = HerosMod != null && HMGodMode != null && HMGodMode?.GetValue(Player) is true;
-			bool dlGodMode = DragonLens != null && DLGodMode != null && DLGodMode?.GetValue(Player) is true;
-			CrossModGodMode = csGodMode || hmGodMode || dlGodMode;
-
 			// Resetting Core guardian fields
 			if (Player.itemTime > 0 && Player.HeldItem.damage > 0 && Player.HeldItem.ModItem is not OrchidModGuardianItem && Player.HeldItem.pick + Player.HeldItem.hammer + Player.HeldItem.axe == 0)
 				GuardianRegenThreshold = 0;
@@ -738,8 +706,7 @@ namespace OrchidMod.Content.Guardian
 			GuardianHoneyPotion = false;
 			GuardianWormTooth = false;
 			GuardianMonsterFang = false;
-			// GuardianInfiniteResources = false;
-			GuardianInfiniteResources = (Player.creativeGodMode || CrossModGodMode);
+			GuardianInfiniteResources = false; //  
 			if (OldGuardianDebugVisuals != GuardianDebugVisuals)
 			{
 				if (Main.myPlayer == Player.whoAmI)

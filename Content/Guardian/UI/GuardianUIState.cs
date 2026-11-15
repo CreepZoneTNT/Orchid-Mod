@@ -116,6 +116,16 @@ namespace OrchidMod.Content.Guardian.UI
 			Top.Set(Main.screenHeight / 2, 0f);
 		}
 
+		public override void Unload()
+		{
+			TextureCustomOnCache.Clear();
+			TextureCustomOffCache.Clear();
+			TextureCustomReadyCache.Clear();
+			TextureCustomOnCache = null;
+			TextureCustomOffCache = null;
+			TextureCustomReadyCache = null;
+		}
+
 		public static void ReloadTextures()
 		{
 			string path = "OrchidMod/Content/Guardian/UI/Textures/";
@@ -280,16 +290,17 @@ namespace OrchidMod.Content.Guardian.UI
 			Recalculate();
 			Player player = Main.LocalPlayer;
 			OrchidGuardian modPlayer = player.Guardian();
+			OrchidClientConfig config = OrchidMod.OrchidClientConfig;
 
 			if (!player.dead && modPlayer.GuardianDisplayUI > 0)
 			{
 				spriteBatch.End(out SpriteBatchSnapshot spriteBatchSnapshot);
 				spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
 
-				bool minHoldTimer = modPlayer.ChargeHoldTimer > ModContent.GetInstance<OrchidClientConfig>().GuardianMinHoldTimer;
-				bool maxHoldTimer = modPlayer.ChargeHoldTimer > ModContent.GetInstance<OrchidClientConfig>().GuardianMaxHoldTimer;
+				bool minHoldTimer = modPlayer.ChargeHoldTimer > config.GuardianMinHoldTimer;
+				bool maxHoldTimer = modPlayer.ChargeHoldTimer > config.GuardianMaxHoldTimer;
 
-				bool drawAtCursor = ModContent.GetInstance<OrchidClientConfig>().GuardianChargeCursor;
+				bool drawAtCursor = config.GuardianChargeCursor;
 				Vector2 position = (player.position + new Vector2(player.width * 0.5f, player.height + player.gfxOffY + 12)).Floor();
 				if (player.gravDir < 0) position.Y -= 81;
 				Vector2 drawpos = position;
@@ -316,10 +327,10 @@ namespace OrchidMod.Content.Guardian.UI
 					}
 					
 					Texture2D texture = check ? textureOn : textureOff;
-					
 					drawpos = new Vector2(position.X - offSet + (textureOn.Width + 2) * i, position.Y);
-					Color bgColor = Color.White;
+					Color bgColor = Main.MouseTextColorReal;
 					Color fgColor = bgColor;
+					
 					Vector2 voidShake = Main.rand.NextVector2Unit() * Utils.Remap(modPlayer.GuardianGuard + modPlayer.GuardianGuardRecharging, 0, modPlayer.GuardianGuardMax / 2f, 1.5f, 0f);
 					if (voidCheck)
 					{
@@ -329,8 +340,9 @@ namespace OrchidMod.Content.Guardian.UI
 					
 					spriteBatch.Draw(texture, drawpos, null, check ? fgColor : bgColor, 0f, Vector2.Zero, 1f, effect, 0f);
 					
-					Vector2 drawposHighlight = new Vector2(position.X - offSet - 2 + 18 * i, position.Y - 2);
+					Vector2 drawposHighlight = new(position.X - offSet - 2 + 18 * i, position.Y - 2);
 					if (voidCheck) drawposHighlight += voidShake;
+					
 					if (i < modPlayer.MissingGuardsUI)
 					{
 						float flash = 0.5f + (float)Math.Cos(modPlayer.MissingResourcesTimer * 0.28) * 0.5f;
@@ -367,16 +379,21 @@ namespace OrchidMod.Content.Guardian.UI
 				for (int i = 0; i < modPlayer.GuardianSlamMax; i++)
 				{
 					bool check = modPlayer.GuardianSlam > i;
+					
 					Texture2D texture = check ? textureSlamBarOn : textureSlamBarOff;
 					drawpos = new Vector2(position.X - offSet + 18 * i, position.Y + 18 * player.gravDir);
-					Vector2 drawposHighlight = new Vector2(position.X - offSet - 2 + 18 * i, position.Y + 16 * player.gravDir + 2f * (player.gravDir - 1));
+					Color bgColor = Main.MouseTextColorReal;
+					Color fgColor = bgColor;
+					
+					Vector2 drawposHighlight = new(position.X - offSet - 2 + 18 * i, position.Y + 16 * player.gravDir + 2f * (player.gravDir - 1));
+					
 					if (i < modPlayer.MissingSlamsUI)
 					{
 						float flash = 0.5f + (float)Math.Cos(modPlayer.MissingResourcesTimer * 0.28) * 0.5f;
 						spriteBatch.Draw(textureSlamBarHighlight, drawposHighlight, null, (check ? new Color(255, 92, 92) * 0.8f : new Color(169, 60, 60)) * (1 - flash), 0f, Vector2.Zero, 1f, effect, 0f);
-						spriteBatch.Draw(texture, drawpos, null, check ? Color.White : new Color(1f, flash, flash), 0f, Vector2.Zero, 1f, effect, 0f);
+						spriteBatch.Draw(texture, drawpos, null, check ? fgColor : bgColor.Multiply(new Color(1f, flash, flash)), 0f, Vector2.Zero, 1f, effect, 0f);
 					}
-					else spriteBatch.Draw(texture, drawpos, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
+					else spriteBatch.Draw(texture, drawpos, null, check ? fgColor : bgColor, 0f, Vector2.Zero, 1f, effect, 0f);
 					if (modPlayer.SlamCostUI > i && modPlayer.MissingSlamsUI <= i)
 					{
 						spriteBatch.Draw(textureSlamBarHighlight, drawposHighlight, null, (check ? Color.White * 0.8f : Color.DarkGray) * 0.8f, 0f, Vector2.Zero, 1f, effect, 0f);
@@ -484,7 +501,7 @@ namespace OrchidMod.Content.Guardian.UI
 					
 					if ((maxHoldTimer || (minHoldTimer && modPlayer.GuardianItemCharge > (70 * player.GetTotalAttackSpeed(DamageClass.Melee) - player.HeldItem.useTime) / 2.5f)) && guardianItem is OrchidModGuardianHammer)
 					{
-						if (ModContent.GetInstance<OrchidClientConfig>().GuardianUseOldHammerUi)
+						if (config.GuardianUseOldHammerUi)
 						{
 							Vector2 hammerPosition = new Vector2(position.X - textureHammerMain.Width / 2, position.Y - 100 * player.gravDir);
 							spriteBatch.Draw(textureHammerMain, hammerPosition, null, Color.White, 0f, Vector2.Zero, 1f, effect, 0f);
@@ -723,6 +740,9 @@ namespace OrchidMod.Content.Guardian.UI
 							{
 								case OrchidModGuardianHammer hammer:
 									hammer.WarhammerPostDrawUI(spriteBatch, player, ref color, mainAnchor);
+									break;
+								case OrchidModGuardianGreathammer hammer:
+									hammer.GreathammerPostDrawUI(spriteBatch, player, ref color, mainAnchor);
 									break;
 								case OrchidModGuardianShield pavise:
 									pavise.PavisePostDrawUI(spriteBatch, player, ref color, mainAnchor);

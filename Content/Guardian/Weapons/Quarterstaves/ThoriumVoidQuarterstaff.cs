@@ -564,18 +564,20 @@ namespace OrchidMod.Content.Guardian.Weapons.Quarterstaves
 				Vector2 point = finalPoint + velocity;
 
 
-				hitNPC = Main.npc.FirstOrDefault(npc =>
+				hitNPC = null;
+				foreach (NPC npc in Main.npc)
 				{
-					if (!OrchidModProjectile.IsValidTarget(npc)) return false;
-					float lenience = 1.5f;
-
+					if (!OrchidModProjectile.IsValidTarget(npc) || npc.Distance(player.Center) > maxSteps * stepLength) continue;
+					
+					float lenience = 1.333f;
 					bool isBoss = npc.boss || (npc.realLife != -1 && Main.npc[npc.realLife].boss);
-					if (isBoss) lenience *= 2;
-					// Disincentivise 
-					float protectionRatio = Math.Max(npc.defense - player.GetWeaponArmorPenetration(player.HeldItem), 0) / (float)player.GetWeaponDamage(player.HeldItem);
+					if (isBoss) lenience *= 1.5f;
+					// Disincentivise targeting enemies with extremely high defense
+					float protectionRatio = Utils.Clamp((npc.defense - player.GetWeaponArmorPenetration(player.HeldItem)) / (float)player.GetWeaponDamage(player.HeldItem), 0, 20);
 					if (protectionRatio > 1) lenience *= (isBoss ? 0.125f : 0.5f) * (1 / protectionRatio);
-					return npc.CircularizeHitbox(lenience).HasPointInCircle(point);
-				});
+					if (npc.CircularizeHitbox(lenience).HasPointInCircle(point)) hitNPC = npc;
+				}
+
 				if (hitNPC != null)
 				{
 					width = hitNPC.GetLargestDimension() * 0.5f;

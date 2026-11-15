@@ -136,6 +136,7 @@ namespace OrchidMod.Content.Guardian
 		public bool GuardianBronzeShieldProtection = false;
 		public float GuardianChain = 0f; // Increases the swing range on Warhammers (additive, 16f = 1 tile)
 		public string GuardianChainTexture = null; // Used to draw the warhammer chain
+		public int GuardianQuarterstaffPommelBuff = 0;
 		public int GuardianStaffRocket = 0; // If > 0, the player can dash by spending slams with a quarterstaff (1,2,3,4 = red,green,blue,yellow)
 		/// <summary> Throw warhammers will bend in the direction of the cursor when thrown if this is >0f. For reference, the basic Hammer magnet sets this value to 50f. Defaults to 0f.</summary>
 		public float GuardianHammerMagnet = 0f;
@@ -718,6 +719,7 @@ namespace OrchidMod.Content.Guardian
 			GuardianHammerThrowVelocity = 1f;
 			GuardianThoriumCenser = false;
 			GuardianArmMotor = false;
+			if (GuardianQuarterstaffPommelBuff != 0 && !Player.HasBuff<GuardianQuarterstaffPommelBuff>()) GuardianQuarterstaffPommelBuff = 0;
 			GuardianQuarterstaffPommel = false;
 			if (!GuardianBronzeShieldBuff) GuardianBronzeShieldDamage = 0;
 
@@ -949,9 +951,14 @@ namespace OrchidMod.Content.Guardian
 
 		public override void ModifyHurt(ref Player.HurtModifiers modifiers)
 		{
-			if (GuardianParry || Player.HasBuff<GuardianQuarterstaffPommelBuff>())
+			bool inParryState = Player.HasBuff<GuardianQuarterstaffPommelBuff>() && GuardianQuarterstaffPommelBuff > -1;
+			if (GuardianParry || (inParryState && UseGuard(checkOnly: true)))
 			{
-				if (!GuardianParry) UseGuard(1);
+				if (inParryState && !GuardianParry)
+				{
+					UseGuard();
+					GuardianQuarterstaffPommelBuff = -1;
+				}
 
 				modifiers.DamageSource.TryGetCausingEntity(out Entity entity);
 				DoParryItemParry(entity);

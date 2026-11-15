@@ -73,6 +73,7 @@ namespace OrchidMod.Common.Global.Items
 			if (OrchidMod.ThoriumMod is {} thoriumMod && item.type == thoriumMod.Find<ModItem>("MagicThorHammer").Type)
 			{
 				item.ChangeItemType(ModContent.ItemType<ThoriumThorsHammerWarhammer>());
+				SoundEngine.PlaySound(SoundID.Grab);
 				return;
 			}
 			orig(item, player);

@@ -28,6 +28,8 @@ namespace OrchidMod.Content.Guardian
 		public virtual Color GetGlowColor() => Color.White; // Used to draw the glow color when reinforced
 		public int GetAmount(OrchidGuardian guardian) => RuneNumber + guardian.GuardianBonusRune * RuneAmountScaling;
 
+		public override int AnchorType => ModContent.ProjectileType<GuardianRuneAnchor>();
+
 		public virtual void Activate(Player player, OrchidGuardian guardian, int type, int damage, float knockback, int critChance, int duration, float distance, int amount)
 		{
 			NewRuneProjectiles(player, guardian, duration, type, damage, knockback, critChance, distance, amount);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using OrchidMod.Assets;
 using Terraria;
@@ -9,9 +10,13 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 {
 	public class TrashPavise : OrchidModGuardianShield
 	{
+		
+		private SoundStyle BonkSound = new ("OrchidMod/Assets/Sounds/PVZShieldHit_", 2) { PitchRange = (-0.1f, 0.1f), MaxInstances = 10 };
+		
 		public bool FirstBlock = false;
 		public Vector2 ShakeAmount = Vector2.Zero;
 		private Vector2 OldShakeAmount = Vector2.Zero;
+		private List<int> BlockedEnemies;
 		
 		public override void SafeSetDefaults()
 		{
@@ -28,11 +33,12 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			slamDistance = 55f;
 			blockDuration = 60;
 			blockRotation = 5f;
+			BlockedEnemies = [];
 		}
 
 		public override void ExtraAIShield(Player player, OrchidGuardian guardian, Projectile shield)
 		{
-			if (shield.ModProjectile is GuardianShieldAnchor anchor)
+			if (shield.ModProjectile is GuardianShieldAnchor)
 			{
 				if (shield.ai[0] > 0)
 				{
@@ -50,8 +56,26 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 				{
 					if (ShakeAmount.Length() > 0f)
 						ShakeAmount = OldShakeAmount = Vector2.Zero;
+					if (BlockedEnemies.Count > 0)
+					{
+						Gore.NewGoreDirect(shield.GetSource_FromAI(), shield.Center, Main.rand.NextVector2Circular(0.5f, 0.5f), GoreID.FartCloud1);
+						Gore.NewGoreDirect(shield.GetSource_FromAI(), shield.Center, Main.rand.NextVector2Circular(0.5f, 0.5f), GoreID.FartCloud2);
+						Gore.NewGoreDirect(shield.GetSource_FromAI(), shield.Center, Main.rand.NextVector2Circular(0.5f, 0.5f), GoreID.FartCloud3);
+						// SoundEngine.PlaySound(SoundID.Item16);
+						BlockedEnemies.Clear();
+					}
 				}
 				
+			}
+		}
+
+		public override void Push(Player player, OrchidGuardian guardian, Projectile shield, NPC npc)
+		{
+			if (!BlockedEnemies.Contains(npc.whoAmI))
+			{
+				if (BlockedEnemies.Count == 0) FirstBlock = true;
+				// SoundEngine.PlaySound(BonkSound with { Volume = FirstBlock ? 1f : 0.5f }, shield.Center);
+				BlockedEnemies.Add(npc.whoAmI);
 			}
 		}
 
@@ -60,7 +84,7 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			FirstBlock = true;
 			ShakeAmount -= Vector2.Normalize(projectile.velocity) * 2f;
 			Dust.NewDustDirect(shield.Center + 0.5f * (projectile.Center - shield.Center), 2, 2, DustID.Lead, -projectile.velocity.X * 0.5f, -projectile.velocity.Y * 0.5f);
-			SoundEngine.PlaySound(new SoundStyle(OrchidAssets.SoundsPath + "Doink") { PitchVariance = 0.4f, Volume = FirstBlock ? 1f : 0.5f, MaxInstances = 5 }, shield.Center);
+			// SoundEngine.PlaySound(BonkSound with { Volume = FirstBlock ? 1f : 0.5f }, shield.Center);
 			return true;
 		}
 
@@ -70,9 +94,6 @@ namespace OrchidMod.Content.Guardian.Weapons.Shields
 			return true;
 		}
 
-		public override void SlamHit(Player player, OrchidGuardian guardian, Projectile shield, NPC npc, bool WeakSlam)
-		{
-			npc.AddBuff(BuffID.Stinky, WeakSlam ? 100 : 300);
-		}
+		// public override void SlamHit(Player player, OrchidGuardian guardian, Projectile shield, NPC npc, bool WeakSlam) => npc.AddBuff(BuffID.Stinky, WeakSlam ? 100 : 300);
 	}
 }

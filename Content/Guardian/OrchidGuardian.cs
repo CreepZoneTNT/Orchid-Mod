@@ -443,7 +443,7 @@ namespace OrchidMod.Content.Guardian
 				if (GodModeEnabled) {
 				
 					Entity entity = (Entity)Main.projectile?.FirstOrDefault(proj => proj.active && proj.hostile && proj.damage > 0 && Collision.CheckAABBvAABBCollision(Player.Center, Player.Hitbox.Size(), proj.Center, proj.Hitbox.Size()), null)
-					?? Main.npc?.FirstOrDefault(npc => npc.active && !npc.friendly && npc.damage > 0 && Collision.CheckAABBvAABBCollision(Player.Center, Player.Hitbox.Size(), npc.Center, npc.Hitbox.Size()));
+					?? Main.npc?.FirstOrDefault(npc => npc.active && !npc.friendly && npc.damage > 0 && Collision.CheckAABBvAABBCollision(Player.position, Player.Hitbox.Size(), npc.position, npc.Hitbox.Size()));
 
 					if (entity != null) DoParryItemParry(entity);
 				}
